@@ -27,16 +27,12 @@
             </div>
             <bk-divider></bk-divider>
             <div style="padding: 30px;">
-                <bk-form :label-width="100" :model="formData">
-                    <bk-form-item label="测试1" :required="true" :property="'name'">
-                        <bk-input v-model="formData.name1" style="width: 350px;"></bk-input>
-                    </bk-form-item>
-                    <bk-form-item label="测试2" :required="true" :property="'name'">
-                        <bk-input v-model="formData.name2" style="width: 350px;"></bk-input>
-                    </bk-form-item>
-                    <bk-form-item label="测试3" :required="true" :property="'name'">
-                        <bk-input v-model="formData.name3" style="width: 350px;"></bk-input>
-                    </bk-form-item>
+                <bk-form :label-width="100">
+                    <div v-for="(each, index) in formData.var_table" :key="index" style="margin-bottom: 20px;">
+                        <bk-form-item :label="each.name" :required="true" :property="'name'">
+                            <bk-input v-model="each.value" style="width: 350px;" clearable></bk-input>
+                        </bk-form-item>
+                    </div>
                 </bk-form>
             </div>
         </div>
@@ -48,16 +44,16 @@
             <div style="padding: 30px;">
                 <bk-form :label-width="100" :model="formData">
                     <bk-form-item label="执行时间">
-                        <bk-radio-group v-model="formItem.runtimeType">
+                        <bk-radio-group v-model="formData.run_type">
                             <div style="margin-top: 8px;">
-                                <bk-radio :value="'now'">立即</bk-radio>
+                                <bk-radio :value="'hand'">单次</bk-radio>
                             </div>
                             <div style="margin-top: 16px;">
                                 <bk-radio :value="'time'">定时</bk-radio>
                                 <div style="display: inline-block;">
                                     <bk-date-picker
-                                        :disabled="formItem.runtimeType !== 'time'"
-                                        v-model="formItem.beginTime"
+                                        :disabled="formData.run_type !== 'time'"
+                                        v-model="formData.when_start"
                                         style="width: 240px;margin-left: 20px;"
                                         :type="'datetime'"
                                         :options="disableTime"
@@ -67,12 +63,14 @@
                                     </bk-date-picker>
                                 </div>
                             </div>
-                            <div style="color: #EA3636;font-size: 12px;margin: 8px 0 0 68px" v-show="displayImmediate">请填写定时时间</div>
+                            <div style="color: #EA3636;font-size: 12px;margin: 8px 0 0 68px" v-show="displayImmediate">
+                                请填写定时时间
+                            </div>
                             <div style="margin-top: 16px;height: 32px">
                                 <bk-radio :value="'cycle'">周期</bk-radio>
                                 <bk-date-picker
-                                    :disabled="formItem.runtimeType !== 'cycle'"
-                                    v-model="formItem.cyclebeginTime"
+                                    :disabled="formData.run_type !== 'cycle'"
+                                    v-model="formData.when_start"
                                     style="width: 240px;margin-left: 20px;"
                                     :type="'datetime'"
                                     :options="disableTime"
@@ -81,36 +79,44 @@
                                     placeholder="选择开始的日期时间">
                                 </bk-date-picker>
                                 <div style="margin-top: -32px;margin-left: 310px;">
-                                    <bk-button style="float: left;border: none;background: transparent;width: 54px;padding: 0 8px;">每隔：</bk-button>
+                                    <bk-button
+                                        style="float: left;border: none;background: transparent;width: 54px;padding: 0 8px;">
+                                        每隔：
+                                    </bk-button>
                                     <bk-input
                                         style="width:80px;float: left;"
                                         type="number"
-                                        v-model="formItem.cycleDat"
+                                        v-model="formData.cycle_time"
                                         :min="1"
                                         :precision="0"
                                         ext-cls="interval-wrap"
-                                        :disabled="formItem.runtimeType !== 'cycle'">
+                                        :disabled="formData.run_type !== 'cycle'">
                                     </bk-input>
                                     <bk-select
-                                        v-model="formItem.cycleType"
+                                        v-model="formData.cycle_type"
                                         :clearable="false"
                                         style="width:80px;float: left;margin-left: 10px;background-color: #fff;"
-                                        :disabled="formItem.runtimeType !== 'cycle'">
+                                        :disabled="formData.run_type !== 'cycle'">
                                         <bk-option name="分钟" key="min" id="min"></bk-option>
                                         <bk-option name="小时" key="hour" id="hour"></bk-option>
                                         <bk-option name="天" key="day" id="day"></bk-option>
                                     </bk-select>
                                     <span style="margin-left: 10px;">执行一次</span>
                                 </div>
-                                <div style="color: #EA3636;font-size: 12px;margin: 28px 0 0 68px;position: absolute;line-height: 32px;" v-show="displayCycle">请填写周期时间及间隔</div>
+                                <div
+                                    style="color: #EA3636;font-size: 12px;margin: 28px 0 0 68px;position: absolute;line-height: 32px;"
+                                    v-show="displayCycle">请填写周期时间及间隔
+                                </div>
                             </div>
                             <div style="margin-top: 16px;">
                                 <bk-radio :value="'cron'">自定义</bk-radio>
                                 <LoopRuleSelect
-                                    v-if="formItem.runtimeType === 'cron'"
+                                    v-if="formData.run_type === 'cron'"
                                     ref="loopRuleSelect"
                                     style="margin-left: 70px;margin-top: -20px;"
-                                    :manual-input-value="periodicCron">
+                                    :manual-input-value="periodicCron"
+                                    @change="changeCrontab"
+                                >
                                 </LoopRuleSelect>
                             </div>
                         </bk-radio-group>
@@ -121,10 +127,12 @@
         <div class="step-2" v-if="controllableSteps.curStep === 4">
         </div>
         <div class="step-footer">
-            <bk-button :theme="'default'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;" @click="lastStep">
+            <bk-button :theme="'default'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;"
+                @click="lastStep">
                 上一步
             </bk-button>
-            <bk-button :theme="'primary'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;" @click="nextStep">
+            <bk-button :theme="'primary'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;"
+                @click="nextStep">
                 下一步
             </bk-button>
         </div>
@@ -146,19 +154,24 @@
                 controllableSteps: {
                     controllable: false,
                     steps: [
-                        { title: '节点选择', icon: 1 },
-                        { title: '参数填写', icon: 2 },
-                        { title: '执行方式', icon: 3 },
-                        { title: '任务执行', icon: 4 }
+                        {title: '节点选择', icon: 1},
+                        {title: '参数填写', icon: 2},
+                        {title: '执行方式', icon: 3},
+                        {title: '创建任务', icon: 4}
                     ],
                     curStep: 1
                 },
                 formData: {
                     name: '',
-                    name1: '',
-                    name2: '',
-                    name3: ''
+                    run_type: 'hand',
+                    var_table: [],
+                    when_start: '',
+                    cycle_time: '1',
+                    cycle_type: 'hour',
+                    cron_time: '',
+                    process_id: this.$route.query.job_flow_data
                 },
+                varTableList: [],
                 formItem: {
                     taskName: '', // 任务名称
                     notifier: [], // 当前通知人
@@ -185,9 +198,17 @@
                 periodicCron: '*/5 * * * *'
             }
         },
+        created() {
+            this.$api.process.var_table({'process_id': this.$route.query.job_flow_data}).then(res => {
+                this.formData.var_table = res.data
+            })
+        },
         methods: {
             stepChanged(index) {
                 this.controllableSteps.curStep = index
+            },
+            changeCrontab(val) {
+                this.formData.cron_time = val
             },
             changeTime(val) {
                 if (this.formItem.runtimeType === 'now' || this.formItem.runtimeType === 'cron') return
@@ -214,14 +235,12 @@
                         confirmLoading: false,
                         confirmFn: async() => {
                             this.tableLoading = true
-                            this.$api.process.execute({
-                                process_id: this.$route.query.job_flow_data
-                            }).then(res => {
+                            console.log(this.formData)
+                            this.$api.task.create(this.formData).then(res => {
                                 if (res.result) {
                                     this.$cwMessage('执行成功!', 'success')
-                                    this.$store.commit('changeTabActive', 'jobflowview')
                                     this.$router.push({
-                                        path: '/jobflowview'
+                                        path: '/taskList'
                                     })
                                 } else {
                                     this.$cwMessage(res.message, 'error')
@@ -241,15 +260,18 @@
     margin: 20px 30px 30px 20px;
     width: 90%;
 }
+
 .step-1 {
     margin: 20px 30px 30px 20px;
     height: 80%;
 }
+
 .step-2 {
     margin: 20px 30px 30px 20px;
     height: 80%;
     background: #ffffff;
 }
+
 .step-footer {
     background: #ffffff;
     margin-bottom: -50px;

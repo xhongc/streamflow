@@ -16,6 +16,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
     description = serializers.CharField(required=False, allow_blank=True)
     category = serializers.ListField(default="null")
+    var_table = serializers.ListField(default="null")
     run_type = serializers.CharField(default="null")
     pipeline_tree = serializers.JSONField(required=True)
 
@@ -36,6 +37,8 @@ class ProcessViewSetsSerializer(serializers.Serializer):
             process = Process.objects.create(name=validated_data["name"],
                                              description=validated_data["description"],
                                              run_type=validated_data["run_type"],
+                                             category=validated_data.get("category", []),
+                                             var_table=validated_data.get("var_table", []),
                                              dag=dag)
             bulk_nodes = []
             for node in node_map.values():
@@ -78,6 +81,8 @@ class ProcessViewSetsSerializer(serializers.Serializer):
             instance.description = validated_data["description"]
             instance.run_type = validated_data["run_type"]
             instance.dag = dag
+            instance.var_table = validated_data.get("var_table", [])
+            instance.category = validated_data.get("category", [])
             instance.save()
             bulk_update_nodes = []
             bulk_create_nodes = []
@@ -180,6 +185,8 @@ class ListSubProcessRunViewSetsSerializer(serializers.ModelSerializer):
 
 class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
     pipeline_tree = serializers.SerializerMethodField()
+    category = serializers.ListField()
+    var_table = serializers.ListField()
 
     # category = serializers.SerializerMethodField()
     #
@@ -226,7 +233,7 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Process
-        fields = ("id", "name", "description", "category", "run_type", "pipeline_tree")
+        fields = ("id", "name", "description", "category", "run_type", "pipeline_tree","var_table")
 
 
 class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):

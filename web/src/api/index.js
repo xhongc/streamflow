@@ -22,7 +22,7 @@ import processReport from './apiUrl/report/process_report'
 import nodeHistory from './apiUrl/history/node_history'
 import processHistory from './apiUrl/history/process_history'
 
-import Task from './apiUrl/task/task'
+import task from './apiUrl/task/task'
 
 export default {
     alarmCenter,
@@ -44,5 +44,5 @@ export default {
     processHistory,
     processReport,
     showTable,
-    Task
+    task
 }

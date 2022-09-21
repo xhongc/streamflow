@@ -23,6 +23,9 @@ export default {
     execute: function(params) {
         return POST(reUrl + '/process/flow/execute/', params)
     },
+    var_table: function(params) {
+        return GET(reUrl + '/process/flow/var/', params)
+    },
     get_process_node: function(params) {
         return GET(reUrl + '/process/get_process_node/', params)
     },

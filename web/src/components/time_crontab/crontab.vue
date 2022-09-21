@@ -247,7 +247,9 @@
         },
         computed: {
             expressionShowText() {
-                return this.expressionList.join('^').replace(/\^/g, ' ')
+                const m = this.expressionList.join("^").replace(/\^/g, " ");
+                this.$emit("change", m);
+                return m;
             }
         },
         watch: {

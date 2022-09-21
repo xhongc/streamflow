@@ -11,7 +11,8 @@
                 </bk-input>
                 <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
                     @click="handleOpenSeniorSearch"
-                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索</bk-button>
+                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
+                </bk-button>
             </div>
             <div class="senior-search-box" v-if="isDropdownShow">
                 <bk-container :margin="0">
@@ -70,25 +71,28 @@
         <div class="content">
             <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
                 @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
-                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size" :max-height="maxTableHeight">
+                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
+                :max-height="maxTableHeight">
                 <bk-table-column type="selection" width="60"></bk-table-column>
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
                         <span
-                            v-if="item.id !== 'name'">{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
+                            v-if="item.id !== 'name'">{{
+                                (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
+                            }}</span>
                         <span v-else style="color: #3a84ff;cursor: pointer;"
-                            @click="handleOpenDetail(props.row)">{{props.row[item.id]}}</span>
+                            @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)"
-                                v-if="auth.modify">修改</bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleClone(props.row)" v-if="auth.modify">克隆
+                            <bk-button class="mr10" theme="primary" text @click="handleExecute(props.row)">执行
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)" v-if="auth.del">删除
+                            <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)">修改
+                            </bk-button>
+                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)">删除
                             </bk-button>
                         </div>
                     </template>
@@ -101,7 +105,8 @@
             </bk-table>
         </div>
         <div>
-            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500" ext-cls="custom-sidelider">
+            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500"
+                ext-cls="custom-sidelider">
                 <div slot="content" style="height: 100%;">
                     <job-dialog :job-from="jobFrom" :key="dialogKey">
                     </job-dialog>
@@ -113,9 +118,7 @@
 
 <script>
     export default {
-        components: {
-
-        },
+        components: {},
         data() {
             const fields = [{
                 id: 'name',
@@ -123,19 +126,28 @@
                 overflowTooltip: true,
                 sortable: false
             }, {
-                id: 'template_type',
-                label: '模板类型',
+                id: 'process_name',
+                label: '作业流名称',
                 overflowTooltip: true,
                 sortable: false
             }, {
-                id: 'description',
+                id: 'run_type',
                 label: '作业描述',
                 overflowTooltip: true,
                 sortable: false
-            }]
+            }, {
+                id: 'when_start',
+                label: '执行时间',
+                overflowTooltip: true,
+                sortable: false
+            }
+            ]
             return {
                 maxTableHeight: '',
-                auth: {},
+                auth: {
+                    modify: true,
+                    del: true
+                },
                 dialogKey: 0,
                 jobFrom: {},
                 setting: {
@@ -260,6 +272,15 @@
                 })
                 window.open(window.siteUrl + '/export/content/?id=' + ids.join(','))
             },
+            handleExecute(row) {
+                this.$api.task.execute({'task_id': row.id}).then(res => {
+                    console.log(res)
+                    this.$cwMessage('执行成功!', 'success')
+                    this.$router.push({
+                        path: '/jobflowview'
+                    })
+                })
+            },
             // 处理跳转修改
             handleOpenUpdate(row) {
                 this.$router.push({
@@ -349,7 +370,7 @@
             },
             handleLoad() {
                 this.tableLoading = true
-                this.$api.Task.list({
+                this.$api.task.list({
                     ...this.searchFrom,
                     page: this.pagination.current,
                     page_size: this.pagination.limit
@@ -462,6 +483,7 @@
             }
         }
     }
+
     .custom-sidelider {
         /deep/ .bk-sideslider-wrapper {
             overflow-y: hidden;

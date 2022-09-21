@@ -1,10 +1,12 @@
 from applications.flow.models import ProcessRun, NodeRun, Process, Node, SubProcessRun, SubNodeRun
+from applications.task.models import Task
 from applications.utils.dag_helper import PipelineBuilder, instance_dag
 
 
-def build_and_create_process(process_id):
+def build_and_create_process(task_id):
     """构建pipeline和创建运行时数据"""
-    p_builder = PipelineBuilder(process_id)
+    task = Task.objects.filter(id=task_id).first()
+    p_builder = PipelineBuilder(task_id)
     pipeline = p_builder.build()
 
     process = p_builder.process
@@ -15,6 +17,8 @@ def build_and_create_process(process_id):
     process_run_data = process.clone_data
     process_run_data["dag"] = instance_dag(process_run_data["dag"], process_run_uuid)
     process_run = ProcessRun.objects.create(process_id=process.id, root_id=pipeline["id"], **process_run_data)
+    task.process_run_id = process_run.id
+    task.save()
     node_run_bulk = []
     for pipeline_id, node in node_map.items():
         _node = {k: v for k, v in node.__dict__.items() if k in NodeRun.field_names()}

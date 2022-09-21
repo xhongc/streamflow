@@ -2,6 +2,7 @@ from collections import OrderedDict, defaultdict
 from copy import copy, deepcopy
 
 from applications.flow.models import Process, Node
+from applications.task.models import Task
 from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
     ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess
 
@@ -204,10 +205,11 @@ def instance_dag(dag_dict, process_run_uuid):
 
 
 class PipelineBuilder:
-    def __init__(self, process_id):
-        self.process_id = process_id
-        self.process = Process.objects.filter(id=process_id).first()
-        self.node_map = Node.objects.filter(process_id=process_id).in_bulk(field_name="uuid")
+    def __init__(self, task_id):
+        self.task = Task.objects.filter(id=task_id).first()
+        self.process_id = self.task.process_id
+        self.process = Process.objects.filter(id=self.process_id).first()
+        self.node_map = Node.objects.filter(process_id=self.process_id).in_bulk(field_name="uuid")
         self.dag_obj = self.setup_dag()
         self.instance = self.setup_instance()
 
@@ -248,8 +250,9 @@ class PipelineBuilder:
                 # 子流程的pid一并加入pipeline_instance
                 pipeline_instance.update(p_builder.instance)
             else:
+                # todo 动态扩展节点
                 act = ServiceActivity(component_code="http_request")
-                act.component.inputs.inputs = Var(type=Var.PLAIN, value=node.inputs)
+                act.component.inputs.inputs = Var(type=Var.SPLICE, value=node.inputs)
                 pipeline_instance[p_id] = act
         return pipeline_instance
 
@@ -270,6 +273,12 @@ class PipelineBuilder:
             for _out in out_list:
                 self.get_inst(_in).extend(self.get_inst(_out))
         pipeline_data = Data()
+        # 加载变量
+        var_table = self.task.var_table
+        for var in var_table:
+            key = "${%s}" % var["name"]
+            pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
+
         if is_subprocess:
             pipeline = SubProcess(self.get_inst(start), data=pipeline_data)
         else:

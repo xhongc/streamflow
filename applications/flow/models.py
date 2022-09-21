@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models
-from django_mysql.models import JSONField
+from django_mysql.models import JSONField, ListTextField
 
 from applications.flow.constants import FAIL_OFFSET_UNIT_CHOICE, NodeTemplateType
 
@@ -13,12 +13,14 @@ class Category(models.Model):
 class Process(models.Model):
     name = models.CharField("作业名称", max_length=255, blank=False, null=False)
     description = models.CharField("作业描述", max_length=255, blank=True, null=True)
-    category = models.ManyToManyField(Category)
+    # category = models.ManyToManyField(Category)
     run_type = models.CharField("调度类型", max_length=32)
     total_run_count = models.PositiveIntegerField("执行次数", default=0)
     gateways = JSONField("网关信息", default=dict)
     constants = JSONField("内部变量信息", default=dict)
     dag = JSONField("DAG", default=dict)
+    var_table = ListTextField(base_field=models.CharField(max_length=255), default=list)
+    category = ListTextField(base_field=models.CharField(max_length=255), default=list)
 
     create_by = models.CharField("创建者", max_length=64, null=True)
     create_time = models.DateTimeField("创建时间", default=datetime.now)

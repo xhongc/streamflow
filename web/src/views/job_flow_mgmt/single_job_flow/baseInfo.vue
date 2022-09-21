@@ -8,73 +8,30 @@
                 <bk-input placeholder="请输入作业流描述" v-model="form.jobFlowDescribe" :disabled="disabled"></bk-input>
             </bk-form-item>
             <bk-form-item label="分类">
-                <bk-tag-input
-                    v-model="form.category"
-                    placeholder="placeholder"
-                    :trigger="'focus'"
-                    :allow-next-focus="false"
-                    :list="categoryList"
-                    :allow-create="true"
-                    :allow-auto-match="true"
-                    :has-delete-icon="true"
-                    :disabled="disabled">
-                </bk-tag-input>
+                <bk-select
+                    searchable
+                    multiple
+                    display-tag
+                    v-model="form.category">
+                    <bk-option v-for="option in categoryList"
+                        :key="option.id"
+                        :id="option.id"
+                        :name="option.name">
+                    </bk-option>
+                </bk-select>
             </bk-form-item>
-            <bk-form-item label="调度方式" :error-display-type="'normal'" :required="true" :property="'type'">
-                <bk-radio-group v-model="form.run_type" @change="handleControlChange">
-                    <bk-radio :value="item.value" v-for="(item, index) in controlList" :key="index"
-                        style="margin-right: 24px;" :disabled="disabled">
-                        {{item.label}}
-                    </bk-radio>
-                </bk-radio-group>
-            </bk-form-item>
-            <bk-form-item label="开始" v-if="form.run_type && form.run_type !== 'null'" :required="true">
-                <!-- 调度方式为日历 -->
-                <div v-if="form.run_type === 'calendar'">
-                    <bk-compose-form-item head-background-color="#fff">
-                        <bk-select :clearable="false" style="width: 108px;margin-right: 5px;"
-                            v-model="form.calendarValue" placeholder="请选择" :disabled="disabled">
-                            <bk-option v-for="(item, index) in calendarList" :key="index" :id="item.id"
-                                :name="item.name">
-                            </bk-option>
-                        </bk-select>
-                        <bk-time-picker v-model="form.calendarTime" :placeholder="'选择时间'" style="width: 267px;"
-                            format="HH:mm:ss" @change="handleCalendarTimeChange" :disabled="disabled"></bk-time-picker>
-                    </bk-compose-form-item>
-                </div>
-                <!-- 调度方式为定时 -->
-                <div v-else-if="form.run_type === 'time'">
-                    <bk-date-picker :value="form.fixedTime" :placeholder="'选择日期时间'" :type="'datetime'"
-                        style="width: 100%;" format="yyyy-MM-dd HH:mm:ss" @change="handleFixedTimeChange"
-                        :disabled="disabled"></bk-date-picker>
-                </div>
-                <!-- 调度方式为周期 -->
-                <div v-else-if="form.run_type === 'cycle'">
-                    <bk-date-picker :value="form.periodTime" :placeholder="'选择日期时间'" :type="'datetime'"
-                        style="width: 100%;" format="yyyy-MM-dd HH:mm:ss" @change="handlePeriodTimeChange"
-                        :disabled="disabled"></bk-date-picker>
-                </div>
-            </bk-form-item>
-            <!-- 调度方式为周期 -->
-            <bk-form-item label="每隔" v-if="form.run_type === 'cycle'" :required="true">
-                <bk-compose-form-item>
-                    <bk-input v-model="form.cycleDat" style="width: 80px;margin-right: 6px;" type="number"
-                        :disabled="disabled" :min="0"></bk-input>
-                    <bk-select style="background-color: #fff;width: 108px;" v-model="form.timeOption"
-                        placeholder="请选择" :disabled="disabled">
-                        <bk-option v-for="(item, index) in timeTypeList1" :key="index" :id="item.value"
-                            :name="item.label">
-                        </bk-option>
-                    </bk-select>
-                    <span style="margin-left: 11px;">执行</span>
-                </bk-compose-form-item>
-            </bk-form-item>
-            <bk-form-item label="跨日依赖" v-if="form.run_type === 'cycle' || form.run_type === 'calendar'" :style="{ marginTop: form.run_type === 'calendar' ? '10px' : '20px' }">
-                <div style="position: relative;">
-                    <bk-checkbox v-model="form.cross_day_dependence" :disabled="disabled">
-                    </bk-checkbox>
-                    <span class="iconfont icon-mianxingtubiao-wenti" style="margin-left: 12px;color: #979BA5;position: absolute;top: 2px;" v-bk-tooltips="crossDayTipConfig"></span>
-                </div>
+            <bk-form-item label="变量表">
+                <bk-select
+                    searchable
+                    multiple
+                    display-tag
+                    v-model="form.var_table">
+                    <bk-option v-for="option in varTableList"
+                        :key="option.id"
+                        :id="option.id"
+                        :name="option.name">
+                    </bk-option>
+                </bk-select>
             </bk-form-item>
             <bk-divider style="width: 536px;position: relative;right: 20px;border-color: #e8eaec;"></bk-divider>
             <!-- 这个地方是为了解决在一个bk-form-item的情况下组合两个表单项如何做校验，默认渲染所有的校验项，然后动态改变rules的规则即可 -->
@@ -160,20 +117,21 @@
                 }], // 调度方式单选列表
                 varList: [], // 变量表下拉列表
                 categoryList: [
-                    { id: 'shenzhen', name: '深圳' },
-                    { id: 'guangzhou', name: '广州' },
-                    { id: 'beijing', name: '北京' },
-                    { id: 'shanghai', name: '上海' },
-                    { id: 'hangzhou', name: '杭州' },
-                    { id: 'nanjing', name: '南京' },
-                    { id: 'chognqing', name: '重庆' },
-                    { id: 'taibei', name: '台北' },
-                    { id: 'haikou', name: '海口' }
+                    {id: 'shenzhen', name: '深圳'},
+                    {id: 'guangzhou', name: '广州'},
+                    {id: 'beijing', name: '北京'},
+                    {id: 'shanghai', name: '上海'},
+                    {id: 'hangzhou', name: '杭州'},
+                    {id: 'nanjing', name: '南京'},
+                    {id: 'chognqing', name: '重庆'},
+                    {id: 'taibei', name: '台北'},
+                    {id: 'haikou', name: '海口'}
                 ],
+                varTableList: [],
                 form: {
                     jobFlowName: '', // 作业流名称
                     jobFlowDescribe: '', // 作业流描述
-                    var_table: '', // 变量表
+                    var_table: [], // 变量表
                     category: [],
                     run_type: '', // 调度方式
                     calendarValue: '', // 调度方式为日历，日历值
@@ -231,6 +189,7 @@
                     this.form.run_type = this.father_this.jobFlowFrom.run_type // 调度方式初始化
                     this.handleChangeRules()
                     this.form.var_table = this.father_this.jobFlowFrom.var_table // 表量表值初始化
+                    this.form.category = this.father_this.jobFlowFrom.category // 表量表值初始化
                     this.midType = this.form.run_type
                     this.form.jobFlowName = this.father_this.jobFlowFrom.name // 作业流名称初始化
                     this.form.jobFlowDescribe = this.father_this.jobFlowFrom.description // 作业流描述初始化
@@ -244,24 +203,6 @@
                     }
                     if (this.father_this.jobFlowFrom.hasOwnProperty('pre_agent')) {
                         this.form.pre_agent = this.father_this.jobFlowFrom.pre_agent // 作业流前置agnet初始化
-                    }
-                    // 调度方式为定时
-                    if (this.form.run_type === 'time') {
-                        this.form.fixedTime = this.father_this.jobFlowFrom.trigger_data.eta // 调度方式为定时，开始时间初始化
-                    }
-                    // 调度方式为周期
-                    if (this.form.run_type === 'cycle') {
-                        this.form.periodTime = this.father_this.jobFlowFrom.trigger_data.eta // 调度方式为周期，开始时间初始化
-                        this.form.cycleDat = this.father_this.jobFlowFrom.trigger_data.cycle // 调度方式为周期，每隔XXX初始化
-                        this.form.timeOption = this.father_this.jobFlowFrom.trigger_data
-                            .unit // 调度方式为周期， 时间类型初始化
-                    }
-                    // 调度方式为日历
-                    if (this.form.run_type === 'calendar') {
-                        this.form.calendarValue = this.father_this.jobFlowFrom.trigger_data
-                            .calendar_id // 调度方式为日历，日历值初始化
-                        this.form.calendarTime = this.father_this.jobFlowFrom.trigger_data
-                            .eta // 调度方式为日历，开始时间初始化
                     }
                     this.baseInfoLoading = false
                 }, 2000)
@@ -320,6 +261,13 @@
             // 初始化变量表下拉
             initValList() {
                 this.varList = []
+                const params = {
+                    page: 1,
+                    page_size: 9999
+                }
+                this.$api.varTable.list(params).then(res => {
+                    this.varTableList = res.data.items
+                })
             },
             handleCalendarTimeChange(e) {
                 this.form.calendarTime = e
@@ -332,103 +280,17 @@
             },
             // 处理动态切换表单校验规则
             handleChangeRules() {
-                if (this.form.run_type === 'null') {
-                    this.rules = {
-                        jobFlowName: [{
-                            required: true,
-                            message: '作业流名称不能为空，请检查您的输入！',
-                            trigger: 'blur'
-                        }],
-                        run_type: [{
-                            required: true,
-                            message: '调度方式不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }]
-                    }
-                }
-                if (this.form.run_type === 'time') {
-                    this.rules = {
-                        jobFlowName: [{
-                            required: true,
-                            message: '作业流名称不能为空，请检查您的输入！',
-                            trigger: 'blur'
-                        }],
-                        run_type: [{
-                            required: true,
-                            message: '调度方式不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }],
-                        fixedTime: [{
-                            required: true,
-                            trigger: 'blur',
-                            message: '定时调度方式下，开始时间不能为空，请检查您的选择！'
-                        }, {
-                            required: true,
-                            trigger: 'change',
-                            message: '定时调度方式下，开始时间不能小于当前时间，请检查您的选择！',
-                            validator: (e) => {
-                                const data1 = new Date(e)
-                                const data2 = new Date()
-                                if (data1 < data2) {
-                                    return false
-                                }
-                                return true
-                            }
-                        }]
-                    }
-                }
-                if (this.form.run_type === 'cycle') {
-                    this.rules = {
-                        jobFlowName: [{
-                            required: true,
-                            message: '作业流名称不能为空，请检查您的输入！',
-                            trigger: 'blur'
-                        }],
-                        run_type: [{
-                            required: true,
-                            message: '调度方式不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }],
-                        periodTime: [{
-                            required: true,
-                            message: '周期调度方式下，开始时间不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }],
-                        cycleDat: [{
-                            required: true,
-                            message: '周期调度方式下，每隔多少时间不能为空，请检查您的输入！',
-                            trigger: 'blur'
-                        }],
-                        timeOption: [{
-                            required: true,
-                            message: '周期调度方式下，时间类型不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }]
-                    }
-                }
-                if (this.form.run_type === 'calendar') {
-                    this.rules = {
-                        jobFlowName: [{
-                            required: true,
-                            message: '作业流名称不能为空，请检查您的输入！',
-                            trigger: 'blur'
-                        }],
-                        run_type: [{
-                            required: true,
-                            message: '调度方式不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }],
-                        calendarValue: [{
-                            required: true,
-                            message: '日历调度方式下，日历值不能为空，前检查您的选择！',
-                            trigger: 'blur'
-                        }],
-                        calendarTime: [{
-                            required: true,
-                            message: '日历调度方式下，日历开始时间时间不能为空，请检查您的选择！',
-                            trigger: 'blur'
-                        }]
-                    }
+                this.rules = {
+                    jobFlowName: [{
+                        required: true,
+                        message: '作业流名称不能为空，请检查您的输入！',
+                        trigger: 'blur'
+                    }],
+                    run_type: [{
+                        required: true,
+                        message: '调度方式不能为空，请检查您的选择！',
+                        trigger: 'blur'
+                    }]
                 }
             },
             // 处理调度方式切换确认
@@ -486,27 +348,27 @@
 </script>
 
 <style lang="scss" scoped>
-    #baseInfo {
-        /deep/ .custom-form-item {
-            display: none;
-        }
+#baseInfo {
+    /deep/ .custom-form-item {
+        display: none;
+    }
 
-        .pre-commands {
-            display: flex;
+    .pre-commands {
+        display: flex;
 
-            i {
-                font-size: 32px;
-                color: #979BA5;
-                width: 32px;
-                text-align: center;
-                height: 32px;
-                line-height: 32px;
-                cursor: pointer;
+        i {
+            font-size: 32px;
+            color: #979BA5;
+            width: 32px;
+            text-align: center;
+            height: 32px;
+            line-height: 32px;
+            cursor: pointer;
 
-                &:active {
-                    color: rgb(58, 132, 255);
-                }
+            &:active {
+                color: rgb(58, 132, 255);
             }
         }
     }
+}
 </style>

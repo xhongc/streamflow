@@ -1,24 +1,24 @@
-from datetime import datetime
 import random
-from django.db.models import F
+from datetime import datetime
 
-from applications.flow.utils import build_and_create_process
-from bamboo_engine import api
-from bamboo_engine.builder import *
+from django.db.models import F
 from django.http import JsonResponse
-from pipeline.eri.runtime import BambooDjangoRuntime
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from applications.flow.filters import NodeTemplateFilter
-from applications.flow.models import Process, Node, ProcessRun, NodeRun, NodeTemplate, SubProcessRun
+from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
     RetrieveProcessViewSetsSerializer, ExecuteProcessSerializer, ListProcessRunViewSetsSerializer, \
     RetrieveProcessRunViewSetsSerializer, NodeTemplateSerializer, ListSubProcessRunViewSetsSerializer, \
     RetrieveSubProcessRunViewSetsSerializer
-from applications.utils.dag_helper import DAG, instance_dag, PipelineBuilder
+from applications.flow.utils import build_and_create_process
+from applications.task.models import VarTable
+from bamboo_engine import api
+from bamboo_engine.builder import *
 from component.drf.viewsets import GenericViewSet
+from pipeline.eri.runtime import BambooDjangoRuntime
 
 
 class ProcessViewSets(mixins.ListModelMixin,
@@ -36,20 +36,20 @@ class ProcessViewSets(mixins.ListModelMixin,
             return RetrieveProcessViewSetsSerializer
         elif self.action == "execute":
             return ExecuteProcessSerializer
+        elif self.action == "var":
+            return ExecuteProcessSerializer
         return ProcessViewSetsSerializer
 
-    @action(methods=["POST"], detail=False)
-    def execute(self, request, *args, **kwargs):
-        validated_data = self.is_validated_data(request.data)
+
+
+    @action(methods=["GET"], detail=False)
+    def var(self, request, *args, **kwargs):
+        validated_data = self.is_validated_data(request.query_params)
         process_id = validated_data["process_id"]
-        pipeline = build_and_create_process(process_id)
-        # 执行
-        runtime = BambooDjangoRuntime()
-        api.run_pipeline(runtime=runtime, pipeline=pipeline)
-
-        Process.objects.filter(id=process_id).update(total_run_count=F("total_run_count") + 1)
-
-        return Response({})
+        var_table_ids = Process.objects.filter(id=process_id).first().var_table
+        var_tables = VarTable.objects.filter(id__in=var_table_ids).values_list("data", flat=True)
+        result = sum(list(var_tables), [])
+        return Response(result)
 
 
 class ProcessRunViewSets(mixins.ListModelMixin,

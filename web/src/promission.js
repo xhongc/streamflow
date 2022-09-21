@@ -46,7 +46,6 @@ let getButton // 用来获取后台拿到的按钮权限
 saveObjArr('router', '')
 
 router.beforeEach((to, from, next) => {
-    // console.log(getRouter)
     if (!getRouter) { // 不加这个判断，路由会陷入死循环
         if (!getObjArr('router')) {
             getRouter = [
@@ -202,6 +201,7 @@ router.beforeEach((to, from, next) => {
                         'title': '新建作业流'
                     }
                 },
+
                 {
                     'path': '/singlejobflow',
                     'name': 'SingleJobFlow',

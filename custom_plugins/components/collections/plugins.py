@@ -6,6 +6,7 @@ import json
 import time
 import requests
 
+
 # to adapter window pc
 # import eventlet
 # requests = eventlet.import_patched('requests')
@@ -21,15 +22,11 @@ class HttpRequestService(Service):
             inputs["body"] = json.loads(inputs["body"])
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
             res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=inputs["timeout"],
-                                   **req_data).content
+                                   **req_data)
             print("执行了", res)
-            try:
-                res = json.loads(res)
-            except Exception:
-                res = res
-            data.outputs.outputs = res
+            data.outputs.outputs = res.content[:250]
             time.sleep(5)
-            if res.get("result"):
+            if 200 <= res.status_code < 300:
                 return True
             else:
                 return False

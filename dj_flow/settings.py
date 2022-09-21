@@ -9,7 +9,7 @@ BROKER_URL = "redis://localhost:6379/3"
 
 SECRET_KEY = 'django-insecure-u5_r=pekio0@zt!y(kgbufuosb9mddu8*qeejkzj@=7uyvb392'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
@@ -144,3 +144,5 @@ try:
 except ImportError:
     pass
 
+CELERY_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = True
