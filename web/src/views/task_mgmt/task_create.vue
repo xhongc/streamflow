@@ -162,7 +162,7 @@
                     curStep: 1
                 },
                 formData: {
-                    name: '',
+                    name: '任务-' + this.$route.query.job_name,
                     run_type: 'hand',
                     var_table: [],
                     when_start: '',
@@ -231,7 +231,7 @@
                     this.controllableSteps.curStep = this.controllableSteps.curStep + 1
                 } else if (this.controllableSteps.curStep === 3) {
                     this.$bkInfo({
-                        title: '确认要执行吗？',
+                        title: '确认要创建任务吗？',
                         confirmLoading: false,
                         confirmFn: async() => {
                             this.tableLoading = true

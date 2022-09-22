@@ -16,7 +16,7 @@
         </div>
         <div class="header" style="position: relative;z-index: 100;">
             <header-panel @handleSave="handleSave" :graph="graph" ref="headerPanel"
-                :control-type="controlType" @layout-setting="handleLayoutSetting"></header-panel>
+                :control-type="controlType" @layout-setting="handleLayoutSetting" @show-var="handleShowVarTable"></header-panel>
         </div>
         <div style="clear: both;"></div>
         <div id="main" class="main" ref="main">
@@ -26,6 +26,7 @@
                 <base-info v-show="isActive === 1" ref="baseInfo" @empty-task-make="handleEmptyTaskMake" :control-type="controlType"></base-info>
                 <task-make v-show="isActive === 2" @main-add-node="handleAddNode" ref="taskMake" :key="taskMakeKey"
                     :control-type="controlType" @empty-task-make="handleEmptyTaskMake"></task-make>
+                <var-slider v-if="isActive === 3"></var-slider>
             </Drawer>
         </div>
         <bk-dialog title="连线模式选择"
@@ -66,6 +67,7 @@
     import headerPanel from './single_job_flow/headerPanel.vue'
     import baseInfo from './single_job_flow/baseInfo.vue'
     import taskMake from './single_job_flow/taskMake.vue'
+    import varSlider from './single_job_flow/varSlider.vue'
     import baseNodes from './single_job_flow/baseNode.js'
     import registerFactory from '@/components/graph/graph.js'
     import G6 from '@antv/g6'
@@ -77,7 +79,8 @@
             nodeInfo, // 节点信息
             edgeInfo, // 分支线信息
             addModeDialog, // 前置作业流连线模式选择弹窗
-            preFlowCanvas // 前置作业流详情画布
+            preFlowCanvas, // 前置作业流详情画布
+            varSlider // 变量表
         },
         provide() {
             return {
@@ -796,6 +799,9 @@
                     }
                 })
                 return promise
+            },
+            handleShowVarTable() {
+                console.log(123)
             }
         }
     }

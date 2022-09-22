@@ -1,19 +1,17 @@
 import random
 from datetime import datetime
 
-from django.db.models import F
 from django.http import JsonResponse
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from applications.flow.filters import NodeTemplateFilter
-from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun
+from applications.flow.filters import NodeTemplateFilter, ProcessRunFilter, SubProcessRunFilter
+from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun, Category
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
     RetrieveProcessViewSetsSerializer, ExecuteProcessSerializer, ListProcessRunViewSetsSerializer, \
     RetrieveProcessRunViewSetsSerializer, NodeTemplateSerializer, ListSubProcessRunViewSetsSerializer, \
-    RetrieveSubProcessRunViewSetsSerializer
-from applications.flow.utils import build_and_create_process
+    RetrieveSubProcessRunViewSetsSerializer, CategorySerializer
 from applications.task.models import VarTable
 from bamboo_engine import api
 from bamboo_engine.builder import *
@@ -40,8 +38,6 @@ class ProcessViewSets(mixins.ListModelMixin,
             return ExecuteProcessSerializer
         return ProcessViewSetsSerializer
 
-
-
     @action(methods=["GET"], detail=False)
     def var(self, request, *args, **kwargs):
         validated_data = self.is_validated_data(request.query_params)
@@ -56,6 +52,7 @@ class ProcessRunViewSets(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
                          GenericViewSet):
     queryset = ProcessRun.objects.order_by("-update_time")
+    filterset_class = ProcessRunFilter
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -70,6 +67,7 @@ class SubProcessRunViewSets(mixins.ListModelMixin,
                             mixins.RetrieveModelMixin,
                             GenericViewSet):
     queryset = SubProcessRun.objects.order_by("-update_time")
+    filterset_class = SubProcessRunFilter
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -97,6 +95,11 @@ class NodeTemplateViewSet(mixins.ListModelMixin,
     queryset = NodeTemplate.objects.order_by("-id")
     serializer_class = NodeTemplateSerializer
     filterset_class = NodeTemplateFilter
+
+
+class CategoryViewSet(mixins.ListModelMixin, GenericViewSet):
+    queryset = Category.objects.order_by("-id")
+    serializer_class = CategorySerializer
 
 
 # Create your views here.

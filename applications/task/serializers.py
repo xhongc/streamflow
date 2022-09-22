@@ -7,7 +7,7 @@ class TaskSerializer(serializers.ModelSerializer):
     cron_time = serializers.CharField(allow_blank=True, allow_null=True)
     when_start = serializers.CharField(allow_blank=True, allow_null=True)
     process_id = serializers.CharField(write_only=True)
-    process_name = serializers.CharField(source="process.name")
+    process_name = serializers.CharField(source="process.name", read_only=True)
 
     class Meta:
         model = Task
@@ -33,3 +33,7 @@ class VarTableSerializer(serializers.ModelSerializer):
 
 class ExecuteTaskSerializer(serializers.Serializer):
     task_id = serializers.IntegerField(required=True)
+
+
+class VarTableIDSSerializer(serializers.Serializer):
+    ids = serializers.ListField(required=True)

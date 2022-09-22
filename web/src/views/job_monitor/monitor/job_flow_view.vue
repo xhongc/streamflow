@@ -600,7 +600,8 @@
                     is_release_dependency: this.midSearchForm.is_release_dependency, // 是否释放依赖
                     state: this.midSearchForm.state, // 状态
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
+                    process_id: this.$route.query.job_flow_id
                 }
                 this.$api.processRun.list(params).then(res => {
                     if (res.result) {

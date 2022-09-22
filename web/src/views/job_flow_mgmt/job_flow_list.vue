@@ -2,7 +2,9 @@
     <div id="jobFlowList">
         <div class="header">
             <div style="float: left;">
-                <bk-button theme="primary" @click="handleExportFiles">导出</bk-button>
+                <div style="margin-right: 10px;">
+                    <bk-button theme="primary" @click="handleCreate">新建</bk-button>
+                </div>
             </div>
             <div style="float: right;" v-if="auth.search">
                 <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
@@ -11,7 +13,8 @@
                 </bk-input>
                 <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
                     @click="handleOpenSeniorSearch"
-                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索</bk-button>
+                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
+                </bk-button>
             </div>
             <div class="senior-search-box" v-if="isDropdownShow">
                 <bk-container :margin="0">
@@ -28,7 +31,7 @@
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
-                                <bk-form-item label="跑批系统:">
+                                <bk-form-item label="分类:">
                                     <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
                                         v-model="searchFrom.category">
                                         <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id"
@@ -57,19 +60,27 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <div v-if="item.id !== 'type' && item.id !== 'name' && item.id !== 'cross_day_dependence'">
-                            {{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}
+                        <div v-if="item.id !== 'run_type' && item.id !== 'name' && item.id !== 'category'">
+                            {{
+                                (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
+                            }}
                         </div>
-                        <div v-else-if="item.id === 'type'">
-                            <span v-if="props.row.type === 'null'">无</span>
-                            <span v-else-if="props.row.type === 'calendar'">日历</span>
-                            <span v-else-if="props.row.type === 'time'">定时</span>
-                            <span v-else-if="props.row.type === 'cycle'">周期</span>
+                        <div v-else-if="item.id === 'run_type'">
+                            <span v-if="props.row.run_type === 'null'">单次</span>
+                            <span v-else-if="props.row.run_type === 'calendar'">日历</span>
+                            <span v-else-if="props.row.run_type === 'time'">定时</span>
+                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
                         </div>
                         <div v-else-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
-                            @click="handleOpenDetail(props.row)">{{props.row[item.id]}}</div>
-                        <div v-else-if="item.id === 'cross_day_dependence'">
-                            <span>{{props.row[item.id] === true ? '是' : '否'}}</span>
+                            @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
+                        </div>
+                        <div v-else-if="item.id === 'category'">
+                            <bk-tag
+                                :key="each"
+                                v-for="each in props.row[item.id]"
+                                theme="info"
+                            >{{ each }}
+                            </bk-tag>
                         </div>
                     </template>
                 </bk-table-column>
@@ -77,11 +88,14 @@
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
                             <bk-button class="mr10" theme="primary" text @click="handleImplement(props.row)"
-                                v-if="auth.operate">新建任务</bk-button>
+                                v-if="auth.operate">新建任务
+                            </bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)"
-                                v-if="auth.modify">修改</bk-button>
+                                v-if="auth.modify">修改
+                            </bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)"
-                                v-if="auth.del">删除</bk-button>
+                                v-if="auth.del">删除
+                            </bk-button>
                             <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
                                 trigger="click" :arrow="false" :distance="0" offset="15">
                                 <span class="dot-menu-trigger"></span>
@@ -112,11 +126,6 @@
                 overflowTooltip: true,
                 sortable: false
             }, {
-                id: 'var_table',
-                label: '变量表',
-                overflowTooltip: true,
-                sortable: false
-            }, {
                 id: 'run_type',
                 label: '调度方式',
                 overflowTooltip: false,
@@ -140,11 +149,6 @@
                 id: 'update_time',
                 label: '更新时间',
                 overflowTooltip: true,
-                sortable: true
-            }, {
-                id: 'total_run_count',
-                label: '执行次数',
-                overflowTooltip: false,
                 sortable: true
             }, {
                 id: 'description',
@@ -173,7 +177,7 @@
                 setting: {
                     size: 'small', // 表格大小
                     fields: fields, // 表格所有列
-                    selectedFields: fields.slice(0, 8) // 表格当前显示列
+                    selectedFields: fields.slice(0, 6) // 表格当前显示列
                 }
             }
         },
@@ -219,9 +223,9 @@
             },
             // 处理跳转查看历史
             handleJumpHistory(row) {
-                this.$store.commit('changeTabActive', 'jobflowviewhistory')
+                // this.$store.commit('changeTabActive', 'jobflowviewhistory')
                 this.$router.push({
-                    path: '/jobflowviewhistory',
+                    path: '/jobflowview',
                     query: {
                         job_flow_id: row.id
                     }
@@ -248,18 +252,12 @@
             },
             // 处理执行
             handleImplement(row) {
-                this.$bkInfo({
-                    type: 'primary',
-                    title: '确认要执行吗？',
-                    confirmLoading: false,
-                    confirmFn: () => {
-                        this.$router.push({
-                            path: '/taskCreate',
-                            query: {
-                                job_flow_data: row.id,
-                                type: 'detail'
-                            }
-                        })
+                this.$router.push({
+                    path: '/taskCreate',
+                    query: {
+                        job_flow_data: row.id,
+                        job_name: row.name,
+                        type: 'detail'
                     }
                 })
             },
@@ -315,6 +313,9 @@
                     }
                 })
                 window.open(window.siteUrl + '/export/process/?id=' + ids.join(','))
+            },
+            handleCreate() {
+                this.$router.push({'path': '/newjobflow'})
             },
             // 处理搜索
             handleSearch() {
@@ -374,96 +375,96 @@
 </script>
 
 <style lang="scss">
-    .dot-menu {
-        display: inline-block;
-        vertical-align: middle;
+.dot-menu {
+    display: inline-block;
+    vertical-align: middle;
 
-        .tippy-tooltip.dot-menu-theme {
-            padding: 0;
-        }
+    .tippy-tooltip.dot-menu-theme {
+        padding: 0;
     }
+}
 
-    .dot-menu-list {
-        margin: 0;
-        padding: 5px 0;
-        min-width: 50px;
-        list-style: none;
+.dot-menu-list {
+    margin: 0;
+    padding: 5px 0;
+    min-width: 50px;
+    list-style: none;
+}
+
+.dot-menu-list .dot-menu-item {
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 26px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+        background-color: #eaf3ff;
+        color: #3a84ff;
     }
-
-    .dot-menu-list .dot-menu-item {
-        padding: 0 10px;
-        font-size: 12px;
-        line-height: 26px;
-        cursor: pointer;
-        text-align: center;
-
-        &:hover {
-            background-color: #eaf3ff;
-            color: #3a84ff;
-        }
-    }
+}
 </style>
 <style lang="scss" scoped>
-    #jobFlowList {
-        padding: 20px;
-        height: 100%;
-        overflow: auto;
+#jobFlowList {
+    padding: 20px;
+    height: 100%;
+    overflow: auto;
 
-        .header {
+    .header {
+        width: 100%;
+        font-size: 0;
+        float: left;
+        margin-bottom: 20px;
+        // position: relative;
+
+        .senior-search-box {
+            background-color: #fff;
+            padding: 20px;
             width: 100%;
-            font-size: 0;
+            margin-top: 20px;
             float: left;
-            margin-bottom: 20px;
-            // position: relative;
-
-            .senior-search-box {
-                background-color: #fff;
-                padding: 20px;
-                width: 100%;
-                margin-top: 20px;
-                float: left;
-                box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
-                border: 1px solid rgba(0, 0, 0, .2);
-            }
+            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
+            border: 1px solid rgba(0, 0, 0, .2);
         }
+    }
 
-        .content {
+    .content {
 
-            .customTable {
-                /deep/ .bk-table-pagination-wrapper {
-                    background-color: #fff;
-                }
+        .customTable {
+            /deep/ .bk-table-pagination-wrapper {
+                background-color: #fff;
+            }
 
-                /deep/ .bk-table-empty-block {
-                    background-color: #fff;
-                }
+            /deep/ .bk-table-empty-block {
+                background-color: #fff;
+            }
 
-                .dot-menu-trigger {
-                    display: block;
-                    width: 20px;
-                    height: 20px;
-                    line-height: 20px;
-                    border-radius: 50%;
-                    text-align: center;
-                    font-size: 0;
-                    cursor: pointer;
-                }
+            .dot-menu-trigger {
+                display: block;
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                border-radius: 50%;
+                text-align: center;
+                font-size: 0;
+                cursor: pointer;
+            }
 
-                .dot-menu-trigger:hover {
-                    color: #3A84FF;
-                    background-color: #DCDEE5;
-                }
+            .dot-menu-trigger:hover {
+                color: #3A84FF;
+                background-color: #DCDEE5;
+            }
 
-                .dot-menu-trigger:before {
-                    content: "";
-                    display: inline-block;
-                    width: 3px;
-                    height: 3px;
-                    border-radius: 50%;
-                    background-color: currentColor;
-                    box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
-                }
+            .dot-menu-trigger:before {
+                content: "";
+                display: inline-block;
+                width: 3px;
+                height: 3px;
+                border-radius: 50%;
+                background-color: currentColor;
+                box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
             }
         }
     }
+}
 </style>

@@ -8,17 +8,16 @@
                 <bk-input placeholder="请输入作业流描述" v-model="form.jobFlowDescribe" :disabled="disabled"></bk-input>
             </bk-form-item>
             <bk-form-item label="分类">
-                <bk-select
-                    searchable
-                    multiple
-                    display-tag
-                    v-model="form.category">
-                    <bk-option v-for="option in categoryList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
+                <bk-tag-input
+                    v-model="form.category"
+                    :trigger="'focus'"
+                    :allow-next-focus="false"
+                    :list="categoryList"
+                    :allow-create="true"
+                    :allow-auto-match="true"
+                    :has-delete-icon="true"
+                    :disabled="disabled">
+                </bk-tag-input>
             </bk-form-item>
             <bk-form-item label="变量表">
                 <bk-select
@@ -117,15 +116,6 @@
                 }], // 调度方式单选列表
                 varList: [], // 变量表下拉列表
                 categoryList: [
-                    {id: 'shenzhen', name: '深圳'},
-                    {id: 'guangzhou', name: '广州'},
-                    {id: 'beijing', name: '北京'},
-                    {id: 'shanghai', name: '上海'},
-                    {id: 'hangzhou', name: '杭州'},
-                    {id: 'nanjing', name: '南京'},
-                    {id: 'chognqing', name: '重庆'},
-                    {id: 'taibei', name: '台北'},
-                    {id: 'haikou', name: '海口'}
                 ],
                 varTableList: [],
                 form: {
@@ -211,6 +201,9 @@
         methods: {
             // 获取作业库跑批系统
             getRunSysList() {
+                this.$api.process.category({'page': 1, 'page_size': 9999}).then(res => {
+                    this.categoryList = res.data.items
+                })
                 this.runSysList = []
             },
             handleRunIdChange() {

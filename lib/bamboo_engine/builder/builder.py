@@ -19,7 +19,6 @@ from bamboo_engine.utils.string import unique_id
 from .flow.data import Data, Params
 from .flow.event import ExecutableEndEvent
 
-
 __all__ = ["build_tree"]
 
 __skeleton = {
@@ -148,16 +147,9 @@ def __grow(tree, elem):
 
         subprocess_param = elem.params.to_dict() if isinstance(elem.params, Params) else elem.params
 
-        subprocess = {
-            "id": elem.id,
-            "incoming": tree[__incoming][elem.id],
-            "name": elem.name,
-            "outgoing": outgoing,
-            "type": elem.type(),
-            "params": subprocess_param,
-        }
-
-        subprocess["pipeline"] = build_tree(start_elem=elem.start, id=elem.id, data=elem.data)
+        subprocess = {"id": elem.id, "incoming": tree[__incoming][elem.id], "name": elem.name, "outgoing": outgoing,
+                      "type": elem.type(), "params": subprocess_param,
+                      "pipeline": build_tree(start_elem=elem.start, id=elem.id, data=elem.data)}
 
         tree["activities"][elem.id] = subprocess
 

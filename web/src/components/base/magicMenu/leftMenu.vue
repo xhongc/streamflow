@@ -39,7 +39,6 @@
                             'icon': 'iconfont icon-mianxingtubiao-zuoyeguanli',
                             'hasChild': true,
                             'children': [
-                                {'name': 'NewJob', 'cnName': '新建作业', 'to': '/newjob', 'hasChild': false},
                                 {'name': 'JobList', 'cnName': '作业列表', 'to': '/joblist', 'hasChild': false}]
                         },
                         {
@@ -49,12 +48,7 @@
                             'icon': 'iconfont icon-mianxingtubiao-zuoyeliuguanli',
                             'hasChild': true,
                             'children': [{
-                                'name': 'NewJobFlow',
-                                'cnName': '新建作业流',
-                                'to': '/newjobflow',
-                                'hasChild': false
-                            }, {
-                                'name': 'varTable',
+                                'name': 'VariableMgmt',
                                 'cnName': '变量管理',
                                 'to': '/variablemgmt',
                                 'hasChild': false
@@ -81,13 +75,14 @@
                             'hasChild': false
                         }],
                     id: '', // 当前激活侧边栏
-                    toggle: false
+                    toggle: true
                 }
             }
         },
         watch: {
             $route(val) {
                 this.nav.id = val.meta.hasOwnProperty('fatherName') ? val.meta.fatherName : val.name
+                console.log(this.nav.id)
             }
         },
         mounted() {

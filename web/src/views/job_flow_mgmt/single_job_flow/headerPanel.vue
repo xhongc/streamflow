@@ -9,6 +9,10 @@
                 <i class="iconfont icon-mianxingtubiao-renwubianpai" :style="{ color: isActive === 2 ? '#3A84FF' : '#979BA5' }"></i>
                 <p :style="{ color: isActive === 2 ? '#3A84FF' : '#333333' }">任务编排</p>
             </div>
+            <div class="box" style="margin-left: 36px;" @click="handleOpenVarTable" v-if="!disabled">
+                <i class="iconfont icon-mianxingtubiao-gongdanyingshe" :style="{ color: isActive === 3 ? '#3A84FF' : '#979BA5' }"></i>
+                <p :style="{ color: isActive === 3 ? '#3A84FF' : '#333333' }">全局变量</p>
+            </div>
         </div>
         <div class="right">
             <i class="iconfont icon-xianxingtubiao-fuwei" title="复位" @click="handleReset"></i>
@@ -121,6 +125,9 @@
             handleOpenBaseInfo() {
                 this.setDrawer(1, true, '基本信息')
             },
+            handleOpenVarTable() {
+                this.setDrawer(3, true, '全局变量')
+            },
             // 处理打开任务编排抽屉
             handleOpenTaskMake() {
                 if (this.$route.query.type === 'detail') {
@@ -191,10 +198,6 @@
                         this.getWayOK.flag = false
                         this.getWayOK.curGetWayNode = item
                         break
-                    }
-                    // 表明为分支节点，将其type改为4
-                    if (arr.length >= 2) {
-                        item.type = 4
                     }
                     this.midNodes.push(item)
                 }

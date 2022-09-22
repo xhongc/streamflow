@@ -1,5 +1,6 @@
 import json
 
+from applications.utils.dag_helper import PipelineBuilder
 from bamboo_engine import api
 from django.db import transaction
 
@@ -8,7 +9,8 @@ from pipeline.eri.runtime import BambooDjangoRuntime
 from rest_framework import serializers
 
 from applications.flow.constants import PIPELINE_STATE_TO_FLOW_STATE
-from applications.flow.models import Process, Node, ProcessRun, NodeRun, NodeTemplate, SubProcessRun, SubNodeRun
+from applications.flow.models import Process, Node, ProcessRun, NodeRun, NodeTemplate, SubProcessRun, SubNodeRun, \
+    Category
 from applications.utils.uuid_helper import get_uuid
 
 
@@ -33,41 +35,52 @@ class ProcessViewSetsSerializer(serializers.Serializer):
         dag = {k: [] for k in node_map.keys()}
         for line in self.validated_data["pipeline_tree"]["lines"]:
             dag[line["from"]].append(line["to"])
-        with transaction.atomic():
-            process = Process.objects.create(name=validated_data["name"],
-                                             description=validated_data["description"],
-                                             run_type=validated_data["run_type"],
-                                             category=validated_data.get("category", []),
-                                             var_table=validated_data.get("var_table", []),
-                                             dag=dag)
-            bulk_nodes = []
-            for node in node_map.values():
-                node_data = node["node_data"]
-                if isinstance(node_data.get("inputs", {}), dict):
-                    node_inputs = node_data.get("inputs", {})
-                else:
-                    node_inputs = json.loads(node_data["inputs"])
-                bulk_nodes.append(Node(process=process,
-                                       name=node_data["node_name"],
-                                       uuid=node["uuid"],
-                                       description=node_data["description"],
-                                       fail_retry_count=node_data.get("fail_retry_count", 0) or 0,
-                                       fail_offset=node_data.get("fail_offset", 0) or 0,
-                                       fail_offset_unit=node_data.get("fail_offset_unit", "seconds"),
-                                       node_type=node.get("type", 2),
-                                       is_skip_fail=node_data["is_skip_fail"],
-                                       is_timeout_alarm=node_data["is_skip_fail"],
-                                       inputs=node_inputs,
-                                       show=node["show"],
-                                       top=node["top"],
-                                       left=node["left"],
-                                       ico=node["ico"],
-                                       outputs={},
-                                       component_code="http_request",
-                                       content=node.get("content", 0) or 0
-                                       ))
-            Node.objects.bulk_create(bulk_nodes, batch_size=500)
-        self._data = {}
+        try:
+            with transaction.atomic():
+                category_list = validated_data.get("category", [])
+                process = Process.objects.create(name=validated_data["name"],
+                                                 description=validated_data["description"],
+                                                 run_type=validated_data["run_type"],
+                                                 category=category_list,
+                                                 var_table=validated_data.get("var_table", []),
+                                                 dag=dag)
+                for category in category_list:
+                    Category.objects.update_or_create(name=category)
+                bulk_nodes = []
+                for node in node_map.values():
+                    node_data = node["node_data"]
+                    if isinstance(node_data.get("inputs", {}), dict):
+                        node_inputs = node_data.get("inputs", {})
+                    else:
+                        node_inputs = json.loads(node_data["inputs"])
+                    bulk_nodes.append(Node(process=process,
+                                           name=node_data["node_name"],
+                                           uuid=node["uuid"],
+                                           description=node_data["description"],
+                                           fail_retry_count=node_data.get("fail_retry_count", 0) or 0,
+                                           fail_offset=node_data.get("fail_offset", 0) or 0,
+                                           fail_offset_unit=node_data.get("fail_offset_unit", "seconds"),
+                                           node_type=node.get("type", 2),
+                                           is_skip_fail=node_data["is_skip_fail"],
+                                           is_timeout_alarm=node_data["is_skip_fail"],
+                                           inputs=node_inputs,
+                                           show=node["show"],
+                                           top=node["top"],
+                                           left=node["left"],
+                                           ico=node["ico"],
+                                           outputs={},
+                                           component_code="http_request",
+                                           content=node.get("content", 0) or 0
+                                           ))
+                Node.objects.bulk_create(bulk_nodes, batch_size=500)
+                try:
+                    PipelineBuilder(process_id=process.id).build()
+                except Exception as e:
+                    raise Exception(f"验证编译错误:{e}")
+        except Exception as e:
+            raise serializers.ValidationError(f"流程编排错误，请检查!：{e}")
+        else:
+            self._data = {}
 
     def update(self, instance, validated_data):
         node_map = {}
@@ -76,73 +89,84 @@ class ProcessViewSetsSerializer(serializers.Serializer):
         dag = {k: [] for k in node_map.keys()}
         for line in self.validated_data["pipeline_tree"]["lines"]:
             dag[line["from"]].append(line["to"])
-        with transaction.atomic():
-            instance.name = validated_data["name"]
-            instance.description = validated_data["description"]
-            instance.run_type = validated_data["run_type"]
-            instance.dag = dag
-            instance.var_table = validated_data.get("var_table", [])
-            instance.category = validated_data.get("category", [])
-            instance.save()
-            bulk_update_nodes = []
-            bulk_create_nodes = []
-            node_dict = Node.objects.filter(process_id=instance.id).in_bulk(field_name="uuid")
-            for node in node_map.values():
-                node_data = node["node_data"]
-                node_obj = node_dict.get(node["uuid"], None)
-                if isinstance(node_data.get("inputs", {}), dict):
-                    node_inputs = node_data.get("inputs", {})
-                else:
-                    node_inputs = json.loads(node_data["inputs"])
-                if node_obj:
-                    node_obj.content = node.get("content", 0) or 0
-                    node_obj.name = node_data["node_name"]
-                    node_obj.description = node_data["description"]
-                    node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
-                    node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
-                    node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
-                    node_obj.node_type = node.get("type", 3)
-                    node_obj.is_skip_fail = node_data["is_skip_fail"]
-                    node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
-                    node_obj.inputs = node_inputs
-                    node_obj.show = node["show"]
-                    node_obj.top = node["top"]
-                    node_obj.left = node["left"]
-                    node_obj.ico = node["ico"]
-                    node_obj.outputs = {}
-                    node_obj.component_code = "http_request"
-                    bulk_update_nodes.append(node_obj)
-                else:
-                    node_obj = Node()
-                    node_obj.content = node.get("content", 0) or 0
-                    node_obj.name = node_data["node_name"]
-                    node_obj.description = node_data["description"]
-                    node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
-                    node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
-                    node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
-                    node_obj.node_type = node.get("type", 3)
-                    node_obj.is_skip_fail = node_data["is_skip_fail"]
-                    node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
-                    node_obj.inputs = node_inputs
-                    node_obj.show = node["show"]
-                    node_obj.top = node["top"]
-                    node_obj.left = node["left"]
-                    node_obj.ico = node["ico"]
-                    node_obj.outputs = {}
-                    node_obj.component_code = "http_request"
-                    node_obj.uuid = node["uuid"]
-                    node_obj.process_id = instance.id
-                    bulk_create_nodes.append(node_obj)
-            Node.objects.bulk_update(bulk_update_nodes,
-                                     fields=["name", "description", "fail_retry_count", "fail_offset",
-                                             "fail_offset_unit", "node_type", "is_skip_fail",
-                                             "is_timeout_alarm", "inputs", "show", "top", "left", "ico",
-                                             "outputs", "component_code"], batch_size=500)
-            Node.objects.bulk_create(bulk_create_nodes, batch_size=500)
+        try:
+            with transaction.atomic():
+                instance.name = validated_data["name"]
+                instance.description = validated_data["description"]
+                instance.run_type = validated_data["run_type"]
+                instance.dag = dag
+                instance.var_table = validated_data.get("var_table", [])
+                instance.category = validated_data.get("category", [])
+                instance.save()
+                bulk_update_nodes = []
+                bulk_create_nodes = []
+                node_dict = Node.objects.filter(process_id=instance.id).in_bulk(field_name="uuid")
+                for node in node_map.values():
+                    node_data = node["node_data"]
+                    node_obj = node_dict.get(node["uuid"], None)
+                    if isinstance(node_data.get("inputs", {}), dict):
+                        node_inputs = node_data.get("inputs", {})
+                    else:
+                        node_inputs = json.loads(node_data["inputs"])
+                    if node_obj:
+                        node_obj.content = node.get("content", 0) or 0
+                        node_obj.name = node_data["node_name"]
+                        node_obj.description = node_data["description"]
+                        node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
+                        node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
+                        node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
+                        node_obj.node_type = node.get("type", 3)
+                        node_obj.is_skip_fail = node_data["is_skip_fail"]
+                        node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
+                        node_obj.inputs = node_inputs
+                        node_obj.show = node["show"]
+                        node_obj.top = node["top"]
+                        node_obj.left = node["left"]
+                        node_obj.ico = node["ico"]
+                        node_obj.outputs = {}
+                        node_obj.component_code = "http_request"
+                        bulk_update_nodes.append(node_obj)
+                    else:
+                        node_obj = Node()
+                        node_obj.content = node.get("content", 0) or 0
+                        node_obj.name = node_data["node_name"]
+                        node_obj.description = node_data["description"]
+                        node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
+                        node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
+                        node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
+                        node_obj.node_type = node.get("type", 3)
+                        node_obj.is_skip_fail = node_data["is_skip_fail"]
+                        node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
+                        node_obj.inputs = node_inputs
+                        node_obj.show = node["show"]
+                        node_obj.top = node["top"]
+                        node_obj.left = node["left"]
+                        node_obj.ico = node["ico"]
+                        node_obj.outputs = {}
+                        node_obj.component_code = "http_request"
+                        node_obj.uuid = node["uuid"]
+                        node_obj.process_id = instance.id
+                        bulk_create_nodes.append(node_obj)
+                Node.objects.bulk_update(bulk_update_nodes,
+                                         fields=["name", "description", "fail_retry_count", "fail_offset",
+                                                 "fail_offset_unit", "node_type", "is_skip_fail",
+                                                 "is_timeout_alarm", "inputs", "show", "top", "left", "ico",
+                                                 "outputs", "component_code"], batch_size=500)
+                Node.objects.bulk_create(bulk_create_nodes, batch_size=500)
+                try:
+                    PipelineBuilder(process_id=instance.id).build()
+                except Exception as e:
+                    raise Exception(f"验证编译错误:{e}")
+        except Exception as e:
+            raise serializers.ValidationError(f"流程编排错误，请检查!：{e}")
+
         self._data = {}
 
 
 class ListProcessViewSetsSerializer(serializers.ModelSerializer):
+    category = serializers.ListField()
+    var_table = serializers.ListField()
+
     class Meta:
         model = Process
         # fields = "__all__"
@@ -233,7 +257,7 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Process
-        fields = ("id", "name", "description", "category", "run_type", "pipeline_tree","var_table")
+        fields = ("id", "name", "description", "category", "run_type", "pipeline_tree", "var_table")
 
 
 class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
@@ -367,3 +391,9 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodeTemplate
         exclude = ("uuid",)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("name", "id")

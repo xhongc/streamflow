@@ -26,6 +26,9 @@ export default {
     var_table: function(params) {
         return GET(reUrl + '/process/flow/var/', params)
     },
+    category: function(params) {
+        return GET(reUrl + '/process/category/', params)
+    },
     get_process_node: function(params) {
         return GET(reUrl + '/process/get_process_node/', params)
     },

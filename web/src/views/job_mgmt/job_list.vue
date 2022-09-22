@@ -2,7 +2,7 @@
     <div id="jobList">
         <div class="header">
             <div style="float: left;">
-                <bk-button theme="primary" @click="handleExportFiles">导出</bk-button>
+                <bk-button theme="primary" @click="handCreate">新建</bk-button>
             </div>
             <div style="float: right;" v-if="auth.search">
                 <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
@@ -172,6 +172,9 @@
             this.maxTableHeight = this.$store.state.common.defaultTableHeight - 52
         },
         methods: {
+            handCreate() {
+                this.$router.push({'path': '/newjob'})
+            },
             handleJumpHistory(row) {
                 this.$store.commit('changeTabActive', 'jobviewhistory')
                 this.$router.push({

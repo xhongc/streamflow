@@ -14,7 +14,7 @@
                     <bk-option v-for="(item, index) in makeList" :key="index" :id="item.value" :name="item.label">
                     </bk-option>
                 </bk-select>
-                <bk-input clearable style="width: 356px;margin-left: 8px" :placeholder="'请输入'" :right-icon="'bk-icon icon-search'"
+                <bk-input clearable style="width: 356px;margin-left: 8px;" :placeholder="'请输入'" :right-icon="'bk-icon icon-search'"
                     v-model="form.name" @right-icon-click="handleSearch" @enter="handleSearch" :disabled="disabled">
                 </bk-input>
             </bk-compose-form-item>

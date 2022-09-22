@@ -8,6 +8,9 @@ export default {
     create: function(params) {
         return POST(reUrl + '/task/var_table/', params)
     },
+    group: function(params) {
+        return POST(reUrl + '/task/var_table/group/', params)
+    },
     retrieve: function(id, params) {
         return GET(reUrl + '/task/var_table/' + JSON.stringify(id) + '/', params)
     },

@@ -25,7 +25,7 @@ class Task(models.Model):
     process_run = models.ForeignKey(ProcessRun, on_delete=models.SET_NULL, null=True, db_constraint=False,
                                     related_name="tasks")
     run_type = models.CharField("执行方式", choices=TypeChoices, max_length=64)
-    when_start = models.CharField(max_length=100, verbose_name="执行时间",null=True)
+    when_start = models.CharField(max_length=100, verbose_name="执行时间", null=True)
     cycle_time = models.CharField(max_length=20, null=True, verbose_name="周期时间")
     cycle_type = models.CharField(max_length=20, null=True, verbose_name="周期间隔(min,hour,day)", choices=CycleChoices)
     cron_time = models.TextField(default="", verbose_name="cron表达式", null=True)
@@ -33,6 +33,9 @@ class Task(models.Model):
     celery_task_id = models.CharField(max_length=64, null=True, verbose_name="celery的任务ID")
 
     var_table = JSONField("运行时变量", default=dict)
+
+    success_count = models.IntegerField("成功执行次数", default=0)
+    fail_count = models.IntegerField("失败执行次数", default=0)
 
 
 class VarTable(models.Model):

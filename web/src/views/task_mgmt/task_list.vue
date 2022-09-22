@@ -88,12 +88,19 @@
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10" theme="primary" text @click="handleExecute(props.row)">执行
+                            <bk-button class="mr10" theme="primary" text @click="handleImplement(props.row)">执行
                             </bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)">修改
                             </bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)">删除
                             </bk-button>
+                            <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
+                                trigger="click" :arrow="false" :distance="0" offset="15">
+                                <span class="dot-menu-trigger"></span>
+                                <ul class="dot-menu-list" slot="content">
+                                    <li class="dot-menu-item" @click="handleJumpHistory(props.row)">执行历史</li>
+                                </ul>
+                            </bk-popover>
                         </div>
                     </template>
                 </bk-table-column>
@@ -183,11 +190,10 @@
         },
         methods: {
             handleJumpHistory(row) {
-                this.$store.commit('changeTabActive', 'jobviewhistory')
                 this.$router.push({
-                    path: '/jobviewhistory',
+                    path: '/jobflowview',
                     query: {
-                        job_id: row.id
+                        job_flow_id: row.process
                     }
                 })
             },
@@ -216,14 +222,12 @@
                     confirmLoading: false,
                     confirmFn: async() => {
                         this.tableLoading = true
-                        this.$api.content.execute({
-                            id: row.id
-                        }).then(res => {
+                        this.$api.task.execute({'task_id': row.id}).then(res => {
                             if (res.result) {
                                 this.$cwMessage('执行成功!', 'success')
                                 this.$store.commit('changeTabActive', 'jobview')
                                 this.$router.push({
-                                    path: '/jobview'
+                                    path: '/jobflowview'
                                 })
                             } else {
                                 this.$cwMessage(res.message, 'error')
@@ -271,15 +275,6 @@
                     }
                 })
                 window.open(window.siteUrl + '/export/content/?id=' + ids.join(','))
-            },
-            handleExecute(row) {
-                this.$api.task.execute({'task_id': row.id}).then(res => {
-                    console.log(res)
-                    this.$cwMessage('执行成功!', 'success')
-                    this.$router.push({
-                        path: '/jobflowview'
-                    })
-                })
             },
             // 处理跳转修改
             handleOpenUpdate(row) {

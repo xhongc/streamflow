@@ -7,7 +7,8 @@ from applications.flow.models import Process
 from applications.flow.utils import build_and_create_process
 from applications.task.filters import VarTableFilter
 from applications.task.models import Task, VarTable
-from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer
+from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
+    VarTableIDSSerializer
 from component.drf.viewsets import GenericViewSet
 from rest_framework import mixins
 
@@ -47,5 +48,17 @@ class VarTableViewSets(mixins.ListModelMixin,
                        mixins.UpdateModelMixin,
                        GenericViewSet):
     queryset = VarTable.objects.order_by("-id")
-    serializer_class = VarTableSerializer
     filterset_class = VarTableFilter
+
+    def get_serializer_class(self):
+        if self.action == "group":
+            return VarTableIDSSerializer
+        return VarTableSerializer
+
+    @action(methods=["POST"], detail=False)
+    def group(self, request, *args, **kwargs):
+        validated_data = self.is_validated_data(request.data)
+        ids = validated_data["ids"]
+        var_list = list(VarTable.objects.filter(id__in=ids).values_list("data", flat=True))
+        flat_var_list = sum(var_list, [])
+        return Response(flat_var_list)

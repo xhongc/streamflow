@@ -205,9 +205,16 @@ def instance_dag(dag_dict, process_run_uuid):
 
 
 class PipelineBuilder:
-    def __init__(self, task_id):
-        self.task = Task.objects.filter(id=task_id).first()
-        self.process_id = self.task.process_id
+    def __init__(self, task_id=None, process_id=None):
+        if task_id:
+            self.task = Task.objects.filter(id=task_id).first()
+        else:
+            self.task = None
+        if process_id:
+            self.process_id = process_id
+        else:
+            assert self.task
+            self.process_id = self.task.process_id
         self.process = Process.objects.filter(id=self.process_id).first()
         self.node_map = Node.objects.filter(process_id=self.process_id).in_bulk(field_name="uuid")
         self.dag_obj = self.setup_dag()
@@ -274,10 +281,14 @@ class PipelineBuilder:
                 self.get_inst(_in).extend(self.get_inst(_out))
         pipeline_data = Data()
         # 加载变量
-        var_table = self.task.var_table
-        for var in var_table:
-            key = "${%s}" % var["name"]
-            pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
+        if self.task:
+            var_table = self.task.var_table
+            for var in var_table:
+                if "${" not in var["name"]:
+                    key = "${%s}" % var["name"]
+                else:
+                    key = var["name"]
+                pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
 
         if is_subprocess:
             pipeline = SubProcess(self.get_inst(start), data=pipeline_data)
