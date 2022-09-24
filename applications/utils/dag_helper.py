@@ -3,6 +3,7 @@ from copy import copy, deepcopy
 
 from applications.flow.models import Process, Node
 from applications.task.models import Task
+from applications.utils.var_helper import parse_variable
 from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
     ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess, NodeOutput
 
@@ -300,14 +301,16 @@ class PipelineBuilder:
                 else:
                     key = var["name"]
                 pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
-        c = 0
-        for uid, inst in self.instance.items():
-            c += 1
-            if c == 3:
-                pipeline_data.inputs['${act_1_output}'] = NodeOutput(source_act=inst.id,
-                                                                     source_key='param_1',
-                                                                     type=Var.SPLICE,
-                                                                     value='')
+        # 加载输出变量
+        for node_uid, node in self.node_map.items():
+            if node.node_type == 2:
+                for output in node.outputs:
+                    if output["reference"] == 1:
+                        var_key = parse_variable(output["key"])
+                        pipeline_data.inputs[var_key] = NodeOutput(source_act=self.get_inst(node_uid).id,
+                                                                   source_key=output["key"],
+                                                                   type=Var.SPLICE,
+                                                                   value='')
 
         if is_subprocess:
             pipeline = SubProcess(self.get_inst(start), data=pipeline_data)

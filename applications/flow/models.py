@@ -78,6 +78,7 @@ class BaseNode(models.Model):
     def clone_data(self):
         return {
             "name": self.name,
+            "outputs": self.outputs
         }
 
 
