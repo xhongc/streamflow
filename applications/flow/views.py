@@ -42,9 +42,12 @@ class ProcessViewSets(mixins.ListModelMixin,
     def var(self, request, *args, **kwargs):
         validated_data = self.is_validated_data(request.query_params)
         process_id = validated_data["process_id"]
-        var_table_ids = Process.objects.filter(id=process_id).first().var_table
-        var_tables = VarTable.objects.filter(id__in=var_table_ids).values_list("data", flat=True)
-        result = sum(list(var_tables), [])
+        process = Process.objects.filter(id=process_id).first()
+        result = []
+        if process:
+            var_table_ids = process.var_table
+            var_tables = VarTable.objects.filter(id__in=var_table_ids).values_list("data", flat=True)
+            result = sum(list(var_tables), [])
         return Response(result)
 
 

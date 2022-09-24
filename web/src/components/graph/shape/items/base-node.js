@@ -58,7 +58,7 @@ export default G6 => {
                 y: -height / 2,
             }, cfg);
         },
-        // 绘制图标
+        // todo 绘制图标
         drawIcon(cfg, group, attrs) {
             // if(attrs.hasOwnProperty('state') && attrs.state !== '') {
             //     labelCfg.style.fill = colorList[attrs.state].color
@@ -67,7 +67,7 @@ export default G6 => {
             //当前节点拥有icon且不为开始和结束节点
             if (item.attrs.hasOwnProperty('icon') && (attrs.nodeType != 0 || attrs.nodeType != 1)) {
                 //分支节点和作业节点显示同一个icon
-                if (attrs.nodeType === 2 || attrs.nodeType === 4) {
+                if (attrs.nodeType === 2 || attrs.nodeType === 4 || attrs.nodeType === 6 || attrs.nodeType === 7) {
                     const icon = group.addShape('text', {
                         attrs: {
                             fontFamily: 'iconfont',

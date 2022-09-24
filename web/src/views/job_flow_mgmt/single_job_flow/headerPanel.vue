@@ -378,34 +378,6 @@
             checkFrom() {
                 this.father_this.$refs.baseInfo.$refs.form.validate().then(validator => {
                     this.validatorFlag = true
-                    // let flag = false
-                    // 表单校验通过，调度方式为日历的情况下，校验开始时间
-                    if (this.controlType === 'calendar') {
-                        const flag = this.midNodes.some(node => {
-                            return node.node_data.eta < this.father_this.$refs.baseInfo.form.calendarTime &&
-                                (node.name !== '开始' && node.name !== '结束') && node.node_data.eta
-                        })
-                        if (flag) {
-                            this.$cwMessage('校验不通过: 节点开始时间不能小于日历开始时间, 请检查您的选择', 'warning')
-                            this.validatorFlag = false
-                        } else {
-                            this.get_nodeTime(deepClone({
-                                lines: this.midLines,
-                                nodes: this.midNodes
-                            }))
-                            // 获取节点开始时间校验结果
-                            this.timeisOk()
-                            if (this.timeResult.length > 0) {
-                                const msg = this.timeResult[0]
-                                this.$cwMessage(
-                                    `校验不通过: (${msg.node2.name})节点的开始时间必须比(${msg.node1.name})大,请检查您的选择`,
-                                    'warning')
-                                this.validatorFlag = false
-                            } else {
-                                this.validatorFlag = true
-                            }
-                        }
-                    }
                     // 时间校验通过，保存数据
                     if (this.validatorFlag) {
                         const params = {
@@ -413,9 +385,6 @@
                                 lines: [],
                                 nodes: []
                             }
-                        }
-                        if (this.father_this.$refs.baseInfo.form.cross_day_dependence) {
-                            params.cross_day_dependence = true // 跨日依赖
                         }
                         // todo 节点
                         params.pipeline_tree.lines = this.midLines
@@ -427,21 +396,6 @@
                         params.category = this.father_this.$refs.baseInfo.form.category // 跑批系统id
                         // 有前置文件路径
                         if (this.father_this.$refs.baseInfo.form.file_dependence.file_path !== '') {
-                            if (!this.father_this.$refs.baseInfo.form.pre_category) {
-                                return this.$cwMessage('有前置文件，前置跑批系统不能为空，请选择！', 'warning')
-                            }
-                            if (!this.father_this.$refs.baseInfo.form.pre_agent) {
-                                return this.$cwMessage('有前置文件，前置Agent不能为空，请选择！', 'warning')
-                            }
-                            if (!this.father_this.$refs.baseInfo.form.file_dependence.max_num) {
-                                return this.$cwMessage('有前置文件，巡检次数不能为空，请输入！', 'warning')
-                            }
-                            if (!this.father_this.$refs.baseInfo.form.file_dependence.cycle.value) {
-                                return this.$cwMessage('有前置文件，巡检周期不能为空，请输入！', 'warning')
-                            }
-                            if (!this.father_this.$refs.baseInfo.form.file_dependence.cycle.type) {
-                                return this.$cwMessage('有前置文件，巡检周期时间类型不能为空，请选择！', 'warning')
-                            }
                             // 到了这里说明此时有前置路径，且前置跑批系统和前置Agent都不为空，且其余必填条件也满足
                             params.pre_category = this.father_this.$refs.baseInfo.form.pre_category // 作业流前置跑批id
                             params.pre_agent = this.father_this.$refs.baseInfo.form.pre_agent // 作业流前置agent

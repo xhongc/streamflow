@@ -1,6 +1,6 @@
 from applications.flow.models import ProcessRun, NodeRun, Process, Node, SubProcessRun, SubNodeRun
 from applications.task.models import Task
-from applications.utils.dag_helper import PipelineBuilder, instance_dag
+from applications.utils.dag_helper import PipelineBuilder, instance_dag, instance_gateways
 
 
 def build_and_create_process(task_id):
@@ -15,7 +15,9 @@ def build_and_create_process(task_id):
 
     # 保存的实例数据
     process_run_data = process.clone_data
+    # 运算时节点uid重新生成所以需要映射回节点uid
     process_run_data["dag"] = instance_dag(process_run_data["dag"], process_run_uuid)
+    process_run_data["gateways"] = instance_gateways(process_run_data["gateways"], process_run_uuid)
     process_run = ProcessRun.objects.create(process_id=process.id, root_id=pipeline["id"], **process_run_data)
     task.process_run_id = process_run.id
     task.save()

@@ -74,6 +74,12 @@ class BaseNode(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def clone_data(self):
+        return {
+            "name": self.name,
+        }
+
 
 class Node(BaseNode):
     process = models.ForeignKey(Process, on_delete=models.SET_NULL, null=True, db_constraint=False,

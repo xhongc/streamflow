@@ -4,7 +4,7 @@ from copy import copy, deepcopy
 from applications.flow.models import Process, Node
 from applications.task.models import Task
 from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
-    ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess
+    ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess, NodeOutput
 
 
 class DAG(object):
@@ -197,11 +197,21 @@ class DAG(object):
 
 
 def instance_dag(dag_dict, process_run_uuid):
+    """将节点uid转化成eri的uid"""
     new_dag_dict = defaultdict(list)
     for k, v_list in dag_dict.items():
         for v in v_list:
             new_dag_dict[process_run_uuid[k].id].append(process_run_uuid[v].id)
     return dict(new_dag_dict)
+
+
+def instance_gateways(gateways, process_run_uuid):
+    """将节点uid转化成eri的uid"""
+    new_gateways = defaultdict(dict)
+    for in_uid, v_dict in gateways.items():
+        for out_uid, condition in v_dict.items():
+            new_gateways[process_run_uuid[in_uid].id][process_run_uuid[out_uid].id] = condition
+    return dict(new_gateways)
 
 
 class PipelineBuilder:
@@ -230,24 +240,18 @@ class PipelineBuilder:
                 pipeline_instance[p_id] = EmptyEndEvent()
             elif node.node_type == Node.CONDITION_NODE:
                 pipeline_instance[p_id] = ExclusiveGateway(
-                    conditions={
-                        0: '1==0',
-                        1: '0==0'
-                    },
-                    name='act_2 or act_3'
+                    conditions={},
+                    name=""
                 )
             elif node.node_type == Node.PARALLEL_NODE:
                 pipeline_instance[p_id] = ParallelGateway()
             elif node.node_type == Node.CONVERGE_NODE:
                 pipeline_instance[p_id] = ConvergeGateway()
             elif node.node_type == Node.CONDITION_PARALLEL_NODE:
+
                 pipeline_instance[p_id] = ConditionalParallelGateway(
-                    conditions={
-                        0: '1==0',
-                        1: '1==1',
-                        2: '2==2'
-                    },
-                    name='[act_2] or [act_3 and act_4]'
+                    conditions={},
+                    name=""
                 )
             elif node.node_type == Node.SUB_PROCESS_NODE:
                 process_id = node.content
@@ -260,6 +264,7 @@ class PipelineBuilder:
                 # todo 动态扩展节点
                 act = ServiceActivity(component_code="http_request")
                 act.component.inputs.inputs = Var(type=Var.SPLICE, value=node.inputs)
+                act.component.inputs.node_info = Var(type=Var.SPLICE, value=node.clone_data)
                 pipeline_instance[p_id] = act
         return pipeline_instance
 
@@ -276,9 +281,15 @@ class PipelineBuilder:
 
     def build(self, is_subprocess=False):
         start = self.dag_obj.ind_nodes()[0]
-        for _in, out_list in self.dag_obj.graph.items():
-            for _out in out_list:
-                self.get_inst(_in).extend(self.get_inst(_out))
+        gateways = self.process.gateways
+        for in_uid, out_list in self.dag_obj.graph.items():
+            for index, out_uid in enumerate(out_list):
+                # 顺序加入网关条件
+                if in_uid in gateways:
+                    expr = gateways[in_uid][out_uid]["expression"]
+                    self.get_inst(in_uid).add_condition(index, expr)
+                self.get_inst(in_uid).extend(self.get_inst(out_uid))
+
         pipeline_data = Data()
         # 加载变量
         if self.task:
@@ -289,6 +300,14 @@ class PipelineBuilder:
                 else:
                     key = var["name"]
                 pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
+        c = 0
+        for uid, inst in self.instance.items():
+            c += 1
+            if c == 3:
+                pipeline_data.inputs['${act_1_output}'] = NodeOutput(source_act=inst.id,
+                                                                     source_key='param_1',
+                                                                     type=Var.SPLICE,
+                                                                     value='')
 
         if is_subprocess:
             pipeline = SubProcess(self.get_inst(start), data=pipeline_data)

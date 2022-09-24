@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
+
+from bamboo_engine.builder import Var
 from pipeline.core.flow.activity import Service, StaticIntervalGenerator
 from pipeline.component_framework.component import Component
 import json
@@ -25,7 +27,8 @@ class HttpRequestService(Service):
                                    **req_data)
             print("执行了", res)
             data.outputs.outputs = res.content[:250]
-            time.sleep(5)
+            data.outputs.param_1 = "122222222"
+            time.sleep(2)
             if 200 <= res.status_code < 300:
                 return True
             else:
@@ -40,7 +43,8 @@ class HttpRequestService(Service):
 
     def inputs_format(self):
         return [
-            Service.InputItem(name="输入参数", key="inputs", type="dict", required=True)
+            Service.InputItem(name="输入参数", key="inputs", type="dict", required=True),
+            Service.InputItem(name="节点信息", key="node_info", type="dict", required=True),
         ]
 
     def outputs_format(self):

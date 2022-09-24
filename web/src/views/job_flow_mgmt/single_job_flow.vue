@@ -331,7 +331,7 @@
                                     lineWidth: 1,
                                     r: 24
                                 }
-                            } else if (node.type === '4' || node.type === 5) {
+                            } else if (node.type === '4') {
                                 style = {
                                     fill: '#fff',
                                     stroke: '#DCDEE5',
@@ -378,6 +378,8 @@
             // 处理更新节点的数据
             handleUpdateNode(data, id) {
                 const item = this.graph.findById(id).get('model')
+                console.log('处理更新节点的数据', data)
+                item.label = data.node_name
                 item.node_data = data
                 this.graph.updateItem(id, item)
             },
@@ -463,10 +465,10 @@
             initGraphEvent() {
                 // 监听节点选中
                 this.graph.on('after-node-selected', e => {
-                    if (e.item.getModel().nodeType !== 3) {
-                        this.handleOpenNodeDrawer(e)
-                    } else {
+                    if (e.item.getModel().nodeType === 3) {
                         this.handleOpenFlowDrawer(e)
+                    } else if (e.item.getModel().nodeType === 2) {
+                        this.handleOpenNodeDrawer(e)
                     }
                 })
                 // 监听节点连线
@@ -749,6 +751,7 @@
                     },
                     node_data: {
                         inputs: e.target.dataset.inputs,
+                        outputs: e.target.dataset.outputs,
                         inputs_component: e.target.dataset.inputs_component,
                         run_mark: 0,
                         node_name: e.target.innerText,

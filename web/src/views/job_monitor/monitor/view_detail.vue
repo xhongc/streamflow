@@ -330,7 +330,7 @@
                     }
                     if (model.nodeType === 3) {
                         this.handleOpenFlowDrawer(e)
-                    } else {
+                    } else if (model.nodeType === 2) {
                         this.nodeData = {
                             data: deepClone(model.node_data), // 深拷贝节点数据
                             log: model.log,
@@ -344,7 +344,8 @@
                         this.nodeDrawer.show = true
                         this.nodeDrawer.title = model.name
                     }
-                })
+                }
+                )
             },
             createGraphic() {
                 // 创建菜单
@@ -362,12 +363,20 @@
                 setTimeout(() => {
                     const data = {
                         edges: _this.form.pipeline_tree.lines.map(line => {
-                            return {
+                            const item = {
                                 detail: detail,
                                 id: getUUID(32, 16),
                                 source: line.from,
-                                target: line.to
+                                target: line.to,
+                                getWay: {
+                                    name: line.hasOwnProperty('getWay') ? line.getWay.name : '',
+                                    expression: line.hasOwnProperty('getWay') ? line.getWay.expression : ''
+                                }
                             }
+                            if (item.getWay.name !== '') {
+                                item.label = line.getWay.name.length > 4 ? `${item.getWay.name.substr(0, 4)}...` : line.getWay.name
+                            }
+                            return item
                         }),
                         nodes: _this.form.pipeline_tree.nodes.map((node, index) => {
                             let style = {}
@@ -461,6 +470,20 @@
                                 stroke: '#aab7c3'
                             },
                             zIndex: 999999
+                        },
+                        labelCfg: {
+                            refY: -15,
+                            style: {
+                                fill: '#1890ff',
+                                fontSize: 14,
+                                cursor: 'pointer',
+                                background: {
+                                    fill: '#ffffff',
+                                    stroke: '#9EC9FF',
+                                    padding: [4, 4, 4, 4],
+                                    radius: 2
+                                }
+                            }
                         }
                     },
                     // 覆盖全局样式
@@ -497,8 +520,9 @@
                             'zoom-canvas',
                             'hover-node',
                             'drag-node',
-                            'hover-edge'
-                            // 'select-node'
+                            'hover-edge',
+                            'active-edge',
+                            'select-node'
                         ]
                     }
                 })

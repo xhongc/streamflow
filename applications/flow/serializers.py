@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 from applications.utils.dag_helper import PipelineBuilder
 from bamboo_engine import api
@@ -33,8 +34,11 @@ class ProcessViewSetsSerializer(serializers.Serializer):
         for node in validated_data["pipeline_tree"]["nodes"]:
             node_map[node["uuid"]] = node
         dag = {k: [] for k in node_map.keys()}
+        gateways = defaultdict(dict)
         for line in self.validated_data["pipeline_tree"]["lines"]:
             dag[line["from"]].append(line["to"])
+            if line["getWay"]["name"] and line["getWay"]["expression"]:
+                gateways[line["from"]][line["to"]] = line["getWay"]
         try:
             with transaction.atomic():
                 category_list = validated_data.get("category", [])
@@ -43,6 +47,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                                                  run_type=validated_data["run_type"],
                                                  category=category_list,
                                                  var_table=validated_data.get("var_table", []),
+                                                 gateways=gateways,
                                                  dag=dag)
                 for category in category_list:
                     Category.objects.update_or_create(name=category)
@@ -68,7 +73,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                                            top=node["top"],
                                            left=node["left"],
                                            ico=node["ico"],
-                                           outputs={},
+                                           outputs=node_data["outputs"],
                                            component_code="http_request",
                                            content=node.get("content", 0) or 0
                                            ))
@@ -87,14 +92,18 @@ class ProcessViewSetsSerializer(serializers.Serializer):
         for node in validated_data["pipeline_tree"]["nodes"]:
             node_map[node["uuid"]] = node
         dag = {k: [] for k in node_map.keys()}
+        gateways = defaultdict(dict)
         for line in self.validated_data["pipeline_tree"]["lines"]:
             dag[line["from"]].append(line["to"])
+            if line["getWay"]["name"] and line["getWay"]["expression"]:
+                gateways[line["from"]][line["to"]] = line["getWay"]
         try:
             with transaction.atomic():
                 instance.name = validated_data["name"]
                 instance.description = validated_data["description"]
                 instance.run_type = validated_data["run_type"]
                 instance.dag = dag
+                instance.gateways = gateways
                 instance.var_table = validated_data.get("var_table", [])
                 instance.category = validated_data.get("category", [])
                 instance.save()
@@ -123,7 +132,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
-                        node_obj.outputs = {}
+                        node_obj.outputs = node_data["outputs"]
                         node_obj.component_code = "http_request"
                         bulk_update_nodes.append(node_obj)
                     else:
@@ -142,7 +151,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
-                        node_obj.outputs = {}
+                        node_obj.outputs = node_data["outputs"]
                         node_obj.component_code = "http_request"
                         node_obj.uuid = node["uuid"]
                         node_obj.process_id = instance.id
@@ -220,11 +229,14 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
     def get_pipeline_tree(self, obj):
         lines = []
         nodes = []
+        gateways = obj.gateways
         for _from, to_list in obj.dag.items():
             for _to in to_list:
+                get_way = gateways.get(_from, {}).get(_to, {"name": "", "expression": ""})
                 lines.append({
                     "from": _from,
-                    "to": _to
+                    "to": _to,
+                    "getWay": get_way
                 })
         node_list = Node.objects.filter(process_id=obj.id).values()
         node_content_id = [node["content"] for node in node_list if node.get("content", 0)]
@@ -243,6 +255,7 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
                           "content": node["content"],
                           "node_data": {
                               "inputs": json.dumps(node["inputs"]),
+                              "outputs": json.dumps(node["outputs"]),
                               "inputs_component": inputs_component,
                               "run_mark": 0,
                               "node_name": node["name"],
@@ -266,11 +279,15 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
     def get_pipeline_tree(self, obj):
         lines = []
         nodes = []
+        gateways = obj.gateways
+
         for _from, to_list in obj.dag.items():
             for _to in to_list:
+                get_way = gateways.get(_from, {}).get(_to, {"name": "", "expression": ""})
                 lines.append({
                     "from": _from,
-                    "to": _to
+                    "to": _to,
+                    "getWay": get_way
                 })
         runtime = BambooDjangoRuntime()
         process_info = api.get_pipeline_states(runtime, root_id=obj.root_id)

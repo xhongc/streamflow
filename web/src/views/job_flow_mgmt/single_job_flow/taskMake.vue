@@ -23,6 +23,7 @@
             <div v-for="(item, index) in jobList" :key="index" class="select-node" draggable="true" :title="item.name"
                 :data-nodetype="item.nodeType" :data-content="item.id" :data-icon="item.icon" :data-endUuid="item.endUuid"
                 :data-inputs_component="JSON.stringify(item.inputs_component)"
+                :data-outputs="JSON.stringify(item.outputs)"
                 :data-inputs="JSON.stringify(item.inputs)">
                 {{item.name}}
             </div>
