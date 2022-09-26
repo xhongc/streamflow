@@ -211,13 +211,7 @@
                 this.formData.cron_time = val
             },
             changeTime(val) {
-                if (this.formItem.runtimeType === 'now' || this.formItem.runtimeType === 'cron') return
-                if (this.formItem.runtimeType === 'time') {
-                    this.formItem.beginTime = val
-                }
-                if (this.formItem.runtimeType === 'cycle') {
-                    this.formItem.cyclebeginTime = val
-                }
+                this.formData.when_start = val
             },
             lastStep() {
                 if (this.controllableSteps.curStep === 1 || this.controllableSteps.curStep === 4) {

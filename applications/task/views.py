@@ -1,14 +1,13 @@
-from django.db.models import F
-from django.shortcuts import render
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from applications.flow.models import Process
 from applications.flow.utils import build_and_create_process
 from applications.task.filters import VarTableFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
     VarTableIDSSerializer
+from applications.task.tasks import run_by_task
+from applications.task.utils import CronTaskUtils
 from component.drf.viewsets import GenericViewSet
 from rest_framework import mixins
 
@@ -33,12 +32,19 @@ class TaskViewSets(mixins.ListModelMixin,
     def execute(self, request, *args, **kwargs):
         validated_data = self.is_validated_data(request.data)
         task_id = validated_data["task_id"]
-        pipeline = build_and_create_process(task_id)
-        # 执行
-        runtime = BambooDjangoRuntime()
-        api.run_pipeline(runtime=runtime, pipeline=pipeline)
+        is_ok = run_by_task(task_id)
+        if is_ok:
+            return Response({})
+        else:
+            # todo add error response
+            return Response({})
 
-        return Response({})
+    def perform_destroy(self, instance):
+        from dj_flow.celery_app import app
+        if instance.celery_task_id:
+            app.control.revoke(instance.celery_task_id)
+        CronTaskUtils.del_task(instance.id)
+        instance.delete()
 
 
 class VarTableViewSets(mixins.ListModelMixin,

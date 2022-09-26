@@ -77,12 +77,15 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span
-                            v-if="item.id !== 'name'">{{
-                                (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
-                            }}</span>
-                        <span v-else style="color: #3a84ff;cursor: pointer;"
+                        <span v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
+                        <div v-else-if="item.id === 'run_type'">
+                            <span v-if="props.row.run_type === 'hand'">单次</span>
+                            <span v-else-if="props.row.run_type === 'cron'">自定义</span>
+                            <span v-else-if="props.row.run_type === 'time'">定时</span>
+                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
+                        </div>
+                        <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="操作" width="180">
@@ -139,7 +142,7 @@
                 sortable: false
             }, {
                 id: 'run_type',
-                label: '作业描述',
+                label: '执行方式',
                 overflowTooltip: true,
                 sortable: false
             }, {
@@ -294,7 +297,7 @@
                     confirmLoading: false,
                     confirmFn: async() => {
                         this.tableLoading = true
-                        this.$api.content.delete(row.id).then(res => {
+                        this.$api.task.delete(row.id).then(res => {
                             if (res.result) {
                                 this.$cwMessage('删除成功！', 'success')
                                 if (this.tableList.length === 1 && this.pagination.current !== 1) {

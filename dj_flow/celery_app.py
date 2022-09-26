@@ -30,7 +30,16 @@ app = Celery("dj_flow")
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object("django.conf:settings")
-
+app.conf.task_routes = {
+    "applications.task.tasks.run_by_task_in_celery": {
+        "queue": "default",
+        "routing_key": "default"
+    },
+    "applications.task.tasks.cycle_run_by_task_in_celery": {
+        "queue": "default",
+        "routing_key": "default"
+    }
+}
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 

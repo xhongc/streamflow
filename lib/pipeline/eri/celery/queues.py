@@ -43,6 +43,7 @@ class QueueResolver:
                 "queue": "er_timeout%s" % suffix,
                 "routing_key": "er_timeout%s" % suffix,
             },
+
         }
 
     def queues(self) -> List[Queue]:

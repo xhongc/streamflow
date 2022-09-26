@@ -71,6 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dj_flow.wsgi.application'
 TIME_ZONE = "Asia/Shanghai"
+CELERY_TIMEZONE = 'Asia/Shanghai'
 LANGUAGE_CODE = "zh-hans"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -121,6 +122,9 @@ IS_USE_CELERY = True
 if IS_USE_CELERY:
     INSTALLED_APPS += ("django_celery_beat", "django_celery_results")
     CELERY_ENABLE_UTC = False
+    ENABLE_UTC = False
+    DJANGO_CELERY_BEAT_TZ_AWARE = False
+
     CELERY_TASK_SERIALIZER = "pickle"
     CELERY_ACCEPT_CONTENT = ['pickle', ]
     CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"

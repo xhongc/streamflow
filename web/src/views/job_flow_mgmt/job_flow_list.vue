@@ -65,12 +65,6 @@
                                 (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
                             }}
                         </div>
-                        <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'null'">单次</span>
-                            <span v-else-if="props.row.run_type === 'calendar'">日历</span>
-                            <span v-else-if="props.row.run_type === 'time'">定时</span>
-                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
-                        </div>
                         <div v-else-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
                         </div>
@@ -125,11 +119,6 @@
                 label: '作业流名',
                 overflowTooltip: true,
                 sortable: false
-            }, {
-                id: 'run_type',
-                label: '调度方式',
-                overflowTooltip: false,
-                sortable: true
             }, {
                 id: 'category',
                 label: '分类',
