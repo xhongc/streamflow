@@ -75,10 +75,13 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span
-                            v-if="item.id !== 'name'">{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
-                        <span v-else style="color: #3a84ff;cursor: pointer;"
+                        <span v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
                             @click="handleOpenDetail(props.row)">{{props.row[item.id]}}</span>
+                        <span v-else-if="item.id === 'template_type'">
+                            <span v-if="props.row.template_type === '0'">标准节点</span>
+                            <span v-else-if="props.row.template_type === '1'">节点模版</span>
+                        </span>
+                        <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="操作" width="180">
@@ -167,7 +170,7 @@
         },
         created() {
             this.handleLoad()
-            this.getRunSysList()
+            // this.getRunSysList()
             this.auth = this.hasPerm(this.$route.path)
             this.maxTableHeight = this.$store.state.common.defaultTableHeight - 52
         },

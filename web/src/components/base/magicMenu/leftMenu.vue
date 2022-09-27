@@ -34,7 +34,7 @@
                         },
                         {
                             'name': 'NewJob',
-                            'cnName': '作业节点管理',
+                            'cnName': '节点管理',
                             'to': '/newjob',
                             'icon': 'iconfont icon-mianxingtubiao-zuoyeguanli',
                             'hasChild': true,

@@ -127,7 +127,7 @@
             </div>
 
         </div>
-        <div class="footer" v-if="!disabled">
+        <div class="footer" v-if="!disabled" v-show="isShowBtn">
             <bk-button theme="primary" @click="handleConfim" style="margin-right: 8px;" :loading="isChecking">确定
             </bk-button>
             <bk-button @click="handleCancel">保存为模板</bk-button>
@@ -137,11 +137,14 @@
 
 <script>
     export default {
-        // props: ['nodeData'],
         props: {
             nodeData: {
                 type: Object,
                 default: {}
+            },
+            isShowBtn: {
+                type: Boolean,
+                default: true
             }
         },
         inject: ['father_this'],

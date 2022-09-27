@@ -281,13 +281,6 @@
             },
             // 处理跳转修改
             handleOpenUpdate(row) {
-                this.$router.push({
-                    path: '/singlejob',
-                    query: {
-                        type: 'update',
-                        job_id: row.id
-                    }
-                })
             },
             // 处理删除
             handleDelete(row) {

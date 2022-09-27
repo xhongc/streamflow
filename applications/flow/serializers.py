@@ -403,7 +403,19 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         attrs["uuid"] = get_uuid()
+        attrs["inputs_component"] = self.try_json(attrs["inputs_component"])
+        attrs["inputs"] = self.try_json(attrs["inputs"])
         return attrs
+
+    def try_json(self, val):
+        if isinstance(val, str):
+            try:
+                val = json.loads(val)
+                return val
+            except Exception:
+                raise serializers.ValidationError("json序列化失败")
+        else:
+            return val
 
     class Meta:
         model = NodeTemplate

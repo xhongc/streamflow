@@ -6,7 +6,8 @@
 
 <script>
     // 引用组件
-    import * as monaco from 'monaco-editor'
+    // import * as monaco from 'monaco-editor'
+    import * as monaco from "monaco-editor/esm/vs/editor/editor.api"
     export default {
         props: {
             codes: {
@@ -64,9 +65,11 @@
                 //设置新模型
                 this.monacoEditor.setModel(newModel);
             },
+            tidy() {
+                this.monacoEditor.trigger('anyString', 'editor.action.formatDocument')
+            },
             initEditor() {
                 // 初始化编辑器，确保dom已经渲染
-                console.log(this.codes)
                 this.monacoEditor = monaco.editor.create(this.$refs.codeEditor, {
                     value: this.codes, //编辑器初始显示文字
                     language: this.language, //语言支持自行查阅demo
@@ -74,6 +77,7 @@
                     theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
                     readOnly: this.readOnly
                 });
+                this.tidy()
             },
         }
     }

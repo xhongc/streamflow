@@ -3,136 +3,160 @@
         <div class="wrapper">
             <bk-container :col="12" :gutter="4">
                 <bk-row>
-                    <bk-col :span="7"><div class="content">自定义节点</div></bk-col>
-                    <bk-col :span="5"><div class="content">实时预览</div></bk-col>
-                </bk-row>
-                <bk-row>
-                    <bk-col :span="7"><div class="content">
-                        <bk-form ref="form" :label-width="144" :model="form">
-                            <bk-form-item label="节点名称:" :required="true" :error-display-type="'normal'" :property="'node_name'">
-                                <bk-input v-model="form.name" type="text" style="width: 350px;margin-right: 9px;" :disabled="disabled"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="运行标志:" :required="true" :error-display-type="'normal'" :property="'run_mark'">
-                                <bk-radio-group v-model="form.run_mark">
-                                    <bk-radio :value="item.value" v-for="(item, index) in reviewList" :key="index" style="margin-right: 24px;" :disabled="disabled">
-                                        {{ item.label }}
-                                    </bk-radio>
-                                </bk-radio-group>
-                            </bk-form-item>
-                            <bk-form-item label="描述:">
-                                <bk-input v-model="form.description" type="textarea" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="失败重试次数:" :required="true" :error-display-type="'normal'" :property="'fail_retry_count'">
-                                <bk-input v-model="form.fail_retry_count" type="number" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="失败重试间隔:">
-                                <bk-compose-form-item>
-                                    <bk-input v-model="form.fail_offset" type="number" style="width: 139px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                    <bk-select :clearable="true" style="background-color: #fff;width: 138px;margin-right: 14px;" v-model="form.fail_offset_unit" placeholder="请选择" :disabled="disabled">
-                                        <bk-option v-for="(item, index) in timeTypeList" :key="index" :id="item.value" :name="item.label">
-                                        </bk-option>
-                                    </bk-select>
-                                    <span>产生重试</span>
-                                </bk-compose-form-item>
-                            </bk-form-item>
-                            <bk-form-item label="忽略失败:">
-                                <bk-switcher v-model="form.is_skip_fail" :disabled="disabled"></bk-switcher>
-                            </bk-form-item>
-                            <bk-form-item label="超时告警:">
-                                <bk-switcher v-model="form.is_timeout_alarm" :disabled="disabled"></bk-switcher>
-                            </bk-form-item>
-                            <bk-divider
-                                style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
-                            <p class="title">输入参数</p>
-                            <bk-form-item label="输入参数组件">
-                                <editor :height="'200px'" ref="editor1" :codes="JSON.stringify(form.inputs_component)" :read-only="false" :language="'shell'"></editor>
-                            </bk-form-item>
-                            <bk-form-item label="输入参数组件默认值">
-                                <editor :height="'200px'" ref="editor2" :codes="JSON.stringify(form.inputs)" :read-only="false" :language="'shell'"></editor>
-                            </bk-form-item>
-                            <bk-divider
-                                style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
-                        </bk-form>
-                    </div></bk-col>
-                    <bk-col :span="5"><div class="content">
-                        <bk-form ref="form" :label-width="144" :model="form" style="border: 1px solid;">
-                            <bk-form-item label="节点名称:" :required="true" :error-display-type="'normal'" :property="'node_name'">
-                                <bk-input v-model="form.name" type="text" style="width: 350px;margin-right: 9px;" :disabled="disabled"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="运行标志:" :required="true" :error-display-type="'normal'" :property="'run_mark'">
-                                <bk-radio-group v-model="form.run_mark">
-                                    <bk-radio :value="item.value" v-for="(item, index) in reviewList" :key="index" style="margin-right: 24px;" :disabled="disabled">
-                                        {{ item.label }}
-                                    </bk-radio>
-                                </bk-radio-group>
-                            </bk-form-item>
-                            <bk-form-item label="描述:">
-                                <bk-input v-model="form.description" type="textarea" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="失败重试次数:" :required="true" :error-display-type="'normal'" :property="'fail_retry_count'">
-                                <bk-input v-model="form.fail_retry_count" type="number" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item label="失败重试间隔:">
-                                <bk-compose-form-item>
-                                    <bk-input v-model="form.fail_offset" type="number" style="width: 139px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                    <bk-select :clearable="true" style="background-color: #fff;width: 138px;margin-right: 14px;" v-model="form.fail_offset_unit" placeholder="请选择" :disabled="disabled">
-                                        <bk-option v-for="(item, index) in timeTypeList" :key="index" :id="item.value" :name="item.label">
-                                        </bk-option>
-                                    </bk-select>
-                                    <span>产生重试</span>
-                                </bk-compose-form-item>
-                            </bk-form-item>
-                            <bk-form-item label="忽略失败:">
-                                <bk-switcher v-model="form.is_skip_fail" :disabled="disabled"></bk-switcher>
-                            </bk-form-item>
-                            <bk-form-item label="超时告警:">
-                                <bk-switcher v-model="form.is_timeout_alarm" :disabled="disabled"></bk-switcher>
-                            </bk-form-item>
-                            <bk-divider
-                                style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
-                            <p class="title">输入参数</p>
-                            <bk-form-item v-for="(item,index) in form.inputs_component" :label="item.label" :key="index">
-                                <div v-if="item.type === 'textarea'">
-                                    <bk-input v-model="form.inputs[item.key]" type="textarea" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
+                    <bk-col :span="8">
+                        <div class="job-content content">
+                            <p class="job-title">自定义节点</p>
+                            <bk-form ref="form" :label-width="144" :model="form">
+                                <bk-form-item label="节点名称:" :required="true" :error-display-type="'normal'"
+                                    :property="'node_name'">
+                                    <bk-input v-model="form.name" type="text" style="width: 350px;margin-right: 9px;"
+                                        :disabled="disabled"></bk-input>
+                                </bk-form-item>
+                                <bk-form-item label="运行标志:" :required="true" :error-display-type="'normal'"
+                                    :property="'run_mark'">
+                                    <bk-radio-group v-model="form.run_mark">
+                                        <bk-radio :value="item.value" v-for="(item, index) in reviewList" :key="index"
+                                            style="margin-right: 24px;" :disabled="disabled">
+                                            {{ item.label }}
+                                        </bk-radio>
+                                    </bk-radio-group>
+                                </bk-form-item>
+                                <bk-form-item label="描述:">
+                                    <bk-input v-model="form.description" type="textarea"
+                                        style="width: 350px;margin-right: 9px;" :disabled="disabled"
+                                        :min="0"></bk-input>
+                                </bk-form-item>
+                                <bk-form-item label="失败重试次数:" :required="true" :error-display-type="'normal'"
+                                    :property="'fail_retry_count'">
+                                    <bk-input v-model="form.fail_retry_count" type="number"
+                                        style="width: 350px;margin-right: 9px;" :disabled="disabled"
+                                        :min="0"></bk-input>
+                                </bk-form-item>
+                                <bk-form-item label="失败重试间隔:">
+                                    <bk-compose-form-item>
+                                        <bk-input v-model="form.fail_offset" type="number"
+                                            style="width: 139px;margin-right: 9px;" :disabled="disabled"
+                                            :min="0"></bk-input>
+                                        <bk-select :clearable="true"
+                                            style="background-color: #fff;width: 138px;margin-right: 14px;"
+                                            v-model="form.fail_offset_unit" placeholder="请选择" :disabled="disabled">
+                                            <bk-option v-for="(item, index) in timeTypeList" :key="index"
+                                                :id="item.value" :name="item.label">
+                                            </bk-option>
+                                        </bk-select>
+                                        <span>产生重试</span>
+                                    </bk-compose-form-item>
+                                </bk-form-item>
+                                <bk-form-item label="忽略失败:">
+                                    <bk-switcher v-model="form.is_skip_fail" :disabled="disabled"></bk-switcher>
+                                </bk-form-item>
+                                <bk-form-item label="超时告警:">
+                                    <bk-switcher v-model="form.is_timeout_alarm" :disabled="disabled"></bk-switcher>
+                                </bk-form-item>
+                                <bk-divider
+                                    style="width: 100%;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
+                                <p class="job-title">输入参数</p>
+                                <bk-form-item label="表单组件: ">
+                                    <editor :height="'200px'" ref="editor1"
+                                        :codes="JSON.stringify(form.inputs_component)" :read-only="false"
+                                        :language="'shell'"></editor>
+                                </bk-form-item>
+                                <bk-form-item label="默认值: ">
+                                    <editor :height="'200px'" ref="editor2" :codes="JSON.stringify(form.inputs)"
+                                        :read-only="false" :language="'shell'"></editor>
+                                </bk-form-item>
+                                <bk-divider
+                                    style="width: 100%;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
+                                <div class="box">
+                                    <p class="job-title" style="margin-bottom: 10px">输出参数</p>
+                                    <bk-form>
+                                        <bk-table :data="form.outputs">
+                                            <bk-table-column label="名称" prop="name" :show-overflow-tooltip="true">
+                                                <template slot-scope="props">
+                                                    <bk-input v-model="props.row.name"></bk-input>
+                                                </template>
+                                            </bk-table-column>
+                                            <bk-table-column label="KEY" prop="key" :show-overflow-tooltip="true">
+                                                <template slot-scope="props">
+                                                    <bk-input v-model="props.row.key"></bk-input>
+                                                </template>
+                                            </bk-table-column>
+                                            <bk-table-column label="引用" prop="reference">
+                                                <template slot-scope="props">
+                                                    <bk-checkbox :disabled="disabled" v-model="props.row.reference" :true-value="1"
+                                                        :false-value="0"></bk-checkbox>
+                                                </template>
+                                            </bk-table-column>
+                                        </bk-table>
+                                    </bk-form>
                                 </div>
-                                <div v-else-if="item.type === 'select'">
-                                    <bk-select :clearable="true" style="background-color: #fff;width: 130px;margin-right: 14px;" v-model="form.inputs[item.key]" placeholder="请选择" :disabled="disabled">
-                                        <bk-option v-for="(item2, index2) in item.choices || []" :key="index2" :id="item2.value" :name="item2.label">
-                                        </bk-option>
-                                    </bk-select>
-                                </div>
-                                <div v-else-if="item.type === 'dict_map'">
-                                    <div v-for="(item3, index3) in form.inputs[item.key]" class="pre-commands" :key="index3" style="margin-bottom: 12px;">
-                                        <bk-compose-form-item>
-                                            <bk-input v-model="item3.key" type="text" style="width: 130px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                            <bk-input v-model="item3.value" type="text" style="width: 130px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                        </bk-compose-form-item>
-                                        <i class="iconfont icon-changyongtubiao-chahao btn" style="margin-left: 8px;" v-if="!disabled && form.inputs[item.key].length > 1"></i>
-                                        <i class="iconfont icon-changyongtubiao-jiahao btn" v-if="!disabled"></i>
-                                    </div>
-                                </div>
-                                <div v-else-if="item.type === 'number'">
-                                    <bk-input v-model="form.inputs[item.key]" type="number" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                </div>
-                                <div v-else-if="item.type === 'text'">
-                                    <bk-input v-model="form.inputs[item.key]" type="text" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                </div>
-                                <div v-else>
-                                    <div style="color: red">ERROR:不支持的类型</div>
-                                </div>
-                            </bk-form-item>
-                            <bk-divider
-                                style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
-                        </bk-form>
-                    </div></bk-col>
+                            </bk-form>
+                        </div>
+                    </bk-col>
+                    <bk-col :span="4">
+                        <div class="job-content">
+                            <p class="job-title">帮助文档：</p>
+                            <div>支持的表单类型：</div>
+                            <div>
+                                <div>文本类型：</div>
+                                <div>{
+                                    "key": "url",
+                                    "type": "text",
+                                    "label": "请求地址"
+                                    }</div>
+                            </div>
+                            <div>
+                                <div>长文本类型：</div>
+                                <div>{
+                                    "key": "url",
+                                    "type": "textarea",
+                                    "label": "请求地址"
+                                    }</div>
+                            </div>
+                            <div>
+                                <div>下拉框类型：</div>
+                                <div>{
+                                    "key": "method",
+                                    "type": "select",
+                                    "label": "请求类型：",
+                                    "choices": [
+                                    {
+                                    "label": "GET",
+                                    "value": "get"
+                                    }
+                                    ]
+                                    }</div>
+                            </div>
+                            <div>
+                                <div>字典类型：</div>
+                                <div>{
+                                    "key": "header",
+                                    "type": "dict_map",
+                                    "label": "Header"
+                                    }</div>
+                            </div>
+                            <div>
+                                <div>数字类型：</div>
+                                <div>{
+                                    "key": "timeout",
+                                    "type": "number",
+                                    "label": "超时时间："
+                                    }</div>
+                            </div>
+                        </div>
+                    </bk-col>
                 </bk-row>
             </bk-container>
         </div>
+        <bk-sideslider :is-show.sync="customSettings.isShow" :quick-close="true" :width="536" :title="'预览'">
+            <node-info slot="content" :node-data="nodeData" :is-show-btn="false"></node-info>
+        </bk-sideslider>
         <template v-if="overScreenFlag">
             <div style="height: 72px;"></div>
             <div class="footer">
                 <bk-button theme="primary" style="margin: 0 10px 0 140px;" @click="handleConfim">确定</bk-button>
-                <bk-button @click="handleCancel">取消</bk-button>
+                <bk-button @click="handleCancel" style="margin-right: 10px;">取消</bk-button>
+                <bk-button @click="handlePreView">预览</bk-button>
             </div>
         </template>
     </div>
@@ -140,16 +164,22 @@
 
 <script>
     import {
-        deepClone, isJson
+        deepClone
     } from '../../common/util.js'
-    import { validateURL } from '../../common/validate.js'
     import editor from '@/components/monacoEditor'
+    import nodeInfo from '../job_flow_mgmt/single_job_flow/nodeInfo'
+
     export default {
         components: {
-            editor
+            editor,
+            nodeInfo // 节点信息
         },
         data() {
             return {
+                customSettings: {
+                    isShow: false,
+                    title: '更多参数配置'
+                },
                 headerHolder: '请输入请求头, 例如： {"Content-type": "application/json"}',
                 paramsHolder: '请输入填写请求体, 例如： {"name": "abc"}',
                 checkFlag: true,
@@ -159,26 +189,27 @@
                 accountListShow: true,
                 formLoading: false,
                 disabled: false,
-                timeTypeList: [{ // 执行时长告警时间类型下拉列表
-                                   value: 'hours',
-                                   label: '时'
-                               },
-                               {
-                                   value: 'minutes',
-                                   label: '分'
+                timeTypeList: [
+                    { // 执行时长告警时间类型下拉列表
+                        value: 'hours',
+                        label: '时'
+                    },
+                    {
+                        value: 'minutes',
+                        label: '分'
 
-                               },
-                               {
-                                   value: 'seconds',
-                                   label: '秒'
-                               }
+                    },
+                    {
+                        value: 'seconds',
+                        label: '秒'
+                    }
                 ],
                 reviewList: [{ // 执行前人工复核单选列表
                     label: '正常运行',
-                    value: 0
+                    value: 1
                 }, {
                     label: '禁止运行',
-                    value: 1
+                    value: 0
                 }],
                 scriptMap: {
                     1: 'shell',
@@ -272,6 +303,7 @@
                         params: '' // http请求，请求体
                     }
                 },
+                cloneForm: {},
                 otherRules: {
                     'data.script_content': [{
                         required: true,
@@ -323,73 +355,16 @@
                 const rules = {}
                 Object.assign(rules, this.baseRules, this.otherRules)
                 return rules
-            }
-        },
-        watch: {
-            'form.data.script_type': function(val) {
-                if (val === 1 || val === 2 || val === 3 || val === 4 || val === 5) {
-                    this.otherRules = {
-                        'data.script_content': [{
-                            required: true,
-                            message: '脚本内容不能为空',
-                            trigger: 'blur'
-                        }]
-                    }
-                } else if (val === 6) {
-                    this.otherRules = {
-                        'data.request_type': [{
-                            required: true,
-                            message: '请求方式不能为空',
-                            trigger: 'blur'
-                        }],
-                        'data.request_url': [{
-                            required: true,
-                            message: 'URL不能为空',
-                            trigger: 'blur'
-                        }, {
-                            required: true,
-                            trigger: 'change',
-                            message: '请输入合法的url',
-                            validator: (e) => {
-                                if (!validateURL(e)) {
-                                    return false
-                                }
-                                return true
-                            }
-                        }],
-                        'data.params': [{
-                            required: false,
-                            trigger: 'blur',
-                            message: '请输入合法的请求体格式，必须为json',
-                            validator: (e) => {
-                                if (e !== '') {
-                                    return isJson(e)
-                                }
-                                return true
-                            }
-                        }],
-                        'data.headers': [{
-                            required: false,
-                            trigger: 'blur',
-                            message: '请输入合法的请求头格式，必须为json',
-                            validator: (e) => {
-                                if (e !== '') {
-                                    return isJson(e)
-                                }
-                                return true
-                            }
-                        }]
-                    }
-                } else if (val === 7) {
-                    console.log('修改java作业校验规则')
-                } else if (val === 8) {
-                    console.log('修改sql作业校验规则')
+            },
+            nodeData() {
+                return {
+                    'data': this.cloneForm
                 }
             }
         },
+        watch: {
+        },
         created() {
-            // 获取跑批系统
-            this.getRunSysList()
             if (this.$route.query.type === 'update' || this.$route.query.type === 'clone') {
                 this.initJobData()
             } else {
@@ -428,56 +403,11 @@
             }
         },
         methods: {
-            // 处理切换脚本类型
-            handleScriptTypeChange(e) {
-                // this.overScreen()
-                if (e === 6) {
-                    return false
-                }
-                this.$refs.editor.changeModel(this.scriptMap[e])
-            },
-            // 处理跑批系统选择
-            handleRunIdChange(e) {
-                // 由于修改作业时，作业初始化导致触发该方法清除正常的数据，因此这里要做判断。
-                // pageKey为初始化的标志，初始化结束后大于0
-                if ((this.$route.query.type === 'update' || this.$route.query.type === 'clone') && this.pageKey === 0) {
-                    this.getAgentList(e)
-                    return
-                }
-                this.form.station = ''
-                this.form.os = ''
-                this.form.data.account = ''
-                this.getAgentList(e)
-            },
-            // 处理agent选择
-            handleAgentIdChange() {
-                // 由于修改作业时，作业初始化导致触发该方法清除正常的数据，因此这里要做判断。
-                // pageKey为初始化的标志，初始化结束后大于0
-                if (this.pageKey !== 0) {
-                    this.form.os = ''
-                    this.form.data.account = ''
-                    let bkBizId = ''
-                    for (const item of this.agentList) {
-                        if (item.id === this.form.station) {
-                            bkBizId = item.biz_id
-                            this.form.os = item.os
-                        }
-                    }
-                    if (bkBizId !== '') {
-                        this.getAccountList(bkBizId)
-                    }
-                }
-            },
             // 处理新建作业
             handleAddJob() {
                 this.formLoading = true
                 const params = deepClone(this.form)
-                this.deleteProp(params)
-                // if (params.data.params) {
-                //     params.data.params = JSON.stringify(JSON.parse(params.data.params), null, 2)
-                // }
-                // this.form.data.params = params.data.params
-                // console.log(params)
+                console.log(this.form)
                 this.$api.content.create(params).then(res => {
                     if (res.result) {
                         this.checkFlag = false
@@ -496,7 +426,8 @@
                 this.formLoading = true
                 const id = parseInt(this.$route.query.job_id)
                 const params = deepClone(this.form)
-                this.deleteProp(params)
+                params['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
+                params['inputs'] = this.$refs.editor2.monacoEditor.getValue()
                 this.$api.content.update(id, params).then(res => {
                     if (res.result) {
                         this.checkFlag = false
@@ -510,14 +441,10 @@
                     this.formLoading = false
                 })
             },
-            // 非http类型的作业，以下属性不传
-            deleteProp(params) {
-            },
             // 处理克隆作业
             handleCloneJob() {
                 this.formLoading = true
                 const params = deepClone(this.form)
-                this.deleteProp(params)
                 this.$api.content.clone(params).then(res => {
                     if (res.result) {
                         this.$cwMessage('克隆成功！', 'success')
@@ -532,12 +459,6 @@
             },
             // 处理确定
             handleConfim() {
-                // if (this.form.data.script_type !== 6) {
-                //     // 只有非http类型的节点才获取脚本内容
-                //     this.form.data.script_content = this.$refs.editor.monacoEditor.getValue()
-                // } else {
-                //     this.form.data.script_content = '' // 加个else清空脚本内容是为了防止原本非http类型的节点切换为http保存之后，原来的脚本内容还在。
-                // }
                 this.$refs.form.validate().then(validator => {
                     if (this.$route.query.type === 'add') {
                         this.handleAddJob()
@@ -555,55 +476,13 @@
             handleCancel() {
                 this.$router.go(-1)
             },
-            // 获取执行账号下拉列表
-            getAccountList(bkBizId) {
-                this.accountListShow = false
-                this.$api.station.get_os_account({
-                    bk_biz_id: bkBizId
-                }).then(res => {
-                    if (res.result) {
-                        this.accountList = res.data
-                    } else {
-                        this.$cwMessage(res.message, 'error')
-                    }
-                    this.accountListShow = true
-                })
-            },
-            // 获取agent下拉列表
-            getAgentList(e) {
-                this.agnetListShow = false
-                this.accountListShow = false
-                this.$api.station.list({
-                    category: e
-                }).then(res => {
-                    if (res.result) {
-                        this.agentList = res.data.items
-                        // 由于修改作业时，作业初始化时执行账号的获取需要等待agent列表获取之后才能查找biz_id
-                        // pageKey为初始化的标志，初始化结束后大于0
-                        if ((this.$route.query.type === 'update' || this.$route.query.type === 'clone') && this.pageKey === 0) {
-                            this.pageKey += 1
-                            let bkBizId = ''
-                            for (const item of this.agentList) {
-                                if (item.id === this.form.station) {
-                                    bkBizId = item.biz_id
-                                    this.form.os = item.os
-                                }
-                            }
-                            if (bkBizId !== '') {
-                                this.getAccountList(bkBizId)
-                            }
-                        }
-                    } else {
-                        this.$cwMessage(res.message, 'error')
-                    }
-                    this.agnetListShow = true
-                    this.accountListShow = true
-                })
-            },
-            // 获取跑批系统
-            getRunSysList() {
-                // this.formLoading = true
-                this.runSysList = []
+            // 处理预览
+            handlePreView() {
+                this.cloneForm = deepClone(this.form)
+                this.cloneForm['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
+                this.cloneForm['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                this.cloneForm['outputs'] = JSON.stringify(this.form.outputs)
+                this.customSettings.isShow = true
             },
             // 设置默认编辑器
             setDefaultEditor(e, str1, str2) {
@@ -617,13 +496,6 @@
                 this.$api.content.retrieve(id).then(res => {
                     if (res.result) {
                         this.form = res.data
-                        // 非http类型的节点是没有http节点属性的，上面的赋值会将其覆盖。这里将其重新获取。
-                        // if (this.form.data.script_type !== 6) {
-                        //     this.$set(this.form.data, 'request_type', '')
-                        //     this.$set(this.form.data, 'request_url', '')
-                        //     this.$set(this.form.data, 'headers', '')
-                        //     this.$set(this.form.data, 'params', '')
-                        // }
                         this.setDefaultEditor(1, JSON.stringify(this.form.inputs_component), JSON.stringify(this.form.inputs))
                     } else {
                         this.$cwMessage(res.message, 'error')
@@ -636,76 +508,92 @@
 </script>
 
 <style lang="scss" scoped>
-    #singleJob {
-        padding-top: 20px;
-        // height: 100%;
-        // overflow: auto;
-        position: relative;
+#singleJob {
+    padding-top: 20px;
+    // height: 100%;
+    // overflow: auto;
+    position: relative;
 
-        .content {
-            height: 100%;
-            width: 700px;
-            padding-left: 20px;
+    .content {
+        height: 100%;
+        width: 700px;
+        padding-left: 20px;
 
-            .custom-textarea {
-                /deep/ textarea {
-                    padding: 20px;
-                    background-color: rgb(49, 50, 56) !important;
-                    color: #C4C6CC !important;
-                }
-            }
-
-            .os-button {
-                display: inline-block;
-                padding: 0 5px 0 5px;
-                height: 32px;
-                line-height: 32px;
-                background-color: #fff;
-                font-size: 12px;
-                color: #63656E;
-                border: 1px solid #C4C6CC;
+        .custom-textarea {
+            /deep/ textarea {
+                padding: 20px;
+                background-color: rgb(49, 50, 56) !important;
+                color: #C4C6CC !important;
             }
         }
 
-        .footer {
-            position: fixed;
-            width: 100%;
-            bottom: 0px;
-            height: 52px;
-            line-height: 52px;
-            background: #FFFFFF;
-            box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
-            font-size: 0;
-            z-index: 999;
-        }
-    }
-    .demo-grid {
-        .wrapper {
-            overflow: hidden;
-            border: 1px solid #ddd;
-            border-radius: 2px;
-            padding: 20px 0;
-        }
-        .content {
-            background-color: #e1ecff;
-            height: 100%;
-            line-height: 60px;
-            border-radius: 2px;
+        .os-button {
+            display: inline-block;
+            padding: 0 5px 0 5px;
+            height: 32px;
+            line-height: 32px;
+            background-color: #fff;
             font-size: 12px;
-        }
-
-        .bk-grid-row {
-            text-align: center;
-        }
-
-        .bk-grid-row + .bk-grid-row {
-            margin-top: 30px;
-        }
-
-        .flex {
-            .bk-grid-row + .bk-grid-row {
-                margin-top: 10px;
-            }
+            color: #63656E;
+            border: 1px solid #C4C6CC;
         }
     }
+
+    .footer {
+        position: fixed;
+        width: 100%;
+        bottom: 0px;
+        height: 52px;
+        line-height: 52px;
+        background: #FFFFFF;
+        box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
+        font-size: 0;
+        z-index: 999;
+    }
+}
+
+.demo-grid {
+    .wrapper {
+        overflow: hidden;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        padding: 20px 0;
+    }
+
+    .content {
+        background-color: #e1ecff;
+        height: 100%;
+        line-height: 60px;
+        border-radius: 2px;
+        font-size: 12px;
+    }
+
+    .bk-grid-row {
+        text-align: center;
+    }
+
+    .bk-grid-row + .bk-grid-row {
+        margin-top: 30px;
+    }
+
+    .flex {
+        .bk-grid-row + .bk-grid-row {
+            margin-top: 10px;
+        }
+    }
+}
+
+.job-title {
+    width: 160px;
+    height: 21px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #313238;
+    line-height: 21px;
+}
+
+.job-content {
+    background: #ffffff;
+    padding: 20px;
+}
 </style>
