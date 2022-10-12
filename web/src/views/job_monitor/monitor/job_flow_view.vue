@@ -5,8 +5,6 @@
                 <bk-button class="operationBtn" @click="handleOperation('pause')">挂起</bk-button>
                 <bk-button class="operationBtn" @click="handleOperation('resume')">恢复</bk-button>
                 <bk-button class="operationBtn" @click="handleOperation('cancel')">取消</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('replay')">重新执行</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('release')">释放依赖</bk-button>
             </div>
             <div style="float: right;" v-if="auth.search">
                 <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
@@ -108,26 +106,21 @@
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
                         <div v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
-                        <div v-else-if="item.id === 'state'">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</div>
-                        <div v-else-if="item.id === 'type'">
-                            <span v-if="props.row.type === 'null'">无</span>
-                            <span v-else-if="props.row.type === 'time'">定时</span>
-                            <span v-else-if="props.row.type === 'cycle'">周期</span>
-                            <span v-else-if="props.row.type === 'calendar'">日历</span>
-                        </div>
-                        <div v-else-if="item.id === 'is_release_dependency'">
-                            <span v-if="props.row.is_release_dependency === false">否</span>
-                            <span v-if="props.row.is_release_dependency === true">是</span>
+                        <div v-else-if="item.id === 'state'" :class="props.row.state">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</div>
+                        <div v-else-if="item.id === 'run_type'">
+                            <span v-if="props.row.run_type === 'null'">单次</span>
+                            <span v-else-if="props.row.run_type === 'time'">定时</span>
+                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
+                            <span v-else-if="props.row.run_type === 'calendar'">日历</span>
                         </div>
                         <div v-else>
                             <span>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
                         </div>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="作业流情况" width="150">
+                <bk-table-column label="子作业流" width="150">
                     <template slot-scope="props">
-                        <!-- <bk-button theme="primary" text style="margin-right: 12px;display: inline-block;" @click="handleCheckDetail(props.row)">查看详情</bk-button> -->
-                        <bk-button theme="primary" text @click="handleCheckJob(props.row)">查看作业</bk-button>
+                        <bk-button theme="primary" text @click="handleCheckJob(props.row)">查看</bk-button>
                     </template>
                 </bk-table-column>
                 <bk-table-column type="setting">
@@ -660,5 +653,14 @@
                 }
             }
         }
+    }
+    .fail {
+        color: #FF5656;
+    }
+    .success {
+        color: #45E35F;
+    }
+    .run {
+        color: #FFB848;
     }
 </style>

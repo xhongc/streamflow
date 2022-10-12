@@ -11,12 +11,14 @@ from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProce
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
     RetrieveProcessViewSetsSerializer, ExecuteProcessSerializer, ListProcessRunViewSetsSerializer, \
     RetrieveProcessRunViewSetsSerializer, NodeTemplateSerializer, ListSubProcessRunViewSetsSerializer, \
-    RetrieveSubProcessRunViewSetsSerializer, CategorySerializer
+    RetrieveSubProcessRunViewSetsSerializer, CategorySerializer, CtrlSerializer
 from applications.task.models import VarTable
 from bamboo_engine import api
 from bamboo_engine.builder import *
 from component.drf.viewsets import GenericViewSet
 from pipeline.eri.runtime import BambooDjangoRuntime
+from pipeline.eri.runtime import BambooDjangoRuntime
+from bamboo_engine import api
 
 
 class ProcessViewSets(mixins.ListModelMixin,
@@ -64,6 +66,29 @@ class ProcessRunViewSets(mixins.ListModelMixin,
             return RetrieveProcessRunViewSetsSerializer
         elif self.action == "execute":
             return ExecuteProcessSerializer
+        elif self.action == "control":
+            return CtrlSerializer
+
+    @action(methods=["POST"], detail=False)
+    def control(self, request, *args, **kwargs):
+        validated_data = self.is_validated_data(request.data)
+        action_event = validated_data["event"]
+        ids = validated_data["ids"]
+        instance = ProcessRun.objects.filter(id=ids[0]).first()
+        runtime = BambooDjangoRuntime()
+        print(action_event)
+        if action_event == "pause":
+            result = api.pause_pipeline(runtime=runtime, pipeline_id=instance.root_id)
+        elif action_event == "resume":
+            result = api.resume_pipeline(runtime=runtime, pipeline_id=instance.root_id)
+        elif action_event == "cancel":
+            result = api.revoke_pipeline(runtime=runtime, pipeline_id=instance.root_id)
+        else:
+            return self.failure_response(msg="未知event")
+        if result.result:
+            return self.success_response()
+        else:
+            return self.failure_response(msg=result.exc.args[0])
 
 
 class SubProcessRunViewSets(mixins.ListModelMixin,
@@ -103,48 +128,3 @@ class NodeTemplateViewSet(mixins.ListModelMixin,
 class CategoryViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = Category.objects.order_by("-id")
     serializer_class = CategorySerializer
-
-
-# Create your views here.
-def flow(request):
-    # 使用 builder 构造出流程描述结构
-    start = EmptyStartEvent()
-    act = ServiceActivity(component_code="http_request")
-
-    act2 = ServiceActivity(component_code="http_request")
-    act2.component.inputs.n = Var(type=Var.PLAIN, value=50)
-
-    act3 = ServiceActivity(component_code="http_request")
-    act3.component.inputs.n = Var(type=Var.PLAIN, value=5)
-
-    act4 = ServiceActivity(component_code="http_request")
-    act5 = ServiceActivity(component_code="http_request")
-    eg = ExclusiveGateway(
-        conditions={
-            0: '${exe_res} >= 0',
-            1: '${exe_res} < 0'
-        },
-        name='act_2 or act_3'
-    )
-    pg = ParallelGateway()
-    cg = ConvergeGateway()
-
-    end = EmptyEndEvent()
-
-    start.extend(act).extend(eg).connect(act2, act3).to(act2).extend(act4).extend(act5).to(eg).converge(end)
-    # 全局变量
-    pipeline_data = Data()
-    pipeline_data.inputs['${exe_res}'] = NodeOutput(type=Var.PLAIN, source_act=act.id, source_key='exe_res')
-
-    pipeline = builder.build_tree(start, data=pipeline_data)
-    print(pipeline)
-    # 执行流程对象
-    runtime = BambooDjangoRuntime()
-
-    api.run_pipeline(runtime=runtime, pipeline=pipeline)
-
-    result = api.get_pipeline_states(runtime=runtime, root_id=pipeline["id"])
-
-    result_output = api.get_execution_data_outputs(runtime, act.id).data
-    # api.pause_pipeline(runtime=runtime, pipeline_id=pipeline["id"])
-    return JsonResponse({})

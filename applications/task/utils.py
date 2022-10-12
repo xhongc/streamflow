@@ -1,6 +1,6 @@
 import json
 
-from django_celery_beat.models import IntervalSchedule, PeriodicTask, CrontabSchedule
+from django_celery_beat.models import IntervalSchedule, PeriodicTask, CrontabSchedule, ClockedSchedule
 
 from applications.task.models import Task
 
