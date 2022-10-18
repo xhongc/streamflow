@@ -79,6 +79,9 @@ class HttpRequestService(Service):
 class CustomService(Service):
     def execute(self, data, parent_data):
         node_info = data.get_one_of_inputs("node_info")
+        if node_info["show"] == 0:
+            return True
+
         template_id = node_info["content"]
         base_dir = "applications.flow.plugin_code"
         unique_name = f"plugin_{template_id}"

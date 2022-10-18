@@ -1,3 +1,5 @@
+import json
+
 from applications.flow.models import ProcessRun, NodeRun, Process, Node, SubProcessRun, SubNodeRun
 from applications.task.models import Task
 from applications.utils.dag_helper import PipelineBuilder, instance_dag, instance_gateways

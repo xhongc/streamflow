@@ -447,7 +447,8 @@
                     })
                 } else if (this.$route.query.type === 'clone') {
                     params.id = parseInt(this.$route.query.job_flow_data)
-                    this.$api.process.clone(params).then(res => {
+                    params.mode = 'clone'
+                    this.$api.process.create(params).then(res => {
                         if (res.result) {
                             this.checkFlag = false
                             this.$cwMessage('克隆成功', 'success')

@@ -158,3 +158,4 @@ class NodeTemplate(BaseNode):
     inputs_component = JSONField("前端参数组件", default=list)
     outputs_component = JSONField("前端参数组件", default=list)
     coding = models.TextField(default="")
+    create_by = models.CharField("创建人", default="", max_length=255)

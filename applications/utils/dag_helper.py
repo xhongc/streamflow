@@ -3,6 +3,7 @@ from copy import copy, deepcopy
 
 from applications.flow.models import Process, Node
 from applications.task.models import Task
+from applications.utils.json_helper import try_json
 from applications.utils.var_helper import parse_variable
 from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
     ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess, NodeOutput
@@ -234,6 +235,8 @@ class PipelineBuilder:
     def setup_instance(self):
         """将节点转换成bamboo实例"""
         pipeline_instance = {}
+        need_converge = 0
+        converge_count = 0
         for p_id, node in self.node_map.items():
             if node.node_type == Node.START_NODE:
                 pipeline_instance[p_id] = EmptyStartEvent()
@@ -246,9 +249,12 @@ class PipelineBuilder:
                 )
             elif node.node_type == Node.PARALLEL_NODE:
                 pipeline_instance[p_id] = ParallelGateway()
+                need_converge += 1
             elif node.node_type == Node.CONVERGE_NODE:
                 pipeline_instance[p_id] = ConvergeGateway()
+                converge_count += 1
             elif node.node_type == Node.CONDITION_PARALLEL_NODE:
+                need_converge += 1
 
                 pipeline_instance[p_id] = ConditionalParallelGateway(
                     conditions={},
@@ -267,6 +273,8 @@ class PipelineBuilder:
                 act.component.inputs.inputs = Var(type=Var.SPLICE, value=node.inputs)
                 act.component.inputs.node_info = Var(type=Var.SPLICE, value=node.clone_data)
                 pipeline_instance[p_id] = act
+        if need_converge != converge_count:
+            raise Exception("并行网关需要和汇聚网关配套使用！")
         return pipeline_instance
 
     def setup_dag(self):
@@ -307,7 +315,7 @@ class PipelineBuilder:
         # 加载输出变量
         for node_uid, node in self.node_map.items():
             if node.node_type == 2:
-                for output in node.outputs:
+                for output in try_json(node.outputs):
                     if output["reference"] == 1:
                         var_key = parse_variable(output["key"])
                         pipeline_data.inputs[var_key] = NodeOutput(source_act=self.get_inst(node_uid).id,

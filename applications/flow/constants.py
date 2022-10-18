@@ -43,6 +43,8 @@ class NodeTemplateType:
     EmptyTemplate = "0"
     # 带内容的节点模板
     ContentTemplate = "2"
+    # 用户自定义模版
+    CustomTemplate = "1"
 
 
 a = [

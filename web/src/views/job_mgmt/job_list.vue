@@ -136,7 +136,20 @@
                 },
                 tableLoading: false,
                 tableList: [],
-                runSysList: [], // 跑批系统下拉列表
+                runSysList: [
+                    {
+                        id: '0',
+                        name: '标准节点'
+                    },
+                    {
+                        id: '1',
+                        name: '自定义节点'
+                    },
+                    {
+                        id: '2',
+                        name: '节点模版'
+                    }
+                ], // 跑批系统下拉列表
                 isDropdownShow: false,
                 searchFrom: {
                     name: '', // 作业名称

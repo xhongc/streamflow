@@ -24,6 +24,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
     var_table = serializers.ListField(default="null")
     run_type = serializers.CharField(default="null")
     pipeline_tree = serializers.JSONField(required=True)
+    mode = serializers.CharField(required=False)
 
     def save(self, **kwargs):
         if self.instance is not None:
@@ -32,15 +33,21 @@ class ProcessViewSetsSerializer(serializers.Serializer):
             self.create(validated_data=self.validated_data)
 
     def create(self, validated_data):
+        if validated_data.get("mode", "") == "clone":
+            for node in validated_data["pipeline_tree"]["nodes"]:
+                node["uuid"] = f"c{node['uuid']}"
         node_map = {}
         for node in validated_data["pipeline_tree"]["nodes"]:
             node_map[node["uuid"]] = node
         dag = {k: [] for k in node_map.keys()}
         gateways = defaultdict(dict)
         for line in self.validated_data["pipeline_tree"]["lines"]:
-            dag[line["from"]].append(line["to"])
+            from_uuid = line["from"] if validated_data.get("mode", "") != "clone" else f"c{line['from']}"
+            to_uuid = line["to"] if validated_data.get("mode", "") != "clone" else f"c{line['to']}"
+
+            dag[from_uuid].append(to_uuid)
             if line["getWay"]["name"] and line["getWay"]["expression"]:
-                gateways[line["from"]][line["to"]] = line["getWay"]
+                gateways[from_uuid][to_uuid] = line["getWay"]
         try:
             with transaction.atomic():
                 category_list = validated_data.get("category", [])
@@ -61,11 +68,10 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                     else:
                         node_inputs = json.loads(node_data["inputs"])
 
-                    if isinstance(node_data.get("outputs", {}), dict):
+                    if isinstance(node_data.get("outputs", []), list):
                         node_outputs = node_data.get("outputs", {})
                     else:
                         node_outputs = json.loads(node_data["outputs"])
-
                     bulk_nodes.append(Node(process=process,
                                            name=node_data["node_name"],
                                            uuid=node["uuid"],
@@ -77,7 +83,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                                            is_skip_fail=node_data["is_skip_fail"],
                                            is_timeout_alarm=node_data["is_skip_fail"],
                                            inputs=node_inputs,
-                                           show=node["show"],
+                                           show=node_data.get("run_mark", 1),
                                            top=node["top"],
                                            left=node["left"],
                                            ico=node["ico"],
@@ -125,6 +131,10 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_inputs = node_data.get("inputs", {})
                     else:
                         node_inputs = json.loads(node_data["inputs"])
+                    if isinstance(node_data.get("outputs", {}), dict):
+                        node_outputs = node_data.get("outputs", {})
+                    else:
+                        node_outputs = json.loads(node_data["outputs"])
                     if node_obj:
                         node_obj.content = node.get("content", 0) or 0
                         node_obj.name = node_data["node_name"]
@@ -140,7 +150,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
-                        node_obj.outputs = node_data["outputs"]
+                        node_obj.outputs = node_outputs
                         node_obj.component_code = node_data.get("component_code", "node")
                         bulk_update_nodes.append(node_obj)
                     else:
@@ -159,7 +169,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
-                        node_obj.outputs = node_data["outputs"]
+                        node_obj.outputs = node_outputs
                         node_obj.component_code = node_data.get("component_code", "node")
                         node_obj.uuid = node["uuid"]
                         node_obj.process_id = instance.id
@@ -242,11 +252,6 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
     category = serializers.ListField()
     var_table = serializers.ListField()
 
-    # category = serializers.SerializerMethodField()
-    #
-    # def get_category(self, obj):
-    #     return obj.category.all()
-
     def get_pipeline_tree(self, obj):
         lines = []
         nodes = []
@@ -278,6 +283,7 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
                               "inputs": json.dumps(node["inputs"]),
                               "outputs": json.dumps(node["outputs"]),
                               "inputs_component": inputs_component,
+                              "component_code": node["component_code"],
                               "run_mark": 0,
                               "node_name": node["name"],
                               "description": node["description"],
@@ -427,6 +433,7 @@ class CtrlSerializer(serializers.Serializer):
 
 class NodeTemplateSerializer(serializers.ModelSerializer):
     component_code = serializers.CharField(read_only=True)
+    create_by = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
         attrs["uuid"] = get_uuid()

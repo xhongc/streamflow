@@ -172,10 +172,10 @@
                 tableList: [],
                 reviewList: [{ // 执行前人工复核单选列表
                     label: '正常运行',
-                    value: 0
+                    value: 1
                 }, {
                     label: '禁止运行',
-                    value: 1
+                    value: 0
                 }],
                 timeTypeList: [
                     { // 执行时长告警时间类型下拉列表
@@ -279,10 +279,18 @@
         },
         created() {
             this.form = this.nodeData.data
-            console.log('222', this.form)
-            this.form.inputs = JSON.parse(this.form.inputs)
-            this.form.inputs_component = JSON.parse(this.form.inputs_component)
-            this.tableList = JSON.parse(this.form.outputs)
+            if (Object.prototype.toString.call(this.form.inputs) !== '[object Object]') {
+                this.form.inputs = JSON.parse(this.form.inputs)
+            }
+            if (Object.prototype.toString.call(this.form.inputs_component) !== '[object Array]') {
+                this.form.inputs_component = JSON.parse(this.form.inputs_component)
+            }
+            if (Object.prototype.toString.call(this.form.outputs) !== '[object Array]') {
+                this.tableList = JSON.parse(this.form.outputs)
+            } else {
+                this.tableList = this.form.outputs
+            }
+
             this.controlType = this.father_this.controlType
             if (this.$route.query.type === 'detail') {
                 this.disabled = true

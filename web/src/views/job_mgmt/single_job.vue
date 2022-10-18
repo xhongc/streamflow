@@ -483,7 +483,7 @@
                     } else if (this.$route.query.type === 'update') {
                         this.handleUpdateJob()
                     } else if (this.$route.query.type === 'clone') {
-                        this.handleCloneJob()
+                        this.handleAddJob()
                     }
                 }).catch(e => {
                     // this.$cwMessage('输入有误，请检查您的输入！', 'warning')
