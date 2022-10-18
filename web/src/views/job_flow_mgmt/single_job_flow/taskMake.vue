@@ -23,6 +23,7 @@
             <div v-for="(item, index) in jobList" :key="index" class="select-node" draggable="true" :title="item.name"
                 :data-nodetype="item.nodeType" :data-content="item.id" :data-icon="item.icon" :data-endUuid="item.endUuid"
                 :data-inputs_component="JSON.stringify(item.inputs_component)"
+                :data-component_code="item.component_code"
                 :data-outputs="JSON.stringify(item.outputs)"
                 :data-inputs="JSON.stringify(item.inputs)">
                 {{item.name}}
@@ -156,10 +157,10 @@
                 })
             },
             // 获取节点模板
-            getNodeTemplateList(str) {
+            getNodeTemplateList(str, mode) {
                 this.jobListLoading = true
                 const params = {
-                    template_type: this.form.makeType,
+                    template_mode: mode,
                     page_size: 999
                 }
                 if (str === 'search') {
@@ -231,14 +232,14 @@
                 this.form.agent_id = ''
                 // 编排类型切换为未编排时，当前跑批系统id不为空，默认获取agent列表
                 if (this.form.makeType === 0) {
-                    this.getNodeTemplateList()
+                    this.getNodeTemplateList('list', 'custom')
                 } else if (this.form.makeType === 1) {
                     // 编排类型切换成已编排时，记录此时的跑批id
                     this.midRunId = this.form.system_id
                     // 编排类型切换为已编排时，当前跑批系统id不为空，默认获取作业流列表
                     this.getJobFlowList()
                 } else if (this.form.makeType === 2) {
-                    this.getNodeTemplateList()
+                    this.getNodeTemplateList('list', 'template')
                 } else if (this.form.makeType === 3) {
                     this.jobList = [
                         {
@@ -279,14 +280,14 @@
             // 处理查询
             handleSearch() {
                 if (this.form.makeType === 0) {
-                    this.getNodeTemplateList('search')
+                    this.getNodeTemplateList('search', 'custom')
                 } else if (this.form.makeType === 1) {
                     // 编排类型切换成已编排时，记录此时的跑批id
                     this.midRunId = this.form.system_id
                     // 编排类型切换为已编排时，当前跑批系统id不为空，默认获取作业流列表
                     this.getJobFlowList('search')
                 } else if (this.form.makeType === 2) {
-                    this.getNodeTemplateList('search')
+                    this.getNodeTemplateList('search', 'template')
                 } else if (this.form.makeType === 3) {
                     this.jobList = [
                         {

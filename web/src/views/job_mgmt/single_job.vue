@@ -68,7 +68,7 @@
                                 <bk-divider
                                     style="width: 100%;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
                                 <div class="box">
-                                    <p class="job-title" style="margin-bottom: 10px">输出参数</p>
+                                    <p class="job-title" style="margin-bottom: 10px;">输出参数</p>
                                     <bk-form>
                                         <bk-table :data="form.outputs">
                                             <bk-table-column label="名称" prop="name" :show-overflow-tooltip="true">
@@ -90,6 +90,13 @@
                                         </bk-table>
                                     </bk-form>
                                 </div>
+                                <bk-divider
+                                    style="width: 100%;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
+                                <p class="job-title" style="margin-bottom: 10px;">执行代码</p>
+                                <bk-form-item label="后端逻辑: ">
+                                    <editor :height="'200px'" ref="editor3" :codes="form.coding"
+                                        :read-only="false" :language="'python'"></editor>
+                                </bk-form-item>
                             </bk-form>
                         </div>
                     </bk-col>
@@ -301,7 +308,14 @@
                         request_url: '', // http请求，请求url
                         headers: '', // http请求，请求头
                         params: '' // http请求，请求体
-                    }
+                    },
+                    outputs: [
+                        {'key': '_result', 'name': '执行结果', 'reference': 1},
+                        {'key': '_log_outputs', 'name': '作业输出变量', 'reference': 0}
+                    ],
+                    coding: 'class Task:\n' +
+                        '    def execute(self):\n' +
+                        '        pass'
                 },
                 cloneForm: {},
                 otherRules: {
@@ -407,7 +421,9 @@
             handleAddJob() {
                 this.formLoading = true
                 const params = deepClone(this.form)
-                console.log(this.form)
+                params['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
+                params['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                params['coding'] = this.$refs.editor3.monacoEditor.getValue()
                 this.$api.content.create(params).then(res => {
                     if (res.result) {
                         this.checkFlag = false
@@ -428,6 +444,8 @@
                 const params = deepClone(this.form)
                 params['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
                 params['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                params['coding'] = this.$refs.editor3.monacoEditor.getValue()
+
                 this.$api.content.update(id, params).then(res => {
                     if (res.result) {
                         this.checkFlag = false
@@ -479,6 +497,7 @@
             // 处理预览
             handlePreView() {
                 this.cloneForm = deepClone(this.form)
+                console.log(this.form)
                 this.cloneForm['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
                 this.cloneForm['inputs'] = this.$refs.editor2.monacoEditor.getValue()
                 this.cloneForm['outputs'] = JSON.stringify(this.form.outputs)
@@ -497,6 +516,7 @@
                     if (res.result) {
                         this.form = res.data
                         this.setDefaultEditor(1, JSON.stringify(this.form.inputs_component), JSON.stringify(this.form.inputs))
+                        this.$refs.editor3.changeModel('python', this.form.coding)
                     } else {
                         this.$cwMessage(res.message, 'error')
                     }
@@ -542,11 +562,11 @@
     .footer {
         position: fixed;
         width: 100%;
-        bottom: 0px;
+        bottom: 0;
         height: 52px;
         line-height: 52px;
         background: #FFFFFF;
-        box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.1);
         font-size: 0;
         z-index: 999;
     }

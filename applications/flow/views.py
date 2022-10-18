@@ -6,6 +6,7 @@ from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from applications.flow.constants import NodeTemplateType
 from applications.flow.filters import NodeTemplateFilter, ProcessRunFilter, SubProcessRunFilter
 from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun, Category
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
@@ -123,6 +124,13 @@ class NodeTemplateViewSet(mixins.ListModelMixin,
     queryset = NodeTemplate.objects.order_by("-id")
     serializer_class = NodeTemplateSerializer
     filterset_class = NodeTemplateFilter
+
+    def perform_update(self, serializer):
+        # 暂时设计不能修改标准节点
+        if serializer.validated_data.get("template_type") == NodeTemplateType.EmptyTemplate:
+            pass
+        else:
+            serializer.save()
 
 
 class CategoryViewSet(mixins.ListModelMixin, GenericViewSet):

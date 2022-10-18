@@ -78,7 +78,15 @@ class BaseNode(models.Model):
     def clone_data(self):
         return {
             "name": self.name,
-            "outputs": self.outputs
+            "show": self.show,
+            "fail_retry_count": self.fail_retry_count,
+            "fail_offset": self.fail_offset,
+            "fail_offset_unit": self.fail_offset_unit,
+            "is_skip_fail": self.is_skip_fail,
+            "is_timeout_alarm": self.is_timeout_alarm,
+            "outputs": self.outputs,
+            "inputs": self.inputs,
+            "content": self.content,
         }
 
 
@@ -149,3 +157,4 @@ class NodeTemplate(BaseNode):
     template_type = models.CharField("节点模板类型", max_length=1, default=NodeTemplateType.ContentTemplate)
     inputs_component = JSONField("前端参数组件", default=list)
     outputs_component = JSONField("前端参数组件", default=list)
+    coding = models.TextField(default="")

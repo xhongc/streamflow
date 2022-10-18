@@ -1,10 +1,12 @@
 import json
+import os
 from collections import defaultdict
 
 from applications.utils.dag_helper import PipelineBuilder
 from bamboo_engine import api
 from django.db import transaction
 
+from dj_flow.settings import BASE_DIR
 from pipeline.eri.models import State
 from pipeline.eri.runtime import BambooDjangoRuntime
 from rest_framework import serializers
@@ -58,6 +60,12 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_inputs = node_data.get("inputs", {})
                     else:
                         node_inputs = json.loads(node_data["inputs"])
+
+                    if isinstance(node_data.get("outputs", {}), dict):
+                        node_outputs = node_data.get("outputs", {})
+                    else:
+                        node_outputs = json.loads(node_data["outputs"])
+
                     bulk_nodes.append(Node(process=process,
                                            name=node_data["node_name"],
                                            uuid=node["uuid"],
@@ -73,8 +81,8 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                                            top=node["top"],
                                            left=node["left"],
                                            ico=node["ico"],
-                                           outputs=node_data["outputs"],
-                                           component_code="http_request",
+                                           outputs=node_outputs,
+                                           component_code=node_data.get("component_code") or "node",
                                            content=node.get("content", 0) or 0
                                            ))
                 Node.objects.bulk_create(bulk_nodes, batch_size=500)
@@ -133,7 +141,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
                         node_obj.outputs = node_data["outputs"]
-                        node_obj.component_code = "http_request"
+                        node_obj.component_code = node_data.get("component_code", "node")
                         bulk_update_nodes.append(node_obj)
                     else:
                         node_obj = Node()
@@ -152,7 +160,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
                         node_obj.outputs = node_data["outputs"]
-                        node_obj.component_code = "http_request"
+                        node_obj.component_code = node_data.get("component_code", "node")
                         node_obj.uuid = node["uuid"]
                         node_obj.process_id = instance.id
                         bulk_create_nodes.append(node_obj)
@@ -418,6 +426,7 @@ class CtrlSerializer(serializers.Serializer):
 
 
 class NodeTemplateSerializer(serializers.ModelSerializer):
+    component_code = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
         attrs["uuid"] = get_uuid()
@@ -434,6 +443,29 @@ class NodeTemplateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("json序列化失败")
         else:
             return val
+
+    def save_file(self, name, content):
+        coding_path = os.path.join(BASE_DIR, "applications", "flow", "plugin_code")
+        with open(f"{coding_path}/{name}.py", "wb") as f:
+            f.write(content.encode())
+
+    def create(self, validated_data):
+        if not validated_data.get("component_code"):
+            validated_data["component_code"] = "custom_plugin"
+            validated_data["template_type"] = "1"
+        else:
+            validated_data["template_type"] = "2"
+        coding = validated_data.get("coding", "")
+        instance = super(NodeTemplateSerializer, self).create(validated_data)
+
+        self.save_file(name=f"plugin_{instance.id}", content=coding)
+        return instance
+
+    def update(self, instance, validated_data):
+        coding = validated_data.get("coding", "")
+        self.save_file(name=f"plugin_{instance.id}", content=coding)
+        instance = super(NodeTemplateSerializer, self).update(instance, validated_data)
+        return instance
 
     class Meta:
         model = NodeTemplate

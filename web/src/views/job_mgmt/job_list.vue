@@ -23,15 +23,9 @@
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
-                                <bk-form-item label="Agent:">
-                                    <bk-input :placeholder="'请输入Agent名称'" v-model="searchFrom.station_name" clearable>
-                                    </bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="跑批系统:">
+                                <bk-form-item label="模版类型:">
                                     <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchFrom.category">
+                                        v-model="searchFrom.template_type">
                                         <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id"
                                             :name="item.name">
                                         </bk-option>
@@ -39,16 +33,8 @@
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
-                                <bk-form-item label="IP:">
-                                    <bk-input :placeholder="'请输入IP'" v-model="searchFrom.ip" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="margin-top: 20px;">
-                            <bk-col :span="6">
-                                <bk-form-item label="作业流名称:">
-                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchFrom.process_name" clearable>
-                                    </bk-input>
+                                <bk-form-item label="作业描述:">
+                                    <bk-input :placeholder="'请输入作业描述'" v-model="searchFrom.description" clearable></bk-input>
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
@@ -79,7 +65,8 @@
                             @click="handleOpenDetail(props.row)">{{props.row[item.id]}}</span>
                         <span v-else-if="item.id === 'template_type'">
                             <span v-if="props.row.template_type === '0'">标准节点</span>
-                            <span v-else-if="props.row.template_type === '1'">节点模版</span>
+                            <span v-else-if="props.row.template_type === '2'">节点模版</span>
+                            <span v-else-if="props.row.template_type === '1'">自定义节点</span>
                         </span>
                         <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
                     </template>
@@ -91,7 +78,7 @@
                                 v-if="auth.modify">修改</bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleClone(props.row)" v-if="auth.modify">克隆
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)" v-if="auth.del">删除
+                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)" v-if="props.row.template_type !== '0'">删除
                             </bk-button>
                         </div>
                     </template>
@@ -153,10 +140,8 @@
                 isDropdownShow: false,
                 searchFrom: {
                     name: '', // 作业名称
-                    station_name: '', // agent
-                    category: '', // 跑批系统
-                    ip: '', // ip
-                    process_name: '', // 作业流名称
+                    template_type: '',
+                    description: '', // 跑批系统
                     creator: '' // 创建人
                 },
                 pagination: {
@@ -204,30 +189,6 @@
             }) {
                 this.setting.size = size
                 this.setting.selectedFields = fields
-            },
-            // 处理执行
-            handleImplement(row) {
-                this.$bkInfo({
-                    title: '确认要执行吗？',
-                    confirmLoading: false,
-                    confirmFn: async() => {
-                        this.tableLoading = true
-                        this.$api.content.execute({
-                            id: row.id
-                        }).then(res => {
-                            if (res.result) {
-                                this.$cwMessage('执行成功!', 'success')
-                                this.$store.commit('changeTabActive', 'jobview')
-                                this.$router.push({
-                                    path: '/jobview'
-                                })
-                            } else {
-                                this.$cwMessage(res.message, 'error')
-                            }
-                            this.tableLoading = false
-                        })
-                    }
-                })
             },
             // 处理打开详情
             handleOpenDetail(row) {
@@ -321,11 +282,11 @@
                     process_name: '', // 作业流名称
                     creator: '' // 创建人
                 }
+                this.handleLoad()
             },
             // 处理打开高级搜索
             handleOpenSeniorSearch() {
                 this.isDropdownShow = !this.isDropdownShow
-                // this.handleReset()
             },
             // 处理表格size切换
             handlePageLimitChange(val) {

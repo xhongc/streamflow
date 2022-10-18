@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import importlib
 import math
 
 from bamboo_engine.api import logger
@@ -75,7 +76,37 @@ class HttpRequestService(Service):
         ]
 
 
+class CustomService(Service):
+    def execute(self, data, parent_data):
+        node_info = data.get_one_of_inputs("node_info")
+        template_id = node_info["content"]
+        base_dir = "applications.flow.plugin_code"
+        unique_name = f"plugin_{template_id}"
+
+        try:
+            module = importlib.import_module(f"{base_dir}.{unique_name}")
+        except ModuleNotFoundError:
+            return False
+        try:
+            module.Task().execute()
+        except Exception:
+            return False
+        return True
+
+    def inputs_format(self):
+        return []
+
+    def outputs_format(self):
+        return []
+
+
 class HttpRequestComponent(Component):
     name = "HttpRequestComponent"
     code = "http_request"
     bound_service = HttpRequestService
+
+
+class CustomComponent(Component):
+    name = "CustomComponent"
+    code = "custom_plugin"
+    bound_service = CustomService

@@ -263,7 +263,7 @@ class PipelineBuilder:
                 pipeline_instance.update(p_builder.instance)
             else:
                 # todo 动态扩展节点
-                act = ServiceActivity(component_code="http_request")
+                act = ServiceActivity(component_code=node.component_code)
                 act.component.inputs.inputs = Var(type=Var.SPLICE, value=node.inputs)
                 act.component.inputs.node_info = Var(type=Var.SPLICE, value=node.clone_data)
                 pipeline_instance[p_id] = act
@@ -282,6 +282,8 @@ class PipelineBuilder:
 
     def build(self, is_subprocess=False):
         start = self.dag_obj.ind_nodes()[0]
+
+        # 构造流程
         gateways = self.process.gateways
         for in_uid, out_list in self.dag_obj.graph.items():
             for index, out_uid in enumerate(out_list):
@@ -301,6 +303,7 @@ class PipelineBuilder:
                 else:
                     key = var["name"]
                 pipeline_data.inputs[key] = Var(type=Var.PLAIN, value=var["value"])
+
         # 加载输出变量
         for node_uid, node in self.node_map.items():
             if node.node_type == 2:

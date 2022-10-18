@@ -39,7 +39,7 @@ PIPELINE_STATE_TO_FLOW_STATE = {
 
 
 class NodeTemplateType:
-    # 空节点模板
+    # 空节点模板(标准节点)
     EmptyTemplate = "0"
     # 带内容的节点模板
     ContentTemplate = "2"
