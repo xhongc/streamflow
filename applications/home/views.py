@@ -4,6 +4,19 @@ from rest_framework.response import Response
 from applications.flow.models import ProcessRun
 from component.drf.viewsets import GenericViewSet
 
+import datetime
+import time
+from django.http import StreamingHttpResponse
+
+
+def stream(request):
+    def event_stream():
+        while True:
+            time.sleep(3)
+            yield 'data: The server time is: %s\n\n' % datetime.datetime.now()
+
+    return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+
 
 class OverviewSet(GenericViewSet):
     def list(self, request, *args, **kwargs):

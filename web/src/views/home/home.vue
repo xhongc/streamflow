@@ -1,5 +1,6 @@
 <template>
     <div id="home">
+        <div id="result"></div>
         <bk-container :margin="0">
             <bk-row class="first-line" v-bkloading="{ isLoading: overViewLoading, zIndex: 10 }">
                 <bk-col :span="6">
@@ -168,6 +169,14 @@
             }
         },
         mounted() {
+            if (typeof (EventSource) !== 'undefined') {
+                const source = new EventSource('http://127.0.0.1:8001/stream/')
+                source.onmessage = function(event) {
+                    document.getElementById('result').innerHTML += event.data + '<br>'
+                }
+            } else {
+                document.getElementById('result').innerHTML = 'Sorry, your browser does not support server-sent events...'
+            }
             this.getWeeklyJob()
             this.getTop5Agent()
             this.getTodayJob()

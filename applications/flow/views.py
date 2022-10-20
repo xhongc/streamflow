@@ -1,7 +1,6 @@
 import random
 from datetime import datetime
 
-from django.http import JsonResponse
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,11 +14,8 @@ from applications.flow.serializers import ProcessViewSetsSerializer, ListProcess
     RetrieveSubProcessRunViewSetsSerializer, CategorySerializer, CtrlSerializer
 from applications.task.models import VarTable
 from bamboo_engine import api
-from bamboo_engine.builder import *
 from component.drf.viewsets import GenericViewSet
 from pipeline.eri.runtime import BambooDjangoRuntime
-from pipeline.eri.runtime import BambooDjangoRuntime
-from bamboo_engine import api
 
 
 class ProcessViewSets(mixins.ListModelMixin,
@@ -77,7 +73,6 @@ class ProcessRunViewSets(mixins.ListModelMixin,
         ids = validated_data["ids"]
         instance = ProcessRun.objects.filter(id=ids[0]).first()
         runtime = BambooDjangoRuntime()
-        print(action_event)
         if action_event == "pause":
             result = api.pause_pipeline(runtime=runtime, pipeline_id=instance.root_id)
         elif action_event == "resume":

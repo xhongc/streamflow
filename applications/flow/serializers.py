@@ -17,14 +17,65 @@ from applications.flow.models import Process, Node, ProcessRun, NodeRun, NodeTem
 from applications.utils.uuid_helper import get_uuid
 
 
+class NodeDataSerializer(serializers.Serializer):
+    component_code = serializers.CharField(required=False, default="node")
+    description = serializers.CharField(required=False, allow_blank=True)
+    fail_offset = serializers.IntegerField(required=False, default=0)
+    fail_retry_count = serializers.IntegerField(required=True)
+    run_mark = serializers.IntegerField(required=False, default=1)
+    fail_offset_unit = serializers.CharField(required=False, default="seconds")
+    inputs = serializers.JSONField(required=True)
+    outputs = serializers.JSONField(required=True)
+    node_name = serializers.CharField(required=True)
+    is_skip_fail = serializers.BooleanField(required=True)
+    is_timeout_alarm = serializers.BooleanField(required=True)
+
+    def validate_inputs(self, obj):
+        if isinstance(obj, dict):
+            return obj
+        else:
+            return json.loads(obj)
+
+    def validate_outputs(self, obj):
+        if isinstance(obj, list):
+            return obj
+        else:
+            return json.loads(obj)
+
+    def validate(self, attrs):
+        attrs["name"] = attrs.pop("node_name")
+        attrs["show"] = attrs.pop("run_mark")
+        return attrs
+
+
+class NodeSerializer(serializers.Serializer):
+    content = serializers.IntegerField(required=True, allow_null=True)
+    ico = serializers.CharField(required=True)
+    node_data = NodeDataSerializer(required=True)
+    left = serializers.IntegerField(required=True)
+    top = serializers.IntegerField(required=True)
+    type = serializers.IntegerField(required=True)
+    uuid = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        attrs["node_type"] = attrs.pop("type")
+        attrs["content"] = attrs.get("content", 0) or 0
+        return attrs
+
+
+class PipelineTreeSerializer(serializers.Serializer):
+    nodes = NodeSerializer(many=True)
+    lines = serializers.ListField(required=True)
+
+
 class ProcessViewSetsSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
     description = serializers.CharField(required=False, allow_blank=True)
     category = serializers.ListField(default="null")
     var_table = serializers.ListField(default="null")
     run_type = serializers.CharField(default="null")
-    pipeline_tree = serializers.JSONField(required=True)
     mode = serializers.CharField(required=False)
+    pipeline_tree = PipelineTreeSerializer()
 
     def save(self, **kwargs):
         if self.instance is not None:
@@ -60,37 +111,11 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                                                  dag=dag)
                 for category in category_list:
                     Category.objects.update_or_create(name=category)
+
                 bulk_nodes = []
                 for node in node_map.values():
-                    node_data = node["node_data"]
-                    if isinstance(node_data.get("inputs", {}), dict):
-                        node_inputs = node_data.get("inputs", {})
-                    else:
-                        node_inputs = json.loads(node_data["inputs"])
-
-                    if isinstance(node_data.get("outputs", []), list):
-                        node_outputs = node_data.get("outputs", {})
-                    else:
-                        node_outputs = json.loads(node_data["outputs"])
-                    bulk_nodes.append(Node(process=process,
-                                           name=node_data["node_name"],
-                                           uuid=node["uuid"],
-                                           description=node_data["description"],
-                                           fail_retry_count=node_data.get("fail_retry_count", 0) or 0,
-                                           fail_offset=node_data.get("fail_offset", 0) or 0,
-                                           fail_offset_unit=node_data.get("fail_offset_unit", "seconds"),
-                                           node_type=node.get("type", 2),
-                                           is_skip_fail=node_data["is_skip_fail"],
-                                           is_timeout_alarm=node_data["is_skip_fail"],
-                                           inputs=node_inputs,
-                                           show=node_data.get("run_mark", 1),
-                                           top=node["top"],
-                                           left=node["left"],
-                                           ico=node["ico"],
-                                           outputs=node_outputs,
-                                           component_code=node_data.get("component_code") or "node",
-                                           content=node.get("content", 0) or 0
-                                           ))
+                    node_data = node.pop("node_data")
+                    bulk_nodes.append(Node(process=process, **node, **node_data))
                 Node.objects.bulk_create(bulk_nodes, batch_size=500)
                 try:
                     PipelineBuilder(process_id=process.id).build()
@@ -103,54 +128,47 @@ class ProcessViewSetsSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         node_map = {}
-        for node in validated_data["pipeline_tree"]["nodes"]:
+        pipeline_tree = validated_data.pop("pipeline_tree")
+        for node in pipeline_tree["nodes"]:
             node_map[node["uuid"]] = node
         dag = {k: [] for k in node_map.keys()}
         gateways = defaultdict(dict)
-        for line in self.validated_data["pipeline_tree"]["lines"]:
+        for line in pipeline_tree["lines"]:
             dag[line["from"]].append(line["to"])
             if line["getWay"]["name"] and line["getWay"]["expression"]:
                 gateways[line["from"]][line["to"]] = line["getWay"]
         try:
             with transaction.atomic():
-                instance.name = validated_data["name"]
-                instance.description = validated_data["description"]
-                instance.run_type = validated_data["run_type"]
+                for attr, value in validated_data.items():
+                    setattr(instance, attr, value)
                 instance.dag = dag
                 instance.gateways = gateways
-                instance.var_table = validated_data.get("var_table", [])
-                instance.category = validated_data.get("category", [])
                 instance.save()
-                bulk_update_nodes = []
-                bulk_create_nodes = []
-                node_dict = Node.objects.filter(process_id=instance.id).in_bulk(field_name="uuid")
+
+                bulk_update_nodes, bulk_create_nodes = [], []
+                node_bulk = Node.objects.filter(process_id=instance.id).in_bulk(field_name="uuid")
+
                 for node in node_map.values():
                     node_data = node["node_data"]
-                    node_obj = node_dict.get(node["uuid"], None)
-                    if isinstance(node_data.get("inputs", {}), dict):
-                        node_inputs = node_data.get("inputs", {})
-                    else:
-                        node_inputs = json.loads(node_data["inputs"])
-                    if isinstance(node_data.get("outputs", {}), dict):
-                        node_outputs = node_data.get("outputs", {})
-                    else:
-                        node_outputs = json.loads(node_data["outputs"])
+                    node_obj = node_bulk.get(node["uuid"], None)
                     if node_obj:
+
                         node_obj.content = node.get("content", 0) or 0
-                        node_obj.name = node_data["node_name"]
+                        node_obj.node_type = node.get("node_type", 3)
+                        node_obj.show = node_data["show"]
+                        node_obj.top = node["top"]
+                        node_obj.left = node["left"]
+                        node_obj.ico = node["ico"]
+
+                        node_obj.name = node_data["name"]
                         node_obj.description = node_data["description"]
                         node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
                         node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
                         node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
-                        node_obj.node_type = node.get("type", 3)
                         node_obj.is_skip_fail = node_data["is_skip_fail"]
                         node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
-                        node_obj.inputs = node_inputs
-                        node_obj.show = node["show"]
-                        node_obj.top = node["top"]
-                        node_obj.left = node["left"]
-                        node_obj.ico = node["ico"]
-                        node_obj.outputs = node_outputs
+                        node_obj.inputs = node_data["inputs"]
+                        node_obj.outputs = node_data["outputs"]
                         node_obj.component_code = node_data.get("component_code", "node")
                         bulk_update_nodes.append(node_obj)
                     else:
@@ -164,12 +182,12 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                         node_obj.node_type = node.get("type", 3)
                         node_obj.is_skip_fail = node_data["is_skip_fail"]
                         node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
-                        node_obj.inputs = node_inputs
+                        node_obj.inputs = node_data["inputs"]
                         node_obj.show = node["show"]
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]
-                        node_obj.outputs = node_outputs
+                        node_obj.outputs = node_data["outputs"]
                         node_obj.component_code = node_data.get("component_code", "node")
                         node_obj.uuid = node["uuid"]
                         node_obj.process_id = instance.id

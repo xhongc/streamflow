@@ -16,7 +16,7 @@ const baseNodes = [{
         is_skip_fail: false,
         is_timeout_alarm: false,
         inputs: {},
-        outputs: {}
+        outputs: []
     },
     nodeType: 0,
     endUuid: '',
@@ -50,7 +50,7 @@ const baseNodes = [{
         is_skip_fail: false,
         is_timeout_alarm: false,
         inputs: {},
-        outputs: {}
+        outputs: []
     },
     type: 'circle-node',
     labelCfg: {

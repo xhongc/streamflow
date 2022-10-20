@@ -18,6 +18,7 @@ from django.urls import path, include
 from applications.flow.urls import flow_router, node_router
 from applications.home.urls import home_router
 from applications.task.urls import task_router
+from applications.home import views
 from dj_flow.views import index
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path("node/", include(node_router.urls)),
     path("task/", include(task_router.urls)),
     path("home/", include(home_router.urls)),
+    path('stream/', views.stream, name='stream')
+
 ]
