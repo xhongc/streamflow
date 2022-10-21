@@ -24,6 +24,16 @@
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
+                                <bk-form-item label="执行方式:">
+                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
+                                        v-model="searchForm.run_type">
+                                        <bk-option v-for="(item, index) in runTypeList" :key="index" :id="item.id"
+                                            :name="item.name">
+                                        </bk-option>
+                                    </bk-select>
+                                </bk-form-item>
+                            </bk-col>
+                            <bk-col :span="6">
                                 <bk-form-item label="状态">
                                     <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
                                         v-model="searchForm.state">
@@ -39,51 +49,12 @@
                                         format="yyyy-MM-dd HH:mm:ss" style="width: 100%;" :transfer="true" @change="handleEtaChange"></bk-date-picker>
                                 </bk-form-item>
                             </bk-col>
-                            <!-- 未支持 -->
-                            <bk-col :span="6">
-                                <bk-form-item label="作业总数">
-                                    <bk-input :placeholder="'请输入作业总数'" v-model="searchForm.total_job_count" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
                         </bk-row>
                         <bk-row style="margin-top: 24px;">
-                            <bk-col :span="6">
-                                <bk-form-item label="未执行作业数">
-                                    <bk-input :placeholder="'请输入未执行作业数'" v-model="searchForm.total_not_execute_job_count"
-                                        clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="释放依赖">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchForm.is_release_dependency">
-                                        <bk-option v-for="(item, index) in replyList" :key="index" :id="item.value"
-                                            :name="item.label">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="实际开始">
-                                    <bk-date-picker :value="searchForm.start_time" :placeholder="'选择日期时间'" :type="'datetimerange'"
-                                        format="yyyy-MM-dd HH:mm:ss" style="width: 100%;" :transfer="true" @change="handleStartTimeChange"></bk-date-picker>
-                                </bk-form-item>
-                            </bk-col>
                             <bk-col :span="6">
                                 <bk-form-item label="完成时间">
                                     <bk-date-picker :value="searchForm.end_time" :placeholder="'选择日期时间'" :type="'datetimerange'"
                                         format="yyyy-MM-dd HH:mm:ss" style="width: 100%;" :transfer="true" @change="handleEndTimeChange"></bk-date-picker>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="margin-top: 24px;">
-                            <bk-col :span="6">
-                                <bk-form-item label="跑批系统">
-                                    <bk-select :clearable="true" style="background-color: #fff;" v-model="searchForm.category"
-                                        placeholder="请选择">
-                                        <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id" :name="item.name">
-                                        </bk-option>
-                                    </bk-select>
                                 </bk-form-item>
                             </bk-col>
                         </bk-row>
@@ -210,6 +181,7 @@
                 runSysList: [],
                 searchForm: {
                     name: '', // 作业流名
+                    run_type: '',
                     state: '', // 状态
                     eta: ['', ''], // 计划开始时间
                     total_job_count: '', // 作业总数
@@ -219,6 +191,12 @@
                     end_time: ['', ''], // 完成时间
                     category: '' // 跑批系统
                 },
+                runTypeList: [
+                    {id: 'hand', name: '单次'},
+                    {id: 'time', name: '定时'},
+                    {id: 'cycle', name: '周期'},
+                    {id: 'cron', name: '自定义'}
+                ],
                 isDropdownShow: false,
                 replyList: [{
                                 id: 1,
@@ -285,31 +263,6 @@
                                 id: 11,
                                 name: 'ignore',
                                 label: '忽略'
-                            },
-                            {
-                                id: 12,
-                                name: 'exists_need_confirm',
-                                label: '正在执行（存在审核）'
-                            },
-                            {
-                                id: 13,
-                                name: 'exists_error',
-                                label: '正在执行（存在错误）'
-                            },
-                            {
-                                id: 14,
-                                name: 'exists_fail',
-                                label: '正在执行（存在失败）'
-                            },
-                            {
-                                id: 15,
-                                name: 'exists_stop',
-                                label: '正在执行（存在终止）'
-                            },
-                            {
-                                id: 16,
-                                name: 'exists_pause',
-                                label: '正在执行（存在挂起）'
                             }
                 ]
             }

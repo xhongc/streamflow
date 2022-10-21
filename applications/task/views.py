@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from applications.flow.utils import build_and_create_process
-from applications.task.filters import VarTableFilter
+from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
     VarTableIDSSerializer
@@ -12,9 +12,6 @@ from applications.task.tasks import run_by_task
 from applications.task.utils import CronTaskUtils
 from component.drf.viewsets import GenericViewSet
 from rest_framework import mixins
-
-from pipeline.eri.runtime import BambooDjangoRuntime
-from bamboo_engine import api
 
 
 class TaskViewSets(mixins.ListModelMixin,
@@ -24,6 +21,7 @@ class TaskViewSets(mixins.ListModelMixin,
                    mixins.UpdateModelMixin,
                    GenericViewSet):
     queryset = Task.objects.order_by("-id")
+    filterset_class = TaskFilter
 
     def get_serializer_class(self):
         if self.action == "execute":

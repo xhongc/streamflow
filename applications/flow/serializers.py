@@ -320,6 +320,29 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
 
 class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
     pipeline_tree = serializers.SerializerMethodField()
+    state = serializers.SerializerMethodField()
+
+    def _get_state(self, obj):
+        runtime = BambooDjangoRuntime()
+        states = runtime.get_state_by_root(obj.root_id)
+        flow_state = "error"
+        for state in states:
+            flow_state = PIPELINE_STATE_TO_FLOW_STATE[state.name]
+            if state.node_id == obj.root_id:
+
+                if flow_state != "run":
+                    return flow_state
+            else:
+                if flow_state != "success":
+                    return flow_state
+        return flow_state
+
+    def get_state(self, obj):
+        try:
+            return self._get_state(obj)
+        except Exception as e:
+            print(f"{e}")
+            return "error"
 
     def get_pipeline_tree(self, obj):
         lines = []
@@ -378,7 +401,7 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProcessRun
-        fields = ("id", "name", "description", "run_type", "pipeline_tree")
+        fields = ("id", "name", "description", "run_type", "pipeline_tree", "create_by", "create_time", "state")
 
 
 class RetrieveSubProcessRunViewSetsSerializer(serializers.ModelSerializer):

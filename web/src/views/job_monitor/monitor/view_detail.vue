@@ -12,19 +12,13 @@
                             <bk-form-item label="作业流状态:"><span v-if="form.hasOwnProperty('state')">{{stateList[stateList.findIndex(e => e.name === form.state)].label}}</span></bk-form-item>
                         </bk-col>
                         <bk-col :span="6">
-                            <bk-form-item label="启动人:">{{form.executor}}</bk-form-item>
+                            <bk-form-item label="启动人:">{{form.create_by}}</bk-form-item>
                         </bk-col>
                         <bk-col :span="6">
-                            <bk-form-item label="跑批系统:">{{form.category_name}}</bk-form-item>
+                            <bk-form-item label="开始时间:">{{form.create_time}}</bk-form-item>
                         </bk-col>
                     </bk-row>
                     <bk-row>
-                        <bk-col :span="6">
-                            <bk-form-item label="计划开始时间:">{{form.eta}}</bk-form-item>
-                        </bk-col>
-                        <bk-col :span="6">
-                            <bk-form-item label="实际开始时间:">{{form.start_time}}</bk-form-item>
-                        </bk-col>
                         <bk-col :span="6">
                             <bk-form-item label="完成时间:">{{form.end_time}}</bk-form-item>
                         </bk-col>
@@ -36,7 +30,14 @@
             </bk-container>
         </div>
         <div class="box">
-            <p class="title">执行详情</p>
+            <div class="title" style="display: flex;justify-content:space-between;">
+                <div>执行详情</div>
+                <div>
+                    <bk-icon type="play2" />
+                    <bk-icon type="pause" />
+                    <bk-icon type="stop" style="color: red;" />
+                </div>
+            </div>
             <div id="content" v-bkloading="{ isLoading: mainLoading, zIndex: 999 }">
                 <div class="left-statusList">
                     <statusList style="position: absolute;left: 20px;top: 15px;"></statusList>
@@ -193,31 +194,6 @@
                                 id: 11,
                                 name: 'ignore',
                                 label: '忽略'
-                            },
-                            {
-                                id: 12,
-                                name: 'exists_need_confirm',
-                                label: '正在执行（存在审核）'
-                            },
-                            {
-                                id: 13,
-                                name: 'exists_error',
-                                label: '正在执行（存在错误）'
-                            },
-                            {
-                                id: 14,
-                                name: 'exists_fail',
-                                label: '正在执行（存在失败）'
-                            },
-                            {
-                                id: 15,
-                                name: 'exists_stop',
-                                label: '正在执行（存在终止）'
-                            },
-                            {
-                                id: 16,
-                                name: 'exists_pause',
-                                label: '正在执行（存在挂起）'
                             }
                 ]
             }
@@ -435,18 +411,6 @@
                     animate: true, // Boolean，可选，切换布局时是否使用动画过度
                     maxZoom: 1, // 最大缩放比例
                     fitView: true,
-                    // fitView: true,
-                    // layout: {
-                    //     type: 'xxx'
-                    // },
-                    // layout: {
-                    //     type: 'dagre',
-                    //     rankdir: 'LR', // 可选，默认为图的中心
-                    //     align: 'DL', // 可选
-                    //     nodesep: 20, // 可选
-                    //     ranksep: 50, // 可选
-                    //     controlPoints: false, // 可选
-                    // },
                     defaultNode: {
                         type: 'rect-node',
                         style: {
@@ -705,9 +669,6 @@
                 this.$api.processRun.retrieve(parseInt(this.$route.query.id) || parseInt(this.pid)).then(res => {
                     if (res.result) {
                         this.form = res.data
-                        if (this.form.hasOwnProperty('pre_commands')) {
-                            this.$refs.editor.monacoEditor.setValue(this.form.pre_commands)
-                        }
                         // 是否需要清空画布重新渲染
                         if (clear) {
                             this.graph.clear()

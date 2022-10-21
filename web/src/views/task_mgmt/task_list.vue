@@ -24,32 +24,19 @@
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
-                                <bk-form-item label="Agent:">
-                                    <bk-input :placeholder="'请输入Agent名称'" v-model="searchFrom.station_name" clearable>
+                                <bk-form-item label="作业流名称:">
+                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchFrom.process__name" clearable>
                                     </bk-input>
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
-                                <bk-form-item label="跑批系统:">
+                                <bk-form-item label="执行方式:">
                                     <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchFrom.category">
-                                        <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id"
+                                        v-model="searchFrom.run_type">
+                                        <bk-option v-for="(item, index) in runTypeList" :key="index" :id="item.id"
                                             :name="item.name">
                                         </bk-option>
                                     </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="IP:">
-                                    <bk-input :placeholder="'请输入IP'" v-model="searchFrom.ip" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="margin-top: 20px;">
-                            <bk-col :span="6">
-                                <bk-form-item label="作业流名称:">
-                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchFrom.process_name" clearable>
-                                    </bk-input>
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
@@ -171,11 +158,9 @@
                 isDropdownShow: false,
                 searchFrom: {
                     name: '', // 作业名称
-                    station_name: '', // agent
-                    category: '', // 跑批系统
-                    ip: '', // ip
-                    process_name: '', // 作业流名称
-                    creator: '' // 创建人
+                    process__name: '', // 作业流名称
+                    creator: '', // 创建人
+                    run_type: ''
                 },
                 pagination: {
                     current: 1,
@@ -183,7 +168,13 @@
                     limit: 10
                 },
                 selectionList: [], // 表格多选
-                dialogShow: false
+                dialogShow: false,
+                runTypeList: [
+                    {id: 'hand', name: '单次'},
+                    {id: 'time', name: '定时'},
+                    {id: 'cycle', name: '周期'},
+                    {id: 'cron', name: '自定义'}
+                ]
             }
         },
         created() {
