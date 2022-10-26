@@ -7,7 +7,7 @@ from applications.flow.utils import build_and_create_process
 from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
-    VarTableIDSSerializer
+    VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer
 from applications.task.tasks import run_by_task
 from applications.task.utils import CronTaskUtils
 from component.drf.viewsets import GenericViewSet
@@ -59,7 +59,12 @@ class VarTableViewSets(mixins.ListModelMixin,
     def get_serializer_class(self):
         if self.action == "group":
             return VarTableIDSSerializer
-        return VarTableSerializer
+        elif self.action == "retrieve":
+            return RetrieveVarTableSerializer
+        elif self.action == "list":
+            return VarTableSerializer
+
+        return PostVarTableSerializer
 
     @action(methods=["POST"], detail=False)
     def group(self, request, *args, **kwargs):
@@ -67,4 +72,7 @@ class VarTableViewSets(mixins.ListModelMixin,
         ids = validated_data["ids"]
         var_list = list(VarTable.objects.filter(id__in=ids).values_list("data", flat=True))
         flat_var_list = sum(var_list, [])
+        for each in flat_var_list:
+            if each["type"] == "sensitive":
+                each["value"] = "******"
         return Response(flat_var_list)

@@ -16,7 +16,7 @@
             <bk-divider></bk-divider>
 
             <div style="padding: 30px;">
-                <bk-form :label-width="100" :model="formData">
+                <bk-form :label-width="150" :model="formData">
                     <bk-form-item label="任务名称" :required="true" :property="'name'">
                         <bk-input v-model="formData.name" style="width: 350px;"></bk-input>
                     </bk-form-item>
@@ -27,7 +27,7 @@
             </div>
             <bk-divider></bk-divider>
             <div style="padding: 30px;">
-                <bk-form :label-width="100">
+                <bk-form :label-width="150" style="overflow: scroll;height: 300px;">
                     <div v-for="(each, index) in formData.var_table" :key="index" style="margin-bottom: 20px;">
                         <bk-form-item :label="each.name" :required="true" :property="'name'">
                             <bk-input v-model="each.value" style="width: 350px;" clearable></bk-input>

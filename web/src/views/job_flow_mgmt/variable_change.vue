@@ -30,7 +30,10 @@
                     <bk-table-column label="变量值" prop="value" :show-overflow-tooltip="true" align="center">
                         <template slot-scope="props">
                             <bk-input v-model="props.row.value" v-if="props.row.edit"></bk-input>
-                            <span v-else>{{props.row.value}}</span>
+                            <div v-else>
+                                <span v-if="props.row.type !== 'sensitive'">{{props.row.value}}</span>
+                                <bk-tag v-else theme="danger">保密数据</bk-tag>
+                            </div>
                         </template>
                     </bk-table-column>
                     <bk-table-column label="操作" v-if="$route.query.type === 'detail' ? false : true">

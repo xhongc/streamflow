@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from applications.flow.models import Process
 from applications.task.models import Task, VarTable
 from applications.task.tasks import run_by_task_in_celery, cycle_run_by_task_in_celery
 from applications.task.utils import create_cron_check_task
@@ -44,14 +45,53 @@ class VarTableSerializer(serializers.ModelSerializer):
     total_var_num = serializers.SerializerMethodField()
 
     def get_processes(self, obj):
-        return []
+        return list(Process.objects.filter(var_table__icontains=obj.id).values_list("name", flat=True))
 
     def get_total_var_num(self, obj):
         return len(obj.data)
 
     class Meta:
         model = VarTable
+        exclude = ("data",)
 
+
+class RetrieveVarTableSerializer(serializers.ModelSerializer):
+    data = serializers.SerializerMethodField()
+
+    def get_data(self, obj):
+        new_data = []
+        for each in obj.data:
+            if each["type"] == "sensitive":
+                each["value"] = "******"
+            new_data.append(each)
+        return new_data
+
+    class Meta:
+        model = VarTable
+
+        fields = "__all__"
+
+
+class PostVarTableSerializer(serializers.ModelSerializer):
+    def validate_data(self, data):
+        keys = [i["name"] for i in data]
+        if len(set(keys)) != len(keys):
+            raise serializers.ValidationError("变量名不能重复！")
+        return data
+
+    def update(self, instance, validated_data):
+        db_data = instance.data
+        db_data_dict = {i["name"]: i for i in db_data}
+        for each in validated_data["data"]:
+            if each["type"] == "sensitive":
+                if each["value"] == "******":
+                    each["value"] = db_data_dict[each["name"]]["value"]
+        print(validated_data)
+        instance = super(PostVarTableSerializer, self).update(instance, validated_data)
+        return instance
+
+    class Meta:
+        model = VarTable
         fields = "__all__"
 
 

@@ -401,7 +401,7 @@
                     _this.graph.read(data)
                     // _this.graph.fitCenter()
                     _this.mainLoading = false
-                }, 2000)
+                }, 100)
             },
             initOption() {
                 // 工厂函数注册自定义节点

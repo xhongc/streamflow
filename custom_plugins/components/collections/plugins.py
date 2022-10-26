@@ -2,6 +2,7 @@
 import importlib
 import math
 
+from applications.utils.notify_way import send_email
 from bamboo_engine.api import logger
 from bamboo_engine.builder import Var
 from pipeline.core.flow.activity import Service, StaticIntervalGenerator
@@ -103,6 +104,36 @@ class CustomService(Service):
         return []
 
 
+class SendEmailService(Service):
+    def execute(self, data, parent_data):
+        node_info = data.get_one_of_inputs("node_info")
+        if node_info["show"] == 0:
+            return True
+        inputs = node_info["inputs"]
+        to_emails = inputs["to_emails"]
+        if isinstance(inputs["to_emails"], str):
+            try:
+                to_emails = json.loads(inputs["to_emails"])
+            except Exception:
+                return False
+        is_ok = send_email(title=inputs["title"],
+                           msg=inputs["msg"],
+                           from_email=inputs["from_email"],
+                           to_emails=to_emails,
+                           smtp_host=inputs["smtp_host"],
+                           smtp_port=inputs["smtp_port"],
+                           from_email_pwd=inputs["from_email_pwd"],
+                           from_email_alias=inputs["from_email_alias"]
+                           )
+        return is_ok
+
+    def inputs_format(self):
+        return []
+
+    def outputs_format(self):
+        return []
+
+
 class HttpRequestComponent(Component):
     name = "HttpRequestComponent"
     code = "http_request"
@@ -113,3 +144,9 @@ class CustomComponent(Component):
     name = "CustomComponent"
     code = "custom_plugin"
     bound_service = CustomService
+
+
+class SendEmailComponent(Component):
+    name = "SendEmailComponent"
+    code = "send_email"
+    bound_service = SendEmailService
