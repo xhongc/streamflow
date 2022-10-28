@@ -90,6 +90,7 @@ class HttpRequestService(Service, ServiceMixin):
             inputs["body"] = try_json(inputs["body"])
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
             res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=inputs["timeout"],
+                                   verify=False,
                                    **req_data)
             _result_content = res.text
             if 200 <= res.status_code < 300:
