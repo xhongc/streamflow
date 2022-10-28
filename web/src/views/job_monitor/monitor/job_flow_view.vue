@@ -280,7 +280,7 @@
             this.timer = setInterval(() => {
                 // 轮询刷新，非首屏
                 this.handleLoad(false)
-            }, 15000)
+            }, 5000)
         },
         beforeDestroy() {
             clearInterval(this.timer)

@@ -226,6 +226,8 @@ class ListProcessRunViewSetsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def _get_state(self, obj):
+        if obj.state:
+            return obj.state
         runtime = BambooDjangoRuntime()
         states = runtime.get_state_by_root(obj.root_id)
         flow_state = "error"
@@ -302,7 +304,7 @@ class RetrieveProcessViewSetsSerializer(serializers.ModelSerializer):
                               "outputs": json.dumps(node["outputs"]),
                               "inputs_component": inputs_component,
                               "component_code": node["component_code"],
-                              "run_mark": 0,
+                              "run_mark": int(node["show"]),
                               "node_name": node["name"],
                               "description": node["description"],
                               "fail_retry_count": node["fail_retry_count"],
@@ -323,6 +325,8 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
     state = serializers.SerializerMethodField()
 
     def _get_state(self, obj):
+        if obj.state:
+            return obj.state
         runtime = BambooDjangoRuntime()
         states = runtime.get_state_by_root(obj.root_id)
         flow_state = "error"
@@ -388,7 +392,7 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
                           "node_data": {
                               "inputs": node["inputs"],
                               "outputs": outputs,
-                              "run_mark": 0,
+                              "run_mark": int(node["show"]),
                               "node_name": node["name"],
                               "description": node["description"],
                               "fail_retry_count": node["fail_retry_count"],
@@ -447,7 +451,7 @@ class RetrieveSubProcessRunViewSetsSerializer(serializers.ModelSerializer):
                           "node_data": {
                               "inputs": node["inputs"],
                               "outputs": outputs,
-                              "run_mark": 0,
+                              "run_mark": int(node["show"]),
                               "node_name": node["name"],
                               "description": node["description"],
                               "fail_retry_count": node["fail_retry_count"],

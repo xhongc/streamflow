@@ -39,7 +39,7 @@ class ApiGenericMixin(object):
                     "result": response.data["result"],
                     "code": ResponseCodeStatus.OK,
                     "message": response.data.get("message"),
-                    "data": response.data,
+                    "data": response.data.get("data"),
                 }
         if response.status_code == status.HTTP_204_NO_CONTENT and request.method == "DELETE":
             response.status_code = status.HTTP_200_OK

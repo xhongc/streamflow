@@ -5,7 +5,7 @@ from applications.flow.models import Process, Node
 from applications.task.models import Task
 from applications.utils.json_helper import try_json
 from applications.utils.var_helper import parse_variable
-from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
+from bamboo_engine.builder import EmptyStartEvent, EmptyEndEvent,ExecutableEndEvent, ExclusiveGateway, ServiceActivity, Var, builder, Data, \
     ParallelGateway, ConvergeGateway, ConditionalParallelGateway, SubProcess, NodeOutput
 
 
@@ -241,7 +241,7 @@ class PipelineBuilder:
             if node.node_type == Node.START_NODE:
                 pipeline_instance[p_id] = EmptyStartEvent()
             elif node.node_type == Node.END_NODE:
-                pipeline_instance[p_id] = EmptyEndEvent()
+                pipeline_instance[p_id] = ExecutableEndEvent("ExecutableEndEvent")
             elif node.node_type == Node.CONDITION_NODE:
                 pipeline_instance[p_id] = ExclusiveGateway(
                     conditions={},

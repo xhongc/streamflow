@@ -267,7 +267,7 @@
                     outputs: [
                     ],
                     node_name: '',
-                    run_mark: 0,
+                    run_mark: 1,
                     description: '',
                     fail_retry_count: 0,
                     fail_offset: '',

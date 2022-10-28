@@ -102,12 +102,13 @@ class SubProcessRunViewSets(mixins.ListModelMixin,
 
 class TestViewSets(GenericViewSet):
     def list(self, request, *args, **kwargs):
-        random_list = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+        random_list = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         sign = random.choice(random_list)
+
         if sign:
             return Response({"now": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "data": request.query_params})
         else:
-            raise Exception("随机抛出异常")
+            return Response({"result": False, "data": [], "code": "300", "message": ""}, status=400)
 
 
 class NodeTemplateViewSet(mixins.ListModelMixin,

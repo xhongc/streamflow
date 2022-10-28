@@ -755,7 +755,7 @@
                         outputs: e.target.dataset.outputs,
                         inputs_component: e.target.dataset.inputs_component,
                         component_code: e.target.dataset.component_code,
-                        run_mark: 0,
+                        run_mark: 1,
                         node_name: e.target.innerText,
                         description: '',
                         fail_retry_count: 0,

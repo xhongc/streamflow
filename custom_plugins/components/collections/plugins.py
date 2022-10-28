@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import importlib
 import math
+from copy import deepcopy
 
+from applications.utils.json_helper import try_json
 from applications.utils.notify_way import send_email
 from bamboo_engine.api import logger
 from bamboo_engine.builder import Var
@@ -15,52 +17,91 @@ import requests
 # to adapter window pc
 # import eventlet
 # requests = eventlet.import_patched('requests')
+class ServiceMixin:
+    def before_service(self, node_info):
+        if node_info["show"] == 0:
+            return True
+        return None
+
+    def after_service(self, data, _result_content, _result_sign, node_info):
+        old_outputs = data.get_one_of_outputs("outputs", "")
+        if old_outputs:
+            old_outputs += "\n"
+        new_outputs = old_outputs + _result_content
+        data.set_outputs("outputs", new_outputs)
+        self.set_result_outputs(node_info["outputs"], data, _result_sign, new_outputs)
+
+    def set_result_outputs(self, outputs, data, _result_sign, _result_content):
+        """简单设置返回值"""
+        try:
+            for index, output in enumerate(outputs):
+                if index == 0:
+                    if output["reference"] == 1:
+                        data.set_outputs(output["key"], _result_sign)
+                elif index == 1:
+                    if output["reference"] == 1:
+                        data.set_outputs(output["key"], _result_content)
+        except Exception as e:
+            logger.exception(e)
 
 
-class HttpRequestService(Service):
-    __need_schedule__ = False
+class HttpRequestService(Service, ServiceMixin):
+    __need_schedule__ = True
+    interval = StaticIntervalGenerator(0)
 
     def execute(self, data, parent_data):
+        return True
+
+    def schedule(self, data, parent_data, callback_data=None):
+        node_info = data.get_one_of_inputs("node_info")
+        fail_retry_count = node_info["fail_retry_count"]
+        fail_offset = node_info["fail_offset"]
+        is_skip_fail = node_info["is_skip_fail"]
+
+        # 执行前检查
+        validate_before = self.before_service(node_info)
+        if validate_before is not None:
+            return validate_before
+        # 执行时
+        _result_sign, _result_content = self.__execute(node_info)
+
+        # 执行后保存日志
+        self.after_service(data, _result_content, _result_sign, node_info)
+
+        if _result_sign:
+            self.finish_schedule()
+            return True
+        else:
+            if self.interval.count < fail_retry_count:
+                self.interval.interval = fail_offset
+                return True
+            else:
+                if is_skip_fail:
+                    data.set_outputs("outputs", "忽略失败！")
+                    return True
+                return False
+
+    def __execute(self, node_info):
         _result_sign = True
         _result_content = ""
-        node_info = data.get_one_of_inputs("node_info")
-
+        inputs = node_info["inputs"]
         try:
-            inputs = data.get_one_of_inputs("inputs")
-
             headers = self.parse_headers(inputs["header"])
-            inputs["body"] = json.loads(inputs["body"])
+            inputs["body"] = try_json(inputs["body"])
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
             res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=inputs["timeout"],
                                    **req_data)
-            print("执行了", res)
-            data.outputs.outputs = res.content[:250]
-            _result_content = res.content
-            time.sleep(2)
+            _result_content = res.text
             if 200 <= res.status_code < 300:
                 _result_sign = True
             else:
                 _result_sign = False
 
         except Exception as e:
-            data.outputs.outputs = str(e)
             _result_sign = False
             _result_content = str(e)
         finally:
-            self.parse_result(node_info["outputs"], data, _result_sign, _result_content)
-            return _result_sign
-
-    def parse_result(self, outputs, data, _result_sign, _result_content):
-        try:
-            for index, output in enumerate(outputs):
-                if index == 0:
-                    if output["reference"] == 1:
-                        data.outputs[output["key"]] = _result_sign
-                elif index == 1:
-                    if output["reference"] == 1:
-                        data.outputs[output["key"]] = _result_content
-        except Exception as e:
-            logger.exception(e)
+            return _result_sign, _result_content
 
     def parse_headers(self, headers):
         return {header["key"]: header["value"] for header in headers if header["key"]}

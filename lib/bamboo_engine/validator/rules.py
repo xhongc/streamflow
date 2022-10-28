@@ -19,6 +19,7 @@ FLOW_NODES_WITHOUT_STARTEVENT = [
     NodeType.ServiceActivity.value,
     NodeType.SubProcess.value,
     NodeType.EmptyEndEvent.value,
+    NodeType.ExecutableEndEvent.value,
     NodeType.ParallelGateway.value,
     NodeType.ConditionalParallelGateway.value,
     NodeType.ExclusiveGateway.value,
@@ -78,6 +79,7 @@ CONVERGE_RULE = {
 NODE_RULES = {
     NodeType.EmptyStartEvent.value: SOURCE_RULE,
     NodeType.EmptyEndEvent.value: SINK_RULE,
+    NodeType.ExecutableEndEvent.value: SINK_RULE,
     NodeType.ServiceActivity.value: ACTIVITY_RULE,
     NodeType.ExclusiveGateway.value: EMIT_RULE,
     NodeType.ParallelGateway.value: EMIT_RULE,
