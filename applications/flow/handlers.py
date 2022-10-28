@@ -1,4 +1,5 @@
 from applications.flow.models import NodeTemplate
+from applications.utils.uuid_helper import get_uuid
 
 
 def init_node_template(sender, **kwargs):
@@ -16,7 +17,8 @@ def init_node_template(sender, **kwargs):
                              {"key": "body", "type": "textarea", "label": "Body："},
                              {"key": "timeout", "type": "number", "label": "超时时间："}],
         "content": 0,
-        "template_type": "0"
+        "template_type": "0",
+        "uuid": get_uuid()
     })
     NodeTemplate.objects.update_or_create(component_code="send_email", defaults={
         "name": "发送邮件",
@@ -34,5 +36,7 @@ def init_node_template(sender, **kwargs):
                              {"key": "from_email_pwd", "type": "text", "label": "发件人密码"},
                              {"key": "from_email_alias", "type": "text", "label": "发件人别名"}],
         "content": 0,
-        "template_type": "0"
+        "template_type": "0",
+        "uuid": get_uuid()
+
     })
