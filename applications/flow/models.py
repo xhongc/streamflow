@@ -60,7 +60,7 @@ class BaseNode(models.Model):
     fail_retry_count = models.IntegerField("失败重试次数", default=0)
     fail_offset = models.IntegerField("失败重试间隔", default=0)
     fail_offset_unit = models.CharField("重试间隔单位", choices=FAIL_OFFSET_UNIT_CHOICE, max_length=32)
-    # 0：开始节点，1：结束节点，2：作业节点，3：其他作业流 4：分支，5：汇聚.6:并行
+    # 0：开始节点，1：结束节点，2：作业节点，3：其他作业流 4：分支，5：汇聚.6:并行 7:条件并行
     node_type = models.IntegerField(default=2)
     component_code = models.CharField("插件名称", max_length=255, blank=False, null=False)
     is_skip_fail = models.BooleanField("忽略失败", default=False)

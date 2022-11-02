@@ -35,6 +35,7 @@ __node_type = {
     "ServiceActivity": "activities",
     "SubProcess": "activities",
     "EmptyEndEvent": "end_event",
+    "ExecutableEndEvent": "end_event",
     "EmptyStartEvent": "start_event",
     "ParallelGateway": "gateways",
     "ConditionalParallelGateway": "gateways",

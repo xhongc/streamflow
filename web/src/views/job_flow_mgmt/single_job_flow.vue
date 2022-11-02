@@ -13,6 +13,37 @@
                     @edge-drawer-close="handleEdgeDrawerClose">
                 </edge-info>
             </bk-sideslider>
+            <bk-sideslider :is-show.sync="gatewayDrawer.show" :quick-close="true" :title="gatewayDrawer.title" :width="gatewayDrawer.width"
+                ext-cls="custom-sidelider">
+                <div slot="content">
+                    <div v-if="gatewayDrawer.title === '条件网关'">
+                        <div style="margin-top: 15px;margin-left: 10px;">分支网关允许我们通过当前流程数据上下文中的数据来决定之后流程执行的方向，
+                            下列创建了一个包含三个活动节点（act_1, act_2, act_3）及一个分支网关的流程，
+                            分支网关会根据 act_1 节点输出到数据上下文中的变量来判断接下来是执行 act_2 还是 act_3 节点：
+                        </div>
+                        <bk-image fit="contain" :src="require('@/assets/base/img/conditionGW.png')" style="width: 450px;"></bk-image>
+                        <div style="margin-top: 15px;margin-left: 10px;"> ps. 只允许一个条件成立</div>
+                    </div>
+                    <div v-else-if="gatewayDrawer.title === '条件并行网关'">
+                        <div style="margin-top: 15px;margin-left: 10px;"> 基于条件网关：允许多个条件成立的节点并行执行</div>
+                        <bk-image fit="contain" :src="require('@/assets/base/img/conditionCGW.png')" style="width: 450px;"></bk-image>
+                    </div>
+                    <div v-else-if="gatewayDrawer.title === '并行网关'">
+                        <div style="margin-top: 15px;margin-left: 10px;"> 并行网关允许我们让流程的执行进入并行执行的状态 ，
+                            下列创建了一个包含三个活动节点（act_1, act_2, act_3）及一个并行网关的流程，
+                            并行网关后的 act_1, act_2, act_3 会被引擎并行执行：</div>
+                        <bk-image fit="contain" :src="require('@/assets/base/img/conditionP.png')" style="width: 450px;"></bk-image>
+                        <div style="margin-top: 15px;margin-left: 10px;"> ps. 并行网关必须且只能与一个汇聚网关进行配对</div>
+                    </div>
+                    <div v-else-if="gatewayDrawer.title === '汇聚网关'">
+                        <div style="margin-top: 15px;margin-left: 10px;"> 并行网关允许我们让流程的执行进入并行执行的状态 ，
+                            下列创建了一个包含三个活动节点（act_1, act_2, act_3）及一个并行网关的流程，
+                            并行网关后的 act_1, act_2, act_3 会被引擎并行执行：</div>
+                        <bk-image fit="contain" :src="require('@/assets/base/img/conditionP.png')" style="width: 450px;"></bk-image>
+                        <div style="margin-top: 15px;margin-left: 10px;"> ps. 并行网关必须且只能与一个汇聚网关进行配对</div>
+                    </div>
+                </div>
+            </bk-sideslider>
         </div>
         <div class="header" style="position: relative;z-index: 100;">
             <header-panel @handleSave="handleSave" :graph="graph" ref="headerPanel"
@@ -114,6 +145,11 @@
                     title: ''
                 },
                 edgeDrawer: { // 节点信息抽屉
+                    show: false,
+                    width: 496,
+                    title: ''
+                },
+                gatewayDrawer: { // 网关信息抽屉
                     show: false,
                     width: 496,
                     title: ''
@@ -373,7 +409,7 @@
                     }
                     _this.graph.read(data)
                     _this.mainLoading = false
-                }, 2000)
+                }, 100)
             },
             // 处理更新节点的数据
             handleUpdateNode(data, id) {
@@ -470,6 +506,8 @@
                         this.handleOpenFlowDrawer(e)
                     } else if (e.item.getModel().nodeType === 2) {
                         this.handleOpenNodeDrawer(e)
+                    } else if ([4, 5, 6, 7].indexOf(e.item.getModel().nodeType) !== -1) {
+                        this.handleOpenGatewayDrawer(e)
                     }
                 })
                 // 监听节点连线
@@ -581,6 +619,11 @@
                 this.nodeSliderKey += 1
                 this.nodeDrawer.show = true
                 this.nodeDrawer.title = model.name
+            },
+            handleOpenGatewayDrawer(e) {
+                const model = e.item.get('model')
+                this.gatewayDrawer.show = true
+                this.gatewayDrawer.title = model.name
             },
             // 处理删除节点
             handleDeleteNode(item) {

@@ -1,15 +1,10 @@
 <template>
     <div id="jobView">
         <div class="header" v-if="auth.operate || auth.search">
-            <div style="float: left;font-size: 0px;" v-if="auth.operate">
+            <div style="float: left;font-size: 0;" v-if="auth.operate">
                 <bk-button class="operationBtn" @click="handleOperation('pause')">挂起</bk-button>
                 <bk-button class="operationBtn" @click="handleOperation('resume')">恢复</bk-button>
                 <bk-button class="operationBtn" @click="handleOperation('stop')">终止</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('cancel')">取消</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('replay')">重新执行</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('release')">释放依赖</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('success')">强制成功</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('confirm')">复核</bk-button>
             </div>
             <div style="float: right;" v-if="auth.search">
                 <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
@@ -197,7 +192,9 @@
                 },
                 opreateFlag: false,
                 midSearchForm: {},
-                auth: {},
+                auth: {
+                    operate: false
+                },
                 timer: null, // 轮询定时器
                 pagination: {
                     current: 1,
