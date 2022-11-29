@@ -32,6 +32,6 @@
 
 <style scoped>
     #container {
-        height: calc(100vh - 52px);
+        /*height: calc(100vh + 100px);*/
     }
 </style>
