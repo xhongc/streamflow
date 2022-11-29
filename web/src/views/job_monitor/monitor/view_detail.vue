@@ -3,7 +3,7 @@
         <div class="box">
             <p class="title">基本信息</p>
             <bk-container>
-                <bk-form :label-width="130">
+                <bk-form :label-width="100">
                     <bk-row>
                         <bk-col :span="6">
                             <bk-form-item label="作业流名称:">{{form.name}}</bk-form-item>
@@ -30,9 +30,9 @@
             </bk-container>
         </div>
         <div class="box">
-            <div class="title" style="display: flex;justify-content:space-between;">
+            <div class="title" style="display: flex;justify-content: space-between;">
                 <div>执行详情</div>
-                <div>
+                <div style="cursor: pointer;">
                     <bk-icon type="play2" />
                     <bk-icon type="pause" />
                     <bk-icon type="stop" style="color: red;" />
@@ -706,7 +706,10 @@
         }
 
         .box {
-             margin-bottom: 24px;
+            margin-bottom: 24px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
             .title {
                 margin-bottom: 12px;
                 font-size: 14px;

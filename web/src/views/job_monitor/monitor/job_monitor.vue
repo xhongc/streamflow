@@ -1,6 +1,6 @@
 <template>
     <div id="jobMonitor">
-        <bk-tab :active.sync="$store.state.monitor.tabActive" type="card" @tab-change="handleTabChange">
+        <bk-tab :active.sync="$store.state.monitor.tabActive" type="border-card" @tab-change="handleTabChange">
             <bk-tab-panel v-for="(panel, index) in panels" v-bind="panel" :key="index">
                 <router-view v-if="panel.name === $store.state.monitor.tabActive"></router-view>
             </bk-tab-panel>

@@ -1,14 +1,5 @@
 <template>
     <div class="navigation-header">
-<!--        <div class="header-title">-->
-<!--            <span class="header-title-icon" @click="handleBack" v-if="$route.meta.hasOwnProperty('back')">-->
-<!--                <svg class="icon"-->
-<!--                    style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"-->
-<!--                    viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4756">-->
-<!--                    <path d="M416 480h320v64H416l96 96-48 48-176-176 176-176 48 48-96 96z" p-id="4757"></path>-->
-<!--                </svg>-->
-<!--            </span>-->
-<!--        </div>-->
         <div>
             <bk-popover v-for="(item,index) in header.list" :key="item.id" theme="light navigation-message" :arrow="false"
                 offset="0, -5" placement="bottom" :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
@@ -81,56 +72,6 @@
             }
         },
         computed: {
-            headerTitle() {
-                let title = this.$route.meta.title
-                if (title === '变量表') {
-                    if (this.$route.query.type === 'detail') {
-                        title = '变量表详情'
-                    }
-                    if (this.$route.query.type === 'update') {
-                        title = '修改变量表'
-                    }
-                    if (this.$route.query.type === 'add') {
-                        title = '新增变量表'
-                    }
-                }
-                if (title === '操作日历') {
-                    if (this.$route.query.type === 'add') {
-                        title = '新增日历'
-                    }
-                    if (this.$route.query.type === 'update') {
-                        title = '修改日历'
-                    }
-                    if (this.$route.query.type === 'detail') {
-                        title = '日历详情'
-                    }
-                }
-                // if (title === '操作日历') {
-                //     if (this.$route.params.isAdd === true) {
-                //         title = '新增日历'
-                //     }
-                //     if (this.$route.params.isEdit === true) {
-                //         title = '修改日历'
-                //     }
-                //     if (this.$route.params.isDetail === true) {
-                //         title = '日历详情'
-                //     }
-                // }
-                if (title === '单个作业流') {
-                    if (this.$route.query.type === 'detail') {
-                        title = '单个作业流详情'
-                    }
-                    if (this.$route.query.type === 'update') {
-                        title = '单个作业流修改'
-                    }
-                }
-                if (title === '单个作业') {
-                    if (this.$route.query.type === 'update') {
-                        title = '单个作业修改'
-                    }
-                }
-                return title
-            }
         },
         created() {
             // this.loginUser()
@@ -152,9 +93,6 @@
                         this.logout_url = res.data.logout_url
                     }
                 })
-            },
-            handleBack() {
-                this.$router.go(-1)
             }
         }
     }
