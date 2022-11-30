@@ -9,12 +9,15 @@
             </bk-table-column>
             <bk-table-column label="变量名" prop="name" :show-overflow-tooltip="true" align="center">
                 <template slot-scope="props">
-                    <span>{{props.row.name}}</span>
+                    <div class="var-name">
+                        <span>{{ props.row.name }}</span>
+                        <bk-icon type="chain" v-bk-copy="props.row.name" />
+                    </div>
                 </template>
             </bk-table-column>
             <bk-table-column label="变量值（默认值）" prop="value" :show-overflow-tooltip="true" align="center">
                 <template slot-scope="props">
-                    <span>{{props.row.value}}</span>
+                    <span>{{ props.row.value }}</span>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -22,8 +25,13 @@
 </template>
 
 <script>
+    import { bkCopy } from 'bk-magic-vue'
+
     export default {
         inject: ['father_this'],
+        directives: {
+            bkCopy
+        },
         data() {
             return {
                 baseInfoLoading: false,
@@ -75,5 +83,15 @@
             }
         }
     }
+}
+
+.var-name:hover .icon-chain {
+    display: inline-block;
+    color: #699DF4;
+    cursor: pointer;
+}
+
+.icon-chain {
+    display: none;
 }
 </style>

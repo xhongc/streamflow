@@ -1,17 +1,20 @@
 <template>
     <div id="jobList">
         <div class="header">
-            <div style="float: left;">
-                <bk-button theme="primary" @click="handCreate">新建</bk-button>
-            </div>
-            <div style="float: right;" v-if="auth.search">
-                <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
-                    :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
-                    @enter="handleSearch">
-                </bk-input>
-                <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
-                    @click="handleOpenSeniorSearch"
-                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索</bk-button>
+            <div class="search-box">
+                <div class="add-in">
+                    <bk-button theme="primary" @click="handCreate" style="width: 110px;margin-left: 20px;">新建</bk-button>
+                </div>
+                <div class="search-in" v-if="auth.search">
+                    <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
+                        :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
+                        @enter="handleSearch">
+                    </bk-input>
+                    <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
+                        @click="handleOpenSeniorSearch"
+                        :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
+                    </bk-button>
+                </div>
             </div>
             <div class="senior-search-box" v-if="isDropdownShow">
                 <bk-container :margin="0">
@@ -34,7 +37,8 @@
                             </bk-col>
                             <bk-col :span="6">
                                 <bk-form-item label="作业描述:">
-                                    <bk-input :placeholder="'请输入作业描述'" v-model="searchFrom.description" clearable></bk-input>
+                                    <bk-input :placeholder="'请输入作业描述'" v-model="searchFrom.description"
+                                        clearable></bk-input>
                                 </bk-form-item>
                             </bk-col>
                             <bk-col :span="6">
@@ -52,33 +56,37 @@
                 </bk-container>
             </div>
         </div>
-        <div style="clear: both;"></div>
         <div class="content">
             <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
                 @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
-                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size" :max-height="maxTableHeight">
+                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
+                :max-height="maxTableHeight">
                 <bk-table-column type="selection" width="60"></bk-table-column>
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
                         <span v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
-                            @click="handleOpenDetail(props.row)">{{props.row[item.id]}}</span>
+                            @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                         <span v-else-if="item.id === 'template_type'">
                             <span v-if="props.row.template_type === '0'">标准节点</span>
                             <span v-else-if="props.row.template_type === '2'">节点模版</span>
                             <span v-else-if="props.row.template_type === '1'">自定义节点</span>
                         </span>
-                        <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
+                        <span
+                            v-else>{{ (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
                             <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)"
-                                v-if="auth.modify">修改</bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleClone(props.row)" v-if="auth.modify">克隆
+                                v-if="auth.modify">修改
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)" v-if="props.row.template_type !== '0'">删除
+                            <bk-button class="mr10" theme="primary" text @click="handleClone(props.row)"
+                                v-if="auth.modify">克隆
+                            </bk-button>
+                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)"
+                                v-if="props.row.template_type !== '0'">删除
                             </bk-button>
                         </div>
                     </template>
@@ -91,7 +99,8 @@
             </bk-table>
         </div>
         <div>
-            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500" ext-cls="custom-sidelider">
+            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500"
+                ext-cls="custom-sidelider">
                 <div slot="content" style="height: 100%;">
                     <job-dialog :job-from="jobFrom" :key="dialogKey">
                     </job-dialog>
@@ -103,6 +112,7 @@
 
 <script>
     import jobDialog from './job_dialog.vue'
+
     export default {
         components: {
             jobDialog
@@ -353,101 +363,113 @@
 </script>
 
 <style lang="scss">
-    .dot-menu {
-        display: inline-block;
-        vertical-align: middle;
+.dot-menu {
+    display: inline-block;
+    vertical-align: middle;
 
-        .tippy-tooltip.dot-menu-theme {
-            padding: 0;
-        }
+    .tippy-tooltip.dot-menu-theme {
+        padding: 0;
     }
+}
 
-    .dot-menu-list {
-        margin: 0;
-        padding: 5px 0;
-        min-width: 50px;
-        list-style: none;
+.dot-menu-list {
+    margin: 0;
+    padding: 5px 0;
+    min-width: 50px;
+    list-style: none;
+}
+
+.dot-menu-list .dot-menu-item {
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 26px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+        background-color: #eaf3ff;
+        color: #3a84ff;
     }
-
-    .dot-menu-list .dot-menu-item {
-        padding: 0 10px;
-        font-size: 12px;
-        line-height: 26px;
-        cursor: pointer;
-        text-align: center;
-
-        &:hover {
-            background-color: #eaf3ff;
-            color: #3a84ff;
-        }
-    }
+}
 </style>
 <style lang="scss" scoped>
-    #jobList {
-        padding: 20px;
-        height: 100%;
-        overflow: auto;
+#jobList {
+    padding: 20px;
+    height: 100%;
+    overflow: auto;
 
-        .header {
+    .header {
+        width: 100%;
+        font-size: 0;
+        margin-bottom: 20px;
+        float: left;
+        // position: relative;
+
+        .senior-search-box {
+            background-color: #fff;
+            padding: 20px;
             width: 100%;
-            font-size: 0;
-            margin-bottom: 20px;
+            margin-top: 20px;
             float: left;
-            // position: relative;
+            border-radius: 5px;
+            border: 1px solid #dcdee4;
+        }
+    }
 
-            .senior-search-box {
+    .content {
+        .customTable {
+            background-color: #fff;
+            border-radius: 5px;
+            /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
-                padding: 20px;
-                width: 100%;
-                margin-top: 20px;
-                float: left;
-                box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
-                border: 1px solid rgba(0, 0, 0, .2);
             }
-        }
 
-        .content {
-
-            .customTable {
-                /deep/ .bk-table-pagination-wrapper {
-                    background-color: #fff;
-                }
-
-                /deep/ .bk-table-empty-block {
-                    background-color: #fff;
-                }
-
-                .dot-menu-trigger {
-                    display: block;
-                    width: 20px;
-                    height: 20px;
-                    line-height: 20px;
-                    border-radius: 50%;
-                    text-align: center;
-                    font-size: 0;
-                    cursor: pointer;
-                }
-
-                .dot-menu-trigger:hover {
-                    color: #3A84FF;
-                    background-color: #DCDEE5;
-                }
-
-                .dot-menu-trigger:before {
-                    content: "";
-                    display: inline-block;
-                    width: 3px;
-                    height: 3px;
-                    border-radius: 50%;
-                    background-color: currentColor;
-                    box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
-                }
+            /deep/ .bk-table-empty-block {
+                background-color: #fff;
             }
-        }
-        .custom-sidelider {
-            /deep/ .bk-sideslider-wrapper {
-                overflow-y: hidden;
+
+            .dot-menu-trigger {
+                display: block;
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                border-radius: 50%;
+                text-align: center;
+                font-size: 0;
+                cursor: pointer;
+            }
+
+            .dot-menu-trigger:hover {
+                color: #3A84FF;
+                background-color: #DCDEE5;
+            }
+
+            .dot-menu-trigger::before {
+                content: "";
+                display: inline-block;
+                width: 3px;
+                height: 3px;
+                border-radius: 50%;
+                background-color: currentColor;
+                box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
             }
         }
     }
+
+    .custom-sidelider {
+        /deep/ .bk-sideslider-wrapper {
+            overflow-y: hidden;
+        }
+    }
+}
+.search-box {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #dcdee4;
+    height: 65px;
+    align-items: center;
+}
 </style>

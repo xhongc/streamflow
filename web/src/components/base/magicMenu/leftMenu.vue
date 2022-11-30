@@ -23,61 +23,10 @@
         data() {
             return {
                 nav: {
-                    menuList: [
-                        {
-                            'name': 'home',
-                            'cnName': '首页',
-                            'to': '/home',
-                            'icon': 'iconfont icon-mianxingtubiao-shouye',
-                            'hasChild': false,
-                            'children': []
-                        },
-                        {
-                            'name': 'NewJob',
-                            'cnName': '节点管理',
-                            'to': '/newjob',
-                            'icon': 'iconfont icon-mianxingtubiao-zuoyeguanli',
-                            'hasChild': true,
-                            'children': [
-                                {'name': 'JobList', 'cnName': '作业列表', 'to': '/joblist', 'hasChild': false}]
-                        },
-                        {
-                            'name': 'NewJobFlow',
-                            'cnName': '作业流管理',
-                            'to': '/newjobflow',
-                            'icon': 'iconfont icon-mianxingtubiao-zuoyeliuguanli',
-                            'hasChild': true,
-                            'children': [{
-                                'name': 'VariableMgmt',
-                                'cnName': '变量管理',
-                                'to': '/variablemgmt',
-                                'hasChild': false
-                            },
-                                {
-                                    'name': 'JobFlowList',
-                                    'cnName': '作业流列表',
-                                    'to': '/jobflowlist',
-                                    'hasChild': false
-                                }]
-                        },
-                        {
-                            'name': 'TaskList',
-                            'cnName': '任务管理',
-                            'to': '/taskList',
-                            'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
-                            'hasChild': false
-                        },
-                        {
-                            'name': 'JobMonitor',
-                            'cnName': '作业监视',
-                            'to': '/jobmonitor',
-                            'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
-                            'hasChild': false
-                        }],
                     menuMap: {
                         'JobList': [
                             {
-                                'name': 'JobFlowList',
+                                'name': 'JobList',
                                 'cnName': '节点列表',
                                 'to': '/joblist',
                                 'icon': 'iconfont icon-mianxingtubiao-shouye',
