@@ -105,8 +105,7 @@
         // props: ['nodeData'],
         props: {
             nodeData: {
-                type: Object,
-                default: () => {}
+                type: Object
             }
         },
         data() {

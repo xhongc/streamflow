@@ -260,7 +260,7 @@
                 })
                 setTimeout(() => {
                     this.mainLoading = false
-                }, 1000)
+                }, 300)
             },
             // 处理前置作业流节点连线模式确认
             handleFlowAddEdgeConfirm() {

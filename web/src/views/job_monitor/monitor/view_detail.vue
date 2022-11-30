@@ -300,7 +300,6 @@
                 this.graph.on('node:click', e => {
                     const model = e.item.get('model')
                     // 开始节点，结束节点，作业流节点不做处理
-                    console.log(model.nodeType)
                     if (model.nodeType === 0 || model.nodeType === 1) {
                         return false
                     }
@@ -398,6 +397,7 @@
                             }
                         })
                     }
+                    console.log(data)
                     _this.graph.read(data)
                     // _this.graph.fitCenter()
                     _this.mainLoading = false

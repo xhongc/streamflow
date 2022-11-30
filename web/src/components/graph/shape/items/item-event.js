@@ -107,12 +107,11 @@ const events = {
         } = getItemStyle.call(this, 'node', group, 'selected');
         if (!activeStyle) return;
         if (value) {
-            const textStyle = activeStyle.labelCfg && activeStyle.labelCfg.style ? activeStyle.labelCfg.style : {};
-            setStyle(node, activeStyle, text, textStyle);
+            // const textStyle = activeStyle.labelCfg && activeStyle.labelCfg.style ? activeStyle.labelCfg.style : {};
+            // setStyle(node, activeStyle, text, textStyle);
         } else {
-            const textStyle = defaultStyle.labelCfg && defaultStyle.labelCfg.style ? defaultStyle.labelCfg.style : {};
-
-            setStyle(node, defaultStyle, text, textStyle);
+            // const textStyle = defaultStyle.labelCfg && defaultStyle.labelCfg.style ? defaultStyle.labelCfg.style : {};
+            // setStyle(node, defaultStyle, text, textStyle);
         }
     },
 
