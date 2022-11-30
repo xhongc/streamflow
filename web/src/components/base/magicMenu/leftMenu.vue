@@ -1,7 +1,7 @@
 <template>
-    <bk-navigation-menu ref="menu" :default-active="nav.id" :before-nav-change="beforeNavChange"
+    <bk-navigation-menu ref="menu" :default-active="navName" :before-nav-change="beforeNavChange"
         :toggle-active="nav.toggle">
-        <bk-navigation-menu-item v-for="item in nav.menuList" :key="item.name"
+        <bk-navigation-menu-item v-for="item in nav.menuMap[navName]" :key="item.name"
             :has-child="item.children && !!item.children.length"
             :group="item.group" :icon="item.icon" :disabled="item.disabled" :url="item.to"
             :id="item.name" @click="handleRouterJump(item, false)">
@@ -74,18 +74,59 @@
                             'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
                             'hasChild': false
                         }],
+                    menuMap: {
+                        'JobList': [
+                            {
+                                'name': 'JobFlowList',
+                                'cnName': '节点列表',
+                                'to': '/joblist',
+                                'icon': 'iconfont icon-mianxingtubiao-shouye',
+                                'hasChild': false,
+                                'children': []
+                            }
+                        ],
+                        'JobFlowList': [{
+                            'name': 'VariableMgmt',
+                            'cnName': '变量管理',
+                            'to': '/variablemgmt',
+                            'icon': 'iconfont icon-mianxingtubiao-shouye',
+                            'hasChild': false
+                        },
+                            {
+                                'name': 'JobFlowList',
+                                'cnName': '作业流列表',
+                                'to': '/jobflowlist',
+                                'icon': 'iconfont icon-mianxingtubiao-shouye',
+                                'hasChild': false
+                            }],
+                        'TaskList': [{
+                            'name': 'TaskList',
+                            'cnName': '任务管理',
+                            'to': '/taskList',
+                            'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
+                            'hasChild': false
+                        }],
+                        'JobMonitor': [{
+                            'name': 'JobMonitor',
+                            'cnName': '作业监视',
+                            'to': '/jobmonitor',
+                            'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
+                            'hasChild': false
+                        }]
+                    },
                     id: '', // 当前激活侧边栏
                     toggle: true
                 }
             }
         },
-        watch: {
-            $route(val) {
-                this.nav.id = val.meta.hasOwnProperty('fatherName') ? val.meta.fatherName : val.name
-                console.log(this.nav.id)
-            }
-        },
         mounted() {
+        },
+        computed: {
+            navName() {
+                const name = this.$route.meta.hasOwnProperty('fatherName') ? this.$route.meta.fatherName : this.$route.name
+                console.log(name)
+                return name
+            }
         },
         methods: {
             beforeNavChange(newId, oldId) {

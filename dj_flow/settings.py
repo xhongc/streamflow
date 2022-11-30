@@ -147,6 +147,7 @@ try:
     from local_settings import *  # noqa
 except ImportError:
     pass
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 43200}
 
 CELERY_ALWAYS_EAGER = True
 CELERY_TASK_ALWAYS_EAGER = True

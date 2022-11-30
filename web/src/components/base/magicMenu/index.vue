@@ -3,12 +3,12 @@
         navigation-type="top-bottom"
         :header-title="headerTitle"
         :side-title="title"
-        :need-menu="true"
+        :need-menu="$route.name !== 'home'"
         @toggle="handleToggle"
         class="bk-wrapper">
         <!--      头部菜单      -->
         <template slot="header">
-            <top-header></top-header>
+            <top-header ref="header"></top-header>
         </template>
         <template slot="side-icon" class="monitor-logo">
             <img class="monitor-logo-icon" :src="imgPath">
@@ -70,6 +70,7 @@
                 })
             },
             redirectHome() {
+                this.$refs.header.header.active = -1
                 this.$router.push({name: 'home'})
             }
         }
@@ -128,6 +129,7 @@
     letter-spacing: 3px;
     text-decoration: none;
     position: relative;
+    cursor: pointer;
     //color: transparent;
     //-webkit-text-stroke: 1px var(--text-stroke-color);
 }

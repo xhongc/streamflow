@@ -1,23 +1,28 @@
 <template>
     <div class="navigation-header">
         <div>
-            <bk-popover v-for="(item,index) in header.list" :key="item.id" theme="light navigation-message" :arrow="false"
-                offset="0, -5" placement="bottom" :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
-                <li v-show="item.show" class="header-nav-item" :class="{ 'item-active': index === header.active }">
+            <bk-popover v-for="(item,index) in header.list" :key="index" theme="light navigation-message"
+                :arrow="false"
+                offset="0, -5"
+                @click.native="redirectUrl(item)"
+                placement="bottom"
+                :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
+                <li v-show="item.show" class="header-nav-item" :class="{ 'item-active': item.id === header.active }">
                     {{ item.name }}
                 </li>
             </bk-popover>
         </div>
         <div>
-            <bk-popover theme="light navigation-message" :arrow="false" placement="bottom" :tippy-options="{ 'hideOnClick': false }">
+            <bk-popover theme="light navigation-message" :arrow="false" placement="bottom"
+                :tippy-options="{ 'hideOnClick': false }">
                 <div class="header-user">
-                    {{userData.username}}
+                    {{ userData.username }}
                     <i class="bk-icon icon-down-shape"></i>
                 </div>
                 <template slot="content">
                     <ul class="monitor-navigation-admin" @click="handleUserListClick">
-                        <li class="nav-item" v-for="userItem in user.list" :key="userItem" :data-key="userItem">
-                            {{userItem}}
+                        <li class="nav-item" v-for="userItem in user.list" :key="userItem" :data-key="userItem" @click="redirectUrl">
+                            {{ userItem }}
                         </li>
                     </ul>
                 </template>
@@ -48,35 +53,42 @@
                     list: [
                         {
                             name: '节点管理',
-                            id: 2,
-                            show: true
+                            id: 1,
+                            show: true,
+                            pathName: 'JobList'
                         },
                         {
                             name: '流程管理',
-                            id: 3,
-                            show: true
+                            id: 2,
+                            show: true,
+                            pathName: 'JobFlowList'
                         },
                         {
                             name: '任务管理',
-                            id: 4,
-                            show: true
+                            id: 3,
+                            show: true,
+                            pathName: 'TaskList'
                         },
                         {
                             name: '任务记录',
-                            id: 5,
-                            show: true
+                            id: 4,
+                            show: true,
+                            pathName: 'JobFlowView'
                         }
-                        ],
-                    active: 1
+                    ],
+                    active: -1
                 }
             }
         },
-        computed: {
-        },
+        computed: {},
         created() {
             // this.loginUser()
         },
         methods: {
+            redirectUrl(item) {
+                this.header.active = item.id
+                this.$router.push({name: item.pathName})
+            },
             changeTitle() {
             },
             handleUserListClick(e) {
@@ -149,9 +161,11 @@
     margin: 0;
     color: #63656E;
 }
+
 .header-user:hover {
     cursor: pointer;
 }
+
 .monitor-navigation-admin .nav-item {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 32px;
@@ -185,10 +199,12 @@
     color: #96A2B9;
     min-width: 56px;
 }
+
 .header-nav-item:hover {
     cursor: pointer;
     color: #000;
 }
+
 .header-nav-item::before {
     content: "";
     position: absolute;
@@ -199,14 +215,17 @@
     background: #699DF4;
     transition: all .3s;
 }
+
 .header-nav-item:hover::before {
     width: calc(100% - 40px);
     left: 0;
     right: 0;
 }
+
 .item-active {
     color: #000;
 }
+
 .item-active::before {
     color: #000;
     content: "";

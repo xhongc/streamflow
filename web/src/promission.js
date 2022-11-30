@@ -237,7 +237,8 @@ router.beforeEach((to, from, next) => {
                     'name': 'VariableMgmt',
                     'component': 'VariableMgmt',
                     'meta': {
-                        'title': '变量管理'
+                        'title': '变量管理',
+                        'fatherName': 'JobFlowList'
                     }
                 },
                 {
