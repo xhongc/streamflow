@@ -82,7 +82,7 @@ router.beforeEach((to, from, next) => {
                     'meta': {
                         'title': '变量表',
                         'back': 'true',
-                        'fatherName': 'VariableMgmt'
+                        'fatherName': 'JobFlowList'
                     }
                 },
                 {
@@ -92,7 +92,7 @@ router.beforeEach((to, from, next) => {
                     'meta': {
                         'title': '单个作业',
                         'back': 'true',
-                        'fatherName': 'NewJob'
+                        'fatherName': 'JobList'
                     }
                 },
                 {
@@ -198,7 +198,9 @@ router.beforeEach((to, from, next) => {
                     'name': 'NewJobFlow',
                     'component': 'NewJobFlow',
                     'meta': {
-                        'title': '新建作业流'
+                        'title': '新建作业流',
+                        'fatherName': 'JobFlowList',
+                        'back': 'true'
                     }
                 },
 
@@ -209,7 +211,7 @@ router.beforeEach((to, from, next) => {
                     'meta': {
                         'title': '单个作业流',
                         'back': 'true',
-                        'fatherName': 'NewJobFlow'
+                        'fatherName': 'JobFlowList'
                     }
                 },
                 {
@@ -254,7 +256,9 @@ router.beforeEach((to, from, next) => {
                     'name': 'NewJob',
                     'component': 'NewJob',
                     'meta': {
-                        'title': '新建作业'
+                        'title': '新建作业',
+                        'fatherName': 'JobList',
+                        'back': 'true'
                     }
                 },
                 {
