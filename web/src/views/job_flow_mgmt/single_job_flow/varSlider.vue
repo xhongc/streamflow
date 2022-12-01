@@ -25,12 +25,9 @@
 </template>
 
 <script>
-    import { bkCopy } from 'bk-magic-vue'
-
     export default {
         inject: ['father_this'],
         directives: {
-            bkCopy
         },
         data() {
             return {

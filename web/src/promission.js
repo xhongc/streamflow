@@ -1,42 +1,75 @@
 import router from './router'
 import store from '@/vuex/index'
-import Home from '@/views/home/home'
-import AgentList from '@/views/agent_mgmt/agent_list'
-import AgentMonitor from '@/views/agent_mgmt/agent_monitor'
-import CalendarMgmt from '@/views/job_flow_mgmt/calendar_mgmt'
-import JobFlowList from '@/views/job_flow_mgmt/job_flow_list'
-import NewJobFlow from '@/views/job_flow_mgmt/new_job_flow'
-import VariableMgmt from '@/views/job_flow_mgmt/variable_mgmt'
-import JobList from '@/views/job_mgmt/job_list'
-import NewJob from '@/views/job_mgmt/new_job'
-import ScanFile from '@/views/job_mgmt/scan_file'
-import SingleJob from '@/views/job_mgmt/single_job'
-import JobViewHistory from '@/views/job_monitor/history/job_view_history'
-import JobFlowViewHistory from '@/views/job_monitor/history/job_flow_view_history'
-import MultipleJob from '@/views/job_mgmt/multiple_job'
-import JobHistory from '@/views/job_monitor/history/job_history'
-import JobMonitor from '@/views/job_monitor/monitor/job_monitor'
-import SysSetup from '@/views/system/sys_setup'
-import UserAndPermissions from '@/views/system/user_and_permissions'
-import AlarmList from '@/views/alarm_center/alarm_list'
-import JobView from '@/views/job_monitor/monitor/job_view'
-import JobFlowView from '@/views/job_monitor/monitor/job_flow_view'
-import ViewDetail from '@/views/job_monitor/monitor/view_detail'
-import SingleJobFlow from '@/views/job_flow_mgmt/single_job_flow'
-import MultipleJobFlow from '@/views/job_flow_mgmt/multiple_job_flow'
-import ImportFile from '@/views/job_flow_mgmt/import_file'
-import JobDetail from '@/views/job_monitor/monitor/job_detail'
-import Log from '@/views/system/log'
-import LogMange from '@/views/system/log_mange'
-import Report from '@/views/report/report'
-import SystemClassManage from '@/views/system/system_class_manage'
-import JobFlowDetail from '@/views/job_monitor/history/job_flow_detail'
-import JobViewDetail from '@/views/job_monitor/history/job_view_detail'
-import variableChange from '@/views/job_flow_mgmt/variable_change'
-import AddCalendarMgmt from '@/views/job_flow_mgmt/add_calendar_mgmt'
-import LargeScreen from '@/views/job_monitor_large_screen/large_screen'
-import TaskList from '@/views/task_mgmt/task_list'
-import TaskCreate from '@/views/task_mgmt/task_create'
+
+const Home = () => import('@/views/home/home')
+const AgentList = () => import('@/views/agent_mgmt/agent_list')
+const AgentMonitor = () => import('@/views/agent_mgmt/agent_monitor')
+const CalendarMgmt = () => import('@/views/job_flow_mgmt/calendar_mgmt')
+const JobFlowList = () => import('@/views/job_flow_mgmt/job_flow_list')
+
+const NewJobFlow = () => import('@/views/job_flow_mgmt/new_job_flow')
+
+const VariableMgmt = () => import('@/views/job_flow_mgmt/variable_mgmt')
+
+const JobList = () => import('@/views/job_mgmt/job_list')
+
+const NewJob = () => import('@/views/job_mgmt/new_job')
+
+const ScanFile = () => import('@/views/job_mgmt/scan_file')
+
+const SingleJob = () => import('@/views/job_mgmt/single_job')
+
+const JobViewHistory = () => import('@/views/job_monitor/history/job_view_history')
+
+const JobFlowViewHistory = () => import('@/views/job_monitor/history/job_flow_view_history')
+
+const MultipleJob = () => import('@/views/job_mgmt/multiple_job')
+
+const JobHistory = () => import('@/views/job_monitor/history/job_history')
+
+const JobMonitor = () => import('@/views/job_monitor/monitor/job_monitor')
+
+const SysSetup = () => import('@/views/system/sys_setup')
+
+const UserAndPermissions = () => import('@/views/system/user_and_permissions')
+
+const AlarmList = () => import('@/views/alarm_center/alarm_list')
+
+const JobView = () => import('@/views/job_monitor/monitor/job_view')
+
+const JobFlowView = () => import('@/views/job_monitor/monitor/job_flow_view')
+
+const ViewDetail = () => import('@/views/job_monitor/monitor/view_detail')
+
+const SingleJobFlow = () => import('@/views/job_flow_mgmt/single_job_flow')
+
+const MultipleJobFlow = () => import('@/views/job_flow_mgmt/multiple_job_flow')
+
+const ImportFile = () => import('@/views/job_flow_mgmt/import_file')
+
+const JobDetail = () => import('@/views/job_monitor/monitor/job_detail')
+
+const Log = () => import('@/views/system/log')
+
+const LogMange = () => import('@/views/system/log_mange')
+
+const Report = () => import('@/views/report/report')
+
+const SystemClassManage = () => import('@/views/system/system_class_manage')
+
+const JobFlowDetail = () => import('@/views/job_monitor/history/job_flow_detail')
+
+const JobViewDetail = () => import('@/views/job_monitor/history/job_view_detail')
+
+const variableChange = () => import('@/views/job_flow_mgmt/variable_change')
+
+const AddCalendarMgmt = () => import('@/views/job_flow_mgmt/add_calendar_mgmt')
+
+const LargeScreen = () => import('@/views/job_monitor_large_screen/large_screen')
+
+const TaskList = () => import('@/views/task_mgmt/task_list')
+
+const TaskCreate = () => import('@/views/task_mgmt/task_create')
 
 // const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 

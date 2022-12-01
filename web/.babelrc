@@ -1,15 +1,35 @@
 {
-  "presets": [
-    ["env", {
-      "modules": false,
-      "targets": {
-        "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
-      }
-    }],
-    "stage-2"
-  ],
-  "plugins": ["transform-vue-jsx", "transform-runtime", ["import", {
-      "libraryName": "view-design",
-      "libraryDirectory": "src/components"
-  }]]
+    "presets": [
+        [
+            "env",
+            {
+                "modules": false,
+                "targets": {
+                    "browsers": [
+                        "> 1%",
+                        "last 2 versions",
+                        "not ie <= 8"
+                    ]
+                }
+            }
+        ],
+        "stage-2"
+    ],
+    "plugins": [
+        "transform-vue-jsx",
+        "transform-runtime",
+        [
+            "import",
+            {
+                "libraryName": "view-design",
+                "libraryDirectory": "src/components"
+            }
+        ],
+        [
+            "import-bk-magic-vue",
+            {
+                "baseLibName": "bk-magic-vue"
+            }
+        ]
+    ]
 }

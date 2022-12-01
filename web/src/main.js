@@ -3,10 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-// import ElementUI from 'element-ui'
-// import 'element-ui/lib/theme-chalk/index.css'
-// 全量引入 bk-magic-vue
+// 按需引入 bk-magic-vue
 import bkMagic from 'bk-magic-vue'
+
 // 全量引入 bk-magic-vue 样式
 import 'bk-magic-vue/dist/bk-magic-vue.min.css'
 import store from './vuex'
@@ -20,14 +19,14 @@ import G6 from '@antv/g6'
 // 引用API文件
 import api from './api/index'
 // 时间格式化插件
-import moment from 'moment'
+// import moment from 'moment'
 // filter统一引入
 import './fiter/index.js'
 // 统一样式引入
 import './assets/index'
 import cwMessage from './common/message'
-// 引入自定义组件
-import Component from './components/index.js'
+// 引入自定义组件1
+// import Component from './components/index.js'
 // vuex
 import '@/vuex/index' // 全局
 // import './promission.js' // 路由后台获取
@@ -53,17 +52,15 @@ Vue.use(VeeValidate, config)
 Vue.use(bkMagic)
 Vue.use(Echarts)
 Vue.use(G6)
-Vue.use(Component)
+// Vue.use(Component)
 Vue.use(axios)
 Vue.prototype.$echarts = Echarts
 Vue.prototype.$G6 = G6
-Vue.prototype.$moment = moment
+// Vue.prototype.$moment = moment
 Vue.prototype.$cwMessage = cwMessage
 // 将API方法绑定到全局
-Vue.prototype.$http = axios
+// Vue.prototype.$http = axios
 Vue.prototype.$api = api
-const headTheme = 'light' // 选择 light 或 blue
-Vue.prototype.headTheme = headTheme
 Vue.prototype.$lodash = lodash
 Vue.prototype.hasPerm = hasPermission
 Vue.config.productionTip = false

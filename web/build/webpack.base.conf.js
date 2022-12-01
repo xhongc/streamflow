@@ -56,6 +56,8 @@ module.exports = {
             '@': resolve('src'),
         }
     },
+    externals: {
+    },
     module: {
         rules: [
             ...(config.dev.useEslint ? [createLintingRule()] : []),
