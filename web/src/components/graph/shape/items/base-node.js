@@ -280,7 +280,8 @@ export default G6 => {
             return this.drawShape(cfg, group);
         },
         /* 绘制节点，包含文本 */
-        drawShape(cfg, group) { // 元素分组
+        drawShape(cfg, group) {
+            // 元素分组
             // 合并外部样式和默认样式
             const attrs = this.getShapeStyle(cfg, group);
             if (attrs.hasOwnProperty('state') && attrs.state !== '') {

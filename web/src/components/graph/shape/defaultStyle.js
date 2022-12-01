@@ -1,7 +1,8 @@
 export default {
     // node默认样式
     nodeStyles: {
-        fill: '#fff', // 浅蓝
+        fill: '#fff',
+        stroke: '#1890FF'
     },
     // node 交互样式
     nodeStateStyles: {

@@ -80,7 +80,7 @@
                         <div style="display: flex;align-items: center;">
                             <bk-button class="mr10" theme="primary" text @click="handleImplement(props.row)">执行
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)">修改
+                            <bk-button class="mr10" theme="primary" text @click="handleOpenDetail(props.row)">修改
                             </bk-button>
                             <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)">删除
                             </bk-button>
@@ -233,9 +233,15 @@
             },
             // 处理打开详情
             handleOpenDetail(row) {
-                this.dialogKey += 1
-                this.jobFrom = row
-                this.dialogShow = true
+                this.$router.push({
+                    name: 'taskCreate',
+                    query: {
+                        job_flow_data: row.process,
+                        job_name: row.process_name,
+                        type: 'detail',
+                        task_type: 'update'
+                    }
+                })
             },
             // 处理全选
             handleSelectAll(selection) {

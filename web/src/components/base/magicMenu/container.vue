@@ -41,41 +41,23 @@
                     if (this.$route.query.type === 'add') {
                         title = '新增变量表'
                     }
-                }
-                if (title === '操作日历') {
-                    if (this.$route.query.type === 'add') {
-                        title = '新增日历'
-                    }
-                    if (this.$route.query.type === 'update') {
-                        title = '修改日历'
-                    }
-                    if (this.$route.query.type === 'detail') {
-                        title = '日历详情'
-                    }
-                }
-                // if (title === '操作日历') {
-                //     if (this.$route.params.isAdd === true) {
-                //         title = '新增日历'
-                //     }
-                //     if (this.$route.params.isEdit === true) {
-                //         title = '修改日历'
-                //     }
-                //     if (this.$route.params.isDetail === true) {
-                //         title = '日历详情'
-                //     }
-                // }
-                if (title === '单个作业流') {
+                } else if (title === '单个作业流') {
                     if (this.$route.query.type === 'detail') {
                         title = '单个作业流详情'
                     }
                     if (this.$route.query.type === 'update') {
                         title = '单个作业流修改'
                     }
-                }
-                if (title === '单个作业') {
+                } else if (title === '单个作业') {
                     if (this.$route.query.type === 'update') {
                         title = '单个作业修改'
                     }
+                } else if (title === '新建任务') {
+                    if (this.$route.query.task_type === 'update') {
+                        title = '修改任务'
+                    }
+                } else {
+                    return title
                 }
                 return title
             },
@@ -85,7 +67,7 @@
 
 <style scoped>
 #container {
-    height: calc(100vh + 100px);
+    height: calc(100vh - 100px);
 }
 
 .header-title {

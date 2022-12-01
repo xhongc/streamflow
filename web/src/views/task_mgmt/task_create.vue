@@ -1,11 +1,21 @@
 <template>
     <div style="height: 100%;">
-        <bk-steps ext-cls="custom-icon"
-            :controllable="controllableSteps.controllable"
-            :steps="controllableSteps.steps"
-            :cur-step.sync="controllableSteps.curStep"
-            @step-changed="stepChanged">
-        </bk-steps>
+        <div style="display: flex;align-items: center;justify-content: space-between;">
+            <bk-steps ext-cls="custom-icon"
+                :controllable="controllableSteps.controllable"
+                :steps="controllableSteps.steps"
+                :cur-step.sync="controllableSteps.curStep"
+                @step-changed="stepChanged">
+            </bk-steps>
+            <div style="display: flex;margin-right: 2%;">
+                <div class="next-icon left-icon" @click="lastStep">
+                    <bk-icon type="arrows-m-left-shape" />
+                </div>
+                <div class="next-icon right-icon" @click="nextStep">
+                    <bk-icon type="arrows-m-right-shape" />
+                </div>
+            </div>
+        </div>
         <div class="step-1" v-if="controllableSteps.curStep === 1">
             <single-job-flow></single-job-flow>
         </div>
@@ -63,10 +73,10 @@
                                     </bk-date-picker>
                                 </div>
                             </div>
-                            <div style="color: #EA3636;font-size: 12px;margin: 8px 0 0 68px" v-show="displayImmediate">
+                            <div style="color: #EA3636;font-size: 12px;margin: 8px 0 0 68px;" v-show="displayImmediate">
                                 请填写定时时间
                             </div>
-                            <div style="margin-top: 16px;height: 32px">
+                            <div style="margin-top: 16px;height: 32px;">
                                 <bk-radio :value="'cycle'">周期</bk-radio>
                                 <bk-date-picker
                                     :disabled="formData.run_type !== 'cycle'"
@@ -84,7 +94,7 @@
                                         每隔：
                                     </bk-button>
                                     <bk-input
-                                        style="width:80px;float: left;"
+                                        style="width: 80px;float: left;"
                                         type="number"
                                         v-model="formData.cycle_time"
                                         :min="1"
@@ -95,7 +105,7 @@
                                     <bk-select
                                         v-model="formData.cycle_type"
                                         :clearable="false"
-                                        style="width:80px;float: left;margin-left: 10px;background-color: #fff;"
+                                        style="width: 80px;float: left;margin-left: 10px;background-color: #fff;"
                                         :disabled="formData.run_type !== 'cycle'">
                                         <bk-option name="分钟" key="min" id="min"></bk-option>
                                         <bk-option name="小时" key="hour" id="hour"></bk-option>
@@ -125,16 +135,6 @@
             </div>
         </div>
         <div class="step-2" v-if="controllableSteps.curStep === 4">
-        </div>
-        <div class="step-footer">
-            <bk-button :theme="'default'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;"
-                @click="lastStep">
-                上一步
-            </bk-button>
-            <bk-button :theme="'primary'" :title="'主要按钮'" class="mr10" style="margin: 20px;width: 100px;"
-                @click="nextStep">
-                下一步
-            </bk-button>
         </div>
     </div>
 </template>
@@ -251,13 +251,19 @@
 
 <style scoped>
 .custom-icon {
-    margin: 20px 30px 30px 20px;
-    width: 90%;
+    margin: 20px 0 20px 20px;
+    width: 88%;
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 15px;
 }
 
 .step-1 {
-    margin: 20px 30px 30px 20px;
-    height: 80%;
+    margin: 0 30px 30px 20px;
+    height: 80vh;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #ffffff;
 }
 
 .step-2 {
@@ -268,8 +274,32 @@
 
 .step-footer {
     background: #ffffff;
-    margin-bottom: -50px;
-    height: 100px;
+    margin-bottom: -10px;
+    height: 50px;
     border-top: 1px solid #cacedb;
+}
+.next-icon {
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #979BA5;
+    margin-left: 15px;
+}
+.left-icon {
+    padding-left: 14px;
+}
+.right-icon {
+    padding-left: 15px;
+}
+.next-icon:hover {
+    color: #699DF4;
+}
+.next-btn {
+    margin: 13px 20px;
+    width: 100px;
 }
 </style>

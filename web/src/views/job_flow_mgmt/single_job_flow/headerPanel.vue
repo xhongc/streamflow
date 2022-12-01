@@ -59,8 +59,7 @@
         created() {
             if (this.$route.query.type === 'detail') {
                 this.disabled = true
-            }
-            if (this.$route.query.type === 'add') {
+            } else if (this.$route.query.type === 'add') {
                 this.isActive = 1
             }
         },

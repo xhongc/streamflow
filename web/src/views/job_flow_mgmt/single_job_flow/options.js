@@ -80,7 +80,7 @@ const options = {
     },
     modes: [
         'drag-canvas', // 官方内置的行为
-        'zoom-canvas',
+        // 'zoom-canvas',
         'select-node',
         'hover-node',
         'active-edge',

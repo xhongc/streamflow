@@ -401,7 +401,7 @@
     .header {
         width: 100%;
         font-size: 0;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         float: left;
         // position: relative;
 
@@ -409,7 +409,7 @@
             background-color: #fff;
             padding: 20px;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 16px;
             float: left;
             border-radius: 5px;
             border: 1px solid #dcdee4;
