@@ -157,7 +157,7 @@
                         {title: '节点选择', icon: 1},
                         {title: '参数填写', icon: 2},
                         {title: '执行方式', icon: 3},
-                        {title: '创建任务', icon: 4}
+                        {title: this.$route.query.task_type === 'update' ? '修改任务' : '创建任务', icon: 4}
                     ],
                     curStep: 1
                 },
@@ -225,7 +225,7 @@
                     this.controllableSteps.curStep = this.controllableSteps.curStep + 1
                 } else if (this.controllableSteps.curStep === 3) {
                     this.$bkInfo({
-                        title: '确认要创建任务吗？',
+                        title: this.$route.query.task_type === 'update' ? '确认要修改任务吗？' : '确认要创建任务吗？',
                         confirmLoading: false,
                         confirmFn: async() => {
                             this.tableLoading = true

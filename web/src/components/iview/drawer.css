@@ -1,0 +1,94 @@
+.ivu-drawer-header p, .ivu-drawer-header-inner {
+    display: inline-block;
+    width: 100%;
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
+    color: #17233d;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ivu-drawer-close .ivu-icon-ios-close {
+    font-size: 31px;
+    color: #999;
+    transition: color .2s ease;
+    position: relative;
+    top: 1px;
+}
+
+.ivu-drawer-close {
+    z-index: 1;
+    font-size: 12px;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.ivu-drawer-content-no-mask {
+    pointer-events: auto;
+}
+
+.ivu-drawer-left {
+    left: 0;
+}
+
+.ivu-drawer-inner {
+    position: absolute !important;
+}
+
+.ivu-drawer {
+    width: auto;
+    height: 100%;
+    position: fixed;
+    top: 0;
+}
+
+.ivu-drawer-body {
+    width: 100%;
+    height: calc(100% - 51px);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    position: absolute;
+    overflow: auto;
+}
+
+.ivu-drawer-wrap * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ivu-drawer-content {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: #fff;
+    border: 0;
+    background-clip: padding-box;
+    -webkit-box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+}
+.ivu-drawer-wrap-inner {
+    position: absolute !important;
+    overflow: hidden !important;
+}
+.ivu-drawer-wrap {
+    position: fixed;
+    overflow: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+}

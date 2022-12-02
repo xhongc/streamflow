@@ -34,22 +34,25 @@ feature：
  
  - [ ] 作业监视- 暂停，停止，跳过，忽略，等人工干预操作5
  - [ ] 作业监视- 节点重试功能
- - [ ] 作业监视- Table字段梳理，前端冗余代码删减
  - [ ] 作业监视- 搜索过滤功能
  - [ ] 输出报错内容
- - [ ] 告警管理- 规划中
- - [ ] 审计管理- 规划中
+
+
  - [ ] login
  - [ ] 审核节点
  - [ ] 创建节点需要审核
  - [ ] 节点低代码
- - [ ] 优化画布操作 选择节点的样式
- - [ ] 优化画布操作 选择节点的位置
- - [ ] 优化画布操作 拖动锁定
+
+ - [ ] 前端优化 打包大小
+ - 
+ - [ ] 告警管理- 规划中
+ - [ ] 审计管理- 规划中
+ - 
+ - [x] 优化画布操作 拖动锁定
+ - [x] 前端gzipExtensions completed
  - [x] 任务记录 节点样式丢失
  - [x] 变量复制
  - [x] 白色主题布局左侧菜单修改
  - 
  - ## install tips
-sudo apt-get install libmysqlclient-dev
-python3-dev
+sudo apt-get install libmysqlclient-dev python3-dev

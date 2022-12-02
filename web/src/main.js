@@ -11,6 +11,8 @@ import 'bk-magic-vue/dist/bk-magic-vue.min.css'
 import store from './vuex'
 import axios from 'axios'
 import 'view-design/dist/styles/iview.css'
+// 按需引入iview css
+// import './components/iview/drawer.css'
 // 按需引入iview
 import './components/iview/index'
 // 几何图
@@ -23,7 +25,7 @@ import api from './api/index'
 // filter统一引入
 import './fiter/index.js'
 // 统一样式引入
-import './assets/index'
+// import './assets/index'
 import cwMessage from './common/message'
 // 引入自定义组件1
 // import Component from './components/index.js'
