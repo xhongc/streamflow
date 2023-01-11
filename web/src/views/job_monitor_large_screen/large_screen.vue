@@ -1,430 +1,522 @@
 <template>
-    <div id="largeScreen" ref="largeScreen" v-bkloading="{ isLoading: largeScreenLoading, zIndex: 10 }">
-        <!--   <fullscreen ref="fullscreen" @change="fullscreenChange" id="fullscreen"> -->
-        <bk-resize-layout :collapsible="true" :border="false" style="height: 100%;" initial-divide="272px" :disabled="true"
-            @collapse-change="handleCollapseChange" ext-cls="custom-layout">
-            <div slot="aside" style="height: 100%;" class="left" ref="aside">
-                <left-tree @change-canvas-size="handleChangeCavasSize" @node-select="handleTreeNodeSelect" ref="tree"
-                    :key="treeKey"></left-tree>
+    <div class="form-box">
+        <div class="sub-box1">
+            <div class="components-nav">
+                <span @click="libSelect = 0">组件库</span>
             </div>
-            <div slot="main" style="height: 100%;" class="right" v-bkloading="{ isLoading: mainLoading, zIndex: 10 }">
-                <div class="left-status-list">
-                    <status-list style="position: absolute;left: 20px;top: 15px;"></status-list>
-                </div>
-                <div class="right-canvas" id="main" ref="main"></div>
-                <div class="top-menu">
-                    <top-menu @full-screen="handleFullScreen" ref="topMenu" @open-sys-screen="handleOpenSysScreen"
-                        @open-job-flow="handleOpenJobFlow" @on-reset="hanldeReset"></top-menu>
+            <div>
+                <div class="components" v-for="(group, i) in baseComponents" :key="i">
+                    <p style="margin: 10px 0 10px 0;">{{ group.name }}</p>
+                    <ul>
+                        <draggable class="drag" :list="group.components" :options="{ sort: false }"
+                            :group="{ name: 'form', pull: 'clone', put: false }"
+                            @start="isStart = true" @end="isStart = false" :clone="clone">
+                            <li v-for="(cp, id) in group.components" :key="id"
+                                style="display: flex;flex-direction: row;">
+                                <i :class="cp.icon"></i>
+                                <span>{{ cp.title }}</span>
+                            </li>
+                        </draggable>
+                    </ul>
                 </div>
             </div>
-        </bk-resize-layout>
-        <!-- </fullscreen> -->
+        </div>
+        <div class="sub-box2 layout-main">
+            <div class="work-form">
+                <div :class="{ 'mobile': showMobile, 'pc': !showMobile }">
+                    <div :class="{ 'bd': showMobile }">
+                        <div :class="{ 'form-content': showMobile }">
+                            <div class="form">
+                                <div class="tip" v-show="forms.length === 0 && !isStart">👈 请在左侧选择控件并拖至此处</div>
+                                <draggable class="drag-from" :list="forms" group="form"
+                                    :options="{ animation: 300, chosenClass: 'choose', sort: true }"
+                                    @start="drag = true; selectFormItem = null" @end="drag = false">
+
+                                    <div v-for="(cp, id) in forms" :key="id" class="form-item" @click="selectItem(cp)"
+                                        :style="getSelectedClass(cp)">
+                                        <div class="form-header">
+                                            <p><span v-if="cp.props.required">*</span>{{ cp.title }}</p>
+                                            <div class="option">
+                                                <!--<i class="el-icon-copy-document" @click="copy"></i>-->
+                                                <bk-icon type="close" @click="del(id)"></bk-icon>
+                                            </div>
+                                            <form-design-render :config="cp"></form-design-render>
+                                        </div>
+                                    </div>
+                                </draggable>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-box3 layout-param">
+            <div class="tool-nav-r" v-if="selectFormItem">
+                <i :class="selectFormItem.icon" style="margin-right: 5px; font-size: medium;"></i>
+                <span>{{ selectFormItem.title }}</span>
+            </div>
+            <div v-if="!selectFormItem || forms.length === 0" class="tip">
+                选中控件后在这里进行编辑
+            </div>
+            <div style="text-align: left; padding: 0;margin-top: 10px;" v-else>
+                <form-component-config :form="selectFormItem"></form-component-config>
+            </div>
+        </div>
+        <bk-dialog width="800px" title="表单预览"
+            v-model="viewFormVisible">
+            <form-render ref="form" :forms="forms" v-model="formData"></form-render>
+        </bk-dialog>
     </div>
 </template>
 
 <script>
-    import {
-        deepClone, getUUID
-    } from '../../common/util.js'
-    import leftTree from './tree.vue'
-    import statusList from './statusList.vue'
-    import topMenu from './topMenu.vue'
-    import registerFactory from '@/components/graph/graph.js'
-    import G6 from '@antv/g6'
-    import fullscreen from 'vue-fullscreen'
-    import Vue from 'vue'
-    Vue.use(fullscreen)
+    import draggable from 'vuedraggable'
+    import FormRender from '@/common/form/FormRender'
+    import FormDesignRender from '@/views/job_monitor_large_screen/FormDesignRender'
+    import FormComponentConfig from '@/common/form/FormComponentConfig'
+    import {baseComponents} from '@/common/form/ComponentsConfigExport'
+
     export default {
-        components: {
-            leftTree,
-            statusList,
-            topMenu
-        },
+        name: 'form-design',
+        components: {draggable, FormComponentConfig, FormDesignRender, FormRender},
         data() {
             return {
-                treeKey: 0,
-                tooltip: null,
-                fullscreen: false,
-                largeScreenLoading: false,
-                mainLoading: false,
-                graph: null,
-                cfg: {},
-                sysData: {},
-                flowData: {}
+                formData: {},
+                libSelect: 0,
+                viewFormVisible: false,
+                isStart: false,
+                showMobile: false,
+                baseComponents,
+                select: null,
+                drag: false,
+                forms: [],
+                selectFormItem: {},
+                nodeMap: []
             }
         },
-        mounted() {
-            // 创建画布
-            this.$nextTick(() => {
-                this.createGraphic()
-                this.initGraphEvent()
-            })
-            // 监听屏幕大小变化改变画布
-            window.addEventListener('resize', this.handleChangeCavasSize, false)
-            // let aside = document.getElementsByClassName('')
-        },
-        created() {
-            this.getAllRunSys()
-        },
-        beforeDestroy() {
-            this.graph.destroy()
-            window.removeEventListener('resize', this.handleChangeCavasSize, false)
+        computed: {
         },
         methods: {
-            handleCollapseChange(flag) {
-                if (flag === true) {
-                    this.$nextTick(() => {
-                        const aside = document.getElementsByClassName('bk-resize-layout-aside')
-                        aside[0].style.width = 0
-                    })
-                }
+            copy(node, index) {
+                this.form.splice(index + 1, 0, Object.assign({}, node))
             },
-            // 处理复位
-            hanldeReset() {
-                this.graph.fitCenter()
+            getId() {
+                return 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString() + new Date().getTime().toString().substring(5)
             },
-            // 处理打开跑批系统大屏
-            handleOpenSysScreen(e) {
-                this.$refs.tree.$refs.topoTree.setSelected(e, {
-                    emitEvent: false,
-                    beforeSelect: true
-                })
-                this.getAllRunSys()
-            },
-            // 处理打开作业流大屏
-            handleOpenJobFlow(e) {
-                this.$api.process.get_topology().then(res => {
-                    if (res.result) {
-                        this.flowData = res.data
-                        this.renderCanvas(true, this.flowData)
-                    } else {
-                        this.$cwMessage(res.message, 'error')
-                    }
-                    this.largeScreenLoading = false
-                })
-            },
-            // 处理拓扑树选择
-            handleTreeNodeSelect(e) {
-                this.$refs.topMenu.viewBtnActive = 2
-                let id = e.id
-                if (id === 'all') {
-                    id = ''
-                }
-                this.getJobFlowByRunId(id)
-            },
-            // 处理改变画布大小
-            handleChangeCavasSize() {
-                this.graph.changeSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight)
-            },
-            // 处理全屏
-            handleFullScreen() {
-                this.$fullscreen.toggle(this.$refs.largeScreen, {
-                    wrap: false,
-                    callback: this.fullscreenChange
-                })
-            },
-            // 处理全屏
-            fullscreenChange(fullscreen) {
-                this.fullscreen = fullscreen
-            },
-            initOption() {
-                // 工厂函数注册自定义节点
-                this.cfg = registerFactory(G6, {
-                    width: this.$refs.main.clientWidth,
-                    height: this.$refs.main.clientHeight,
-                    fitView: true,
-                    maxZoom: 1,
-                    animate: true, // Boolean，可选，切换布局时是否使用动画过度
-                    layout: {
-                        type: 'dagre',
-                        rankdir: 'LR', // 可选，默认为图的中心
-                        align: 'DL', // 可选
-                        nodesep: 20, // 可选
-                        ranksep: 50, // 可选
-                        controlPoints: false // 可选
-                    },
-                    // layout: {
-                    //     type: 'xxx', // 位置将固定
-                    // },
-                    defaultNode: {
-                        type: 'rect-node',
-                        style: {
-                            radius: 10
-                        },
-                        labelCfg: {
-                            fontSize: 20
+            del(index) {
+                this.$bkInfo({
+                    title: '删除组件将会连带删除包含该组件的条件以及相关设置，是否继续?',
+                    confirmLoading: false,
+                    confirmFn: () => {
+                        if (this.forms[index].name === 'SpanLayout') {
+                            // 删除的是分栏则遍历删除分栏内所有子组件
+                            this.forms[index].props.items.forEach(item => {
+                                this.removeFormItemAbout(item)
+                            })
+                            this.forms[index].props.items.length = 0
+                        } else {
+                            this.removeFormItemAbout(this.forms[index])
                         }
-                    },
-                    defaultEdge: {
-                        type: 'polyline-edge', // 扩展了内置边, 有边的事件
-                        // type: 'cubic-vertical-edge', // 扩展了内置边, 有边的事件
-                        style: {
-                            radius: 0, // 拐弯弧度
-                            offset: 15, // 拐弯处距离节点的最小距离
-                            stroke: '#aab7c3',
-                            lineAppendWidth: 10, // 防止线太细没法点中
-                            endArrow: {
-                                path: 'M 0,0 L 4,3 L 3,0 L 4,-3 Z',
-                                fill: '#aab7c3',
-                                stroke: '#aab7c3'
-                            },
-                            zIndex: 999999
-                        }
-                    },
-                    // 覆盖全局样式
-                    nodeStateStyles: {
-                        'nodeState:default': {
-                            opacity: 1,
-                            fill: '#fff',
-                            stroke: '#DCDEE5',
-                            labelCfg: {
-                                style: {
-                                    fill: '#333333'
-                                }
-                            }
-                        },
-                        'nodeState:hover': {
-                            opacity: 0.8
-                        },
-                        'nodeState:selected': {
-                            opacity: 0.9,
-                            stroke: 'rgb(58,132,255)',
-                            labelCfg: {
-                                style: {
-                                    fill: 'rgb(58,132,255)'
-                                }
-                            }
-                        }
-                    },
-                    // linkCenter: true,
-                    plugins: [this.tooltip],
-                    modes: {
-                        // 允许拖拽画布、缩放画布、拖拽节点
-                        default: [
-                            'drag-canvas', // 官方内置的行为
-                            'zoom-canvas',
-                            'hover-node',
-                            'drag-node',
-                            'hover-edge'
-                            // 'select-node'
-                        ]
+                        this.forms.splice(index, 1)
                     }
                 })
             },
-            // 创建菜单
-            createMenu() {
-                // 创建内容超出提示
-                this.tooltip = new G6.Tooltip({
-                    offsetX: 10,
-                    offsetY: 10,
-                    itemTypes: ['node'],
-                    // 自定义 tooltip 内容
-                    getContent: (e) => {
-                        const outDiv = document.createElement('div')
-                        const model = e.item.getModel()
-                        outDiv.style.width = 'fit-content'
-                        outDiv.className = 'node-tool-tip'
-                        outDiv.innerHTML =
-                            `<ul>
-                                    <li>作业总数：${model.info.jobCount}</li>
-                                    <li>成功：${model.info.successCount}</li>
-                                    <li>正在执行：${model.info.operatingCount}</li>
-                                    <li>失败：${model.info.failureCount}</li>
-                                    <li>错误：${model.info.errorCount}</li>
-                                    <li>等待：${model.info.waitCount}</li>
-                                    <li>挂起：${model.info.pauseCount}</li>
-                                    <li>取消：${model.info.cancelCount}</li>
-                                    <li>尚未实例化作业数：${model.info.todayNotExecuteCount}</li>
-                                 </ul>`
-                        return outDiv
-                    }
-                    // shouldBegin(e) {
-                    //     const model = e.item.get('model')
-                    //     return true
-                    // }
-                })
-            },
-            // 获取所有跑批系统
-            getAllRunSys() {
-                this.largeScreenLoading = true
-                this.$api.category.get_topology().then(res => {
-                    if (res.result) {
-                        this.sysData = res.data
-                        this.renderCanvas(true, this.sysData)
-                    } else {
-                        this.$cwMessage(res.message, 'error')
-                    }
-                    this.largeScreenLoading = false
-                })
-            },
-            renderCanvas(detail, cavnsData) {
-                this.mainLoading = true
-                if (this.$refs.topMenu.viewBtnActive === 1) {
-                    this.getCavasData(detail, 5, cavnsData)
-                } else {
-                    this.getCavasData(detail, 3, cavnsData)
-                }
-            },
-            // 初始化画布数据，渲染画布
-            getCavasData(detail, nodeType, cData) {
-                const _this = this
-                const cavasData = deepClone(cData)
-                setTimeout(() => {
-                    const data = {
-                        edges: cavasData.lines.map(line => {
-                            return {
-                                detail: detail,
-                                id: getUUID(32, 16),
-                                source: line.from.toString(),
-                                target: line.to.toString()
-                            }
-                        }),
-                        nodes: cavasData.nodes.map((node, index) => {
-                            return {
-                                ...node,
-                                detail: detail,
-                                label: node.label.length > 9 ? `${node.label.substr(0, 9)}` : node
-                                    .label,
-                                name: node.label,
-                                icon: '',
-                                id: node.id.toString(),
-                                // x: (index + 1) * 70,
-                                // y: (index + 1) * 50,
-                                nodeType: nodeType,
-                                state: node.state,
-                                type: 'rect-node',
-                                labelCfg: {
-                                    style: {
-                                        textAlign: 'left'
-                                    }
-                                },
-                                style: {
-                                    width: 154,
-                                    height: 40,
-                                    radius: 20,
-                                    iconCfg: {
-                                        fill: '#3a84ff'
-                                    }
-                                }
+            async removeFormItemAbout(item) {
+                this.nodeMap.forEach(node => {
+                    // 搜寻条件，进行移除
+                    if (node.type === 'CONDITION') {
+                        node.props.groups.forEach(group => {
+                            const i = group.cids.remove(item.id)
+                            if (i > -1) {
+                                // 从子条件移除
+                                group.conditions.splice(i, 1)
                             }
                         })
                     }
-                    _this.graph.read(data)
-                    // _this.graph.fitCenter()
-                    _this.mainLoading = false
-                }, 2000)
-            },
-            createGraphic() {
-                // 创建菜单
-                this.createMenu()
-                // 初始化配置项
-                this.initOption()
-                // 创建graph实例
-                this.graph = new G6.Graph(this.cfg)
-            },
-            initGraphEvent() {
-                this.graph.on('node:click', e => {
-                    const model = e.item.get('model')
-                    if (model.nodeType === 3) {
-                        if (model.instance_id) {
-                            // 消除由于keepalive快照导致从作业流详情回退后找不到dom
-                            if (this.fullscreen) {
-                                this.handleFullScreen()
-                            }
-                            setTimeout(() => {
-                                this.$router.push({
-                                    path: '/viewdetail',
-                                    query: {
-                                        id: model.instance_id
-                                    }
-                                })
-                            }, 300)
-                        } else {
-                            this.$cwMessage('该作业流尚未实例化!', 'primary')
+                    // 搜寻权限，进行移除
+                    if (node.type === 'ROOT' || node.type === 'APPROVAL' || node.type === 'CC') {
+                        node.props.formPerms.removeByKey('id', item.id)
+                        if (node.props.formUser === item.id) {
+                            node.props.formUser = ''
                         }
-                        return false
                     }
-                    this.$refs.tree.treeSeachVal = ''
-                    this.$refs.tree.filterTree('')
-                    this.$refs.tree.$refs.topoTree.setSelected(parseInt(model.id), {
-                        emitEvent: false,
-                        beforeSelect: true
-                    })
-                    this.$refs.topMenu.viewBtnActive = 2
-                    // 根据跑批id获取相关作业流
-                    this.getJobFlowByRunId(model.id)
                 })
             },
-            // 根据跑批id获取相关作业流
-            getJobFlowByRunId(id) {
-                this.largeScreenLoading = true
-                this.$api.process.get_topology({
-                    category: id
-                }).then(res => {
-                    if (res.result) {
-                        this.flowData = res.data
-                        this.renderCanvas(true, this.flowData)
-                    } else {
-                        this.$cwMessage(res.message, 'error')
+            clone(obj) {
+                obj.id = this.getId()
+                return JSON.parse(JSON.stringify(obj))
+            },
+            viewForms() {
+                this.viewFormVisible = true
+            },
+            selectItem(cp) {
+                console.log(cp)
+                this.selectFormItem = cp
+            },
+            getSelectedClass(cp) {
+                return this.selectFormItem && this.selectFormItem.id === cp.id ? 'border-left: 4px solid #409eff' : ''
+            },
+            validateItem(err, titleSet, item) {
+                if (titleSet.has(item.title) && item.name !== 'SpanLayout') {
+                    err.push(`表单 ${item.title} 名称重复`)
+                }
+                titleSet.add(item.title)
+                if (item.name === 'SelectInput' || item.name === 'MultipleSelect') {
+                    if (item.props.options.length === 0) {
+                        err.push(`${item.title} 未设置选项`)
                     }
-                    this.largeScreenLoading = false
-                })
+                } else if (item.name === 'TableList') {
+                    if (item.props.columns.length === 0) {
+                        err.push(`明细表 ${item.title} 内未添加组件`)
+                    }
+                } else if (item.name === 'SpanLayout') {
+                    if (item.props.items.length === 0) {
+                        err.push('分栏内未添加组件')
+                    } else {
+                        item.props.items.forEach(sub => this.validateItem(err, titleSet, sub))
+                    }
+                }
+            },
+            validate() {
+                const err = []
+                if (this.forms.length > 0) {
+                    const titleSet = new Set()
+                    this.forms.forEach(item => {
+                        // 主要校验表格及分栏/选择器/表单名称/是否设置
+                        this.validateItem(err, titleSet, item)
+                    })
+                } else {
+                    err.push('表单为空，请添加组件')
+                }
+                return err
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
-    #largeScreen {
+.choose {
+    border: 1px dashed #000000 !important;
+}
+
+.process-form {
+    /deep/ .el-form-item__label {
+        padding: 0 0;
+    }
+}
+
+.components-nav {
+    box-sizing: content-box;
+    display: flex;
+    align-items: center;
+    margin: 12px 12px 0;
+    height: 28px;
+    box-shadow: 0 2px 4px 0 rgba(17, 31, 44, 0.04);
+    border: 1px solid #ecedef;
+    border-radius: 16px;
+    background-color: #fff;
+
+    .selected {
+        color: #000000;
+    }
+
+    .border {
+        border-left: 1px solid #f5f6f6;
+        border-right: 1px solid #f5f6f6;
+    }
+
+    span {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         height: 100%;
-        background-color: #fff;
+        font-size: 12px;
+        color: rgba(17, 31, 44, 0.72);
+        cursor: pointer;
 
-        .custom-layout {
-            /deep/ .bk-resize-layout-aside:after {
-                width: 0;
-            }
+        &:hover {
+            color: #000000;
         }
+    }
+}
 
-        .left {
-            padding: 16px 16px 0 16px;
-        }
+.components {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    //margin-top: 20px;
+    //padding: 0 20px;
+    font-size: 12px;
+    width: 100%;
+    color: rgba(17, 31, 44, 0.85);
 
-        .right {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-            background-image: linear-gradient(90deg, rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%), linear-gradient(rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
-            background-size: 10px 10px;
+    & > p {
+        padding: 0 20px;
+    }
+
+    .drag {
+        margin-left: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        li {
+            text-align: center;
             display: flex;
+            align-items: center;
+            width: 124px;
+            height: 38px;
+            margin-bottom: 12px;
+            border: 1px solid #C4C6CC;
+            border-radius: 8px;
+            cursor: grab;
+            background-color: #fff;
 
-            .left-status-list {
-                height: 100%;
-                width: 150px;
+            &:hover {
+                border: 1px solid #000000;
+                color: #000000;
             }
 
-            #main {
-                width: 100%;
-                height: 100%;
-
-                /deep/ .node-tool-tip {
-                    ul {
-                        li {
-                            padding: 2px;
-                        }
-                    }
-                }
-
-                // cursor: pointer;
+            i {
+                margin: 0 12px;
             }
+        }
 
-            .top-menu {
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                padding-top: 20px;
-                padding-right: 19px;
+        li:nth-child(odd) {
+            margin-right: 8px;
+        }
+    }
+}
+
+/deep/ .el-main {
+    padding: 0;
+}
+
+.layout-main {
+    background-color: #feffff;
+
+    .tool-nav {
+        font-size: medium;
+        padding: 8px 20px;
+        background: #fafafb;
+        border-bottom: 1px solid #ebecee;
+
+        div:first-child {
+            display: inline-block;
+            text-align: left;
+
+            i {
+                margin-right: 10px;
+            }
+        }
+
+        div:last-child {
+            float: right;
+
+            i {
+                margin-left: 10px;
+            }
+        }
+
+        i {
+            color: #7a7a7a;
+            cursor: pointer;
+
+            &:hover {
+                color: #4b4b4b;
             }
         }
     }
+
+    .work-form {
+        margin: 0 auto;
+        height: 100%;
+        overflow-y: auto;
+        background: rgb(245, 246, 246);
+        border-left: 1px solid rgb(235, 236, 238);
+        border-right: 1px solid rgb(235, 236, 238);
+        padding: 10px;
+
+        .pc {
+            margin-top: 2%;
+
+            .drag-from {
+                height: calc(100vh - 450px);
+                background-color: rgb(245, 246, 246);
+
+                .form-item, li {
+                    cursor: grab;
+                    background: #ffffff;
+                    padding: 10px;
+                    border: 1px solid #ebecee;
+                    margin: 5px 0;
+                }
+            }
+        }
+
+        .mobile {
+            margin-left: auto;
+            margin-right: auto;
+            width: 360px;
+            max-height: 640px;
+            margin-top: 4%;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px 0 rgba(17, 31, 44, 0.12);
+
+            .bd {
+                border: 1px solid rgba(17, 31, 44, 0.08);
+                border-radius: 24px;
+                padding: 10px 10px;
+                background-color: #ffffff;
+
+                .form-content {
+                    padding: 3px 2px;
+                    border-radius: 14px;
+                    background-color: #f2f4f5;
+
+                    .drag-from {
+                        width: 100%;
+                        height: calc(100vh - 190px);
+                        min-height: 200px;
+                        max-height: 600px;
+                    }
+
+                    .form {
+                        overflow-y: auto;
+                        width: 100%;
+                        display: inline-block;
+                        max-height: 640px;
+
+                        .form-item, li {
+                            border: 1px solid #ffffff;
+                            list-style: none;
+                            background: #ffffff;
+                            padding: 10px;
+                            margin: 5px 0;
+                            cursor: grab;
+                        }
+                    }
+                }
+            }
+        }
+
+        .tip {
+            //float: left;
+            margin: 0 auto;
+            width: 65%;
+            max-width: 400px;
+            padding: 35px 20px;
+            border-radius: 10px;
+            border: 1px dashed rgba(25, 31, 37, 0.12);
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: rgb(122, 122, 122);
+            z-index: 9999;
+
+            &:hover {
+                border: 1px dashed #000000;
+            }
+        }
+    }
+
+}
+
+.layout-param {
+    text-align: center;
+    font-size: 14px;
+    color: rgb(122, 122, 122);
+
+    .tool-nav-r {
+        text-align: left;
+        font-size: small;
+        border-left: 1px solid #ebecee;
+        padding: 10px 20px;
+        background: #fafafb;
+        border-bottom: 1px solid #ebecee;
+    }
+
+    .tip {
+        margin-top: 150px;
+    }
+}
+
+.flip-list-move {
+    transition: transform 0.5s;
+}
+
+.no-move {
+    transition: transform 0s;
+}
+
+.select {
+    color: #4b4b4b !important;
+}
+
+.form-header {
+    font-size: small;
+    color: #818181;
+    text-align: left;
+    position: relative;
+    background-color: #fff;
+
+    p {
+        position: relative;
+        margin: 0 0 10px 0;
+
+        span {
+            position: absolute;
+            left: -8px;
+            top: 3px;
+            color: rgb(217, 0, 19);
+        }
+    }
+
+    .option {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+
+        i {
+            font-size: large;
+            cursor: pointer;
+            color: #8c8c8c;
+            padding: 5px;
+
+            &:hover {
+                color: #f56c6c;
+            }
+        }
+    }
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    background-color: #f8f8f8;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 16px;
+    background-color: #e8e8e8;
+}
+
+.form-box {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 280px);
+}
+
+.sub-box1 {
+    width: 23%;
+}
+
+.sub-box2 {
+    flex: 1;
+}
+
+.sub-box3 {
+    width: 20%;
+}
 </style>
