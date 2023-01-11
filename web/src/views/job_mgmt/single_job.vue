@@ -9,16 +9,15 @@
             </bk-steps>
             <div style="display: flex;margin-right: 2%;">
                 <div class="next-icon left-icon" @click="lastStep">
-                    <bk-icon type="arrows-m-left-shape" />
+                    <bk-icon type="arrows-m-left-shape"></bk-icon>
                 </div>
                 <div class="next-icon right-icon" @click="nextStep">
-                    <bk-icon type="arrows-m-right-shape" />
+                    <bk-icon type="arrows-m-right-shape"></bk-icon>
                 </div>
             </div>
         </div>
         <div class="step-1" v-show="controllableSteps.curStep === 1">
-            <p class="job-title">自定义节点</p>
-            <div class="job-content content">
+            <div class="job-content">
                 <bk-form ref="form" :label-width="144" :model="form">
                     <bk-form-item label="节点名称:" :required="true" :error-display-type="'normal'"
                         :property="'node_name'">
@@ -70,7 +69,7 @@
             </div>
         </div>
         <div class="step-2" v-show="controllableSteps.curStep === 2">
-            <div class="job-content">
+            <div class="job-content" style="border-radius: 15px;">
                 <form-design></form-design>
             </div>
         </div>
@@ -624,8 +623,8 @@
 }
 
 .step-1 {
-    margin: 0 30px 30px 20px;
-    height: 80vh;
+    margin: 20px 30px 30px 20px;
+    height: 70vh;
     padding: 10px;
     border-radius: 15px;
     background-color: #ffffff;
@@ -634,5 +633,6 @@
 .step-2 {
     margin: 20px 30px 30px 20px;
     height: 80%;
+    border-radius: 15px;
 }
 </style>
