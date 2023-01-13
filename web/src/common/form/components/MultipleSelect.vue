@@ -1,21 +1,21 @@
 <template>
     <div>
         <div v-if="mode === 'DESIGN'">
-            <bk-select class="max-fill" v-if="!expanding" multiple v-model="value" :disabled="true"
+            <bk-select class="max-fill" multiple v-model="value" :disabled="true"
                 :placeholder="placeholder">
                 <bk-option v-for="option in options"
                     :key="option.id"
-                    :id="option.id"
+                    :id="option.name"
                     :name="option.name">
                 </bk-option>
             </bk-select>
         </div>
         <div v-else>
-            <bk-select class="max-fill" v-if="!expanding" multiple v-model="value"
+            <bk-select class="max-fill" multiple v-model="_value"
                 :placeholder="placeholder">
                 <bk-option v-for="option in options"
                     :key="option.id"
-                    :id="option.id"
+                    :id="option.name"
                     :name="option.name">
                 </bk-option>
             </bk-select>

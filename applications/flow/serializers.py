@@ -87,9 +87,13 @@ class ProcessViewSetsSerializer(serializers.Serializer):
         if validated_data.get("mode", "") == "clone":
             for node in validated_data["pipeline_tree"]["nodes"]:
                 node["uuid"] = f"c{node['uuid']}"
+        node_template_ids = []
         node_map = {}
         for node in validated_data["pipeline_tree"]["nodes"]:
             node_map[node["uuid"]] = node
+            if node["node_type"] == 2:
+                node_template_ids.append(node["content"])
+        node_template_bulk = NodeTemplate.objects.filter(id__in=node_template_ids).in_bulk(field_name="pk")
         dag = {k: [] for k in node_map.keys()}
         gateways = defaultdict(dict)
         for line in self.validated_data["pipeline_tree"]["lines"]:
@@ -115,6 +119,8 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                 bulk_nodes = []
                 for node in node_map.values():
                     node_data = node.pop("node_data")
+                    if node_template_bulk.get(node["content"]):
+                        node_data["inputs_component"] = node_template_bulk[node["content"]].inputs_component
                     bulk_nodes.append(Node(process=process, **node, **node_data))
                 Node.objects.bulk_create(bulk_nodes, batch_size=500)
                 try:
@@ -375,10 +381,10 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
                 output_data = api.get_execution_data_outputs(runtime, node_id=node["uuid"])
                 outputs = output_data.data.get("outputs", "")
                 if node["node_type"] == 3:
-                    # todo先简单判断node有fail，process就为fail
+                    # todo 先简单判断node有fail，process就为fail
                     if State.objects.filter(parent_id=node["uuid"], name="FAILED").exists():
                         flow_state = "fail"
-            # todo先简单判断node有fail，process就为fail
+            # todo 先简单判断node有fail，process就为fail
             if flow_state == "fail":
                 process_state = "fail"
             nodes.append({"show": node["show"],
@@ -391,6 +397,7 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
                           "content": node["content"],
                           "node_data": {
                               "inputs": node["inputs"],
+                              "inputs_component": node.get("inputs_component", []),
                               "outputs": outputs,
                               "run_mark": int(node["show"]),
                               "node_name": node["name"],

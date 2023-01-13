@@ -4,7 +4,7 @@
             <bk-input v-model="value.placeholder" placeholder="请设置提示语"></bk-input>
         </bk-form-item>
         <bk-form-item label="输入值" :label-width="100">
-            <bk-input clearable v-model="value.value" type="number"></bk-input>
+            <bk-input clearable v-model="value.defaultValue" type="number"></bk-input>
         </bk-form-item>
     </div>
 </template>

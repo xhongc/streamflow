@@ -4,7 +4,7 @@
             <bk-input :disabled="true" v-model="value" :placeholder="placeholder"></bk-input>
         </div>
         <div v-else>
-            <bk-input :clearable="true" v-model="value" :placeholder="placeholder"></bk-input>
+            <bk-input :clearable="true" v-model="_value" :placeholder="placeholder"></bk-input>
         </div>
     </div>
 </template>
@@ -24,6 +24,10 @@
             placeholder: {
                 type: String,
                 default: '请输入内容'
+            },
+            defaultValue: {
+                type: String,
+                default: ''
             }
         },
         data() {

@@ -1,7 +1,6 @@
 <template>
     <div>
-        {{config.props}}
-        <component ref="form" :is="config.name" :mode="mode" v-bind="config.props" />
+        <component ref="form" :is="config.name" :mode="mode" v-bind="config.props" v-model="_value"></component>
     </div>
 </template>
 <script>
@@ -17,8 +16,7 @@
                 default: 'DESIGN'
             },
             value: {
-                default: undefined,
-                type: String
+                type: [Object, Number, String, Array]
             },
             config: {
                 type: Object,

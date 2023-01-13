@@ -70,7 +70,7 @@
         </div>
         <div class="step-2" v-show="controllableSteps.curStep === 2">
             <div class="job-content" style="border-radius: 15px;">
-                <form-design></form-design>
+                <form-design ref="form_design"></form-design>
             </div>
         </div>
         <div class="step-2" v-show="controllableSteps.curStep === 3">
@@ -109,7 +109,7 @@
                 </div>
             </bk-form>
         </div>
-        <bk-sideslider :is-show.sync="customSettings.isShow" :quick-close="true" :width="536" :title="'预览'">
+        <bk-sideslider :is-show.sync="customSettings.isShow" :quick-close="true" :width="600" :title="'预览'">
             <node-info slot="content" :node-data="nodeData" :is-show-btn="false"></node-info>
         </bk-sideslider>
         <template v-if="controllableSteps.curStep === 4">
@@ -261,9 +261,10 @@
                 form: {
                     name: '', // 作业名称
                     description: '', // 作业描述
-                    category: '', // 跑批系统
-                    station: '', // agnet
-                    os: '', // 系统类型
+                    run_mark: 1,
+                    fail_retry_count: 0,
+                    fail_offset: 3,
+                    fail_offset_unit: 'seconds',
                     exit_code: '', // 作业退出码
                     data: {
                         account: '', // 执行账号
@@ -372,8 +373,14 @@
             handleAddJob() {
                 this.formLoading = true
                 const params = deepClone(this.form)
-                params['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
-                params['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                const forms = this.$refs.form_design.forms
+                console.log(forms)
+                const inputs = {}
+                forms.forEach(each => {
+                    inputs[each.props.key] = each.props.defaultValue
+                })
+                params['inputs_component'] = forms
+                params['inputs'] = inputs
                 params['coding'] = this.$refs.editor3.monacoEditor.getValue()
                 this.$api.content.create(params).then(res => {
                     if (res.result) {
@@ -393,8 +400,13 @@
                 this.formLoading = true
                 const id = parseInt(this.$route.query.job_id)
                 const params = deepClone(this.form)
-                params['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
-                params['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                const forms = this.$refs.form_design.forms
+                const inputs = {}
+                forms.forEach(each => {
+                    inputs[each.props.key] = each.props.defaultValue
+                })
+                params['inputs_component'] = forms
+                params['inputs'] = inputs
                 params['coding'] = this.$refs.editor3.monacoEditor.getValue()
 
                 this.$api.content.update(id, params).then(res => {
@@ -448,9 +460,13 @@
             // 处理预览
             handlePreView() {
                 this.cloneForm = deepClone(this.form)
-                console.log(this.form)
-                this.cloneForm['inputs_component'] = this.$refs.editor1.monacoEditor.getValue()
-                this.cloneForm['inputs'] = this.$refs.editor2.monacoEditor.getValue()
+                const forms = this.$refs.form_design.forms
+                const inputs = {}
+                forms.forEach(each => {
+                    inputs[each.props.key] = each.props.defaultValue
+                })
+                this.cloneForm['inputs_component'] = forms
+                this.cloneForm['inputs'] = inputs
                 this.cloneForm['outputs'] = JSON.stringify(this.form.outputs)
                 this.customSettings.isShow = true
             },
@@ -466,8 +482,9 @@
                 this.$api.content.retrieve(id).then(res => {
                     if (res.result) {
                         this.form = res.data
-                        this.setDefaultEditor(1, JSON.stringify(this.form.inputs_component), JSON.stringify(this.form.inputs))
-                        this.$refs.editor3.changeModel('python', this.form.coding)
+                        this.form.run_mark = res.data.show ? '1' : '0'
+                        this.$refs.form_design.forms = res.data.inputs_component
+                        // this.$refs.editor3.changeModel('python', this.form.coding)
                     } else {
                         this.$cwMessage(res.message, 'error')
                     }
@@ -486,7 +503,18 @@
             },
             nextStep() {
                 if (this.controllableSteps.curStep < 4) {
-                    this.controllableSteps.curStep = this.controllableSteps.curStep + 1
+                    if (this.controllableSteps.curStep === 2) {
+                        const err = this.$refs.form_design.validate()
+                        if (err.length > 0) {
+                            console.log(err)
+                            this.$cwMessage(err.toString(), 'error')
+                            return false
+                        } else {
+                            this.controllableSteps.curStep = this.controllableSteps.curStep + 1
+                        }
+                    } else {
+                        this.controllableSteps.curStep = this.controllableSteps.curStep + 1
+                    }
                 } else {
                     return false
                 }

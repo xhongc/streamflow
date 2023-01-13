@@ -41,18 +41,14 @@ feature：
  - [ ] login
  - [ ] 审核节点
  - [ ] 创建节点需要审核
- - [ ] 节点低代码
+ - [x] 节点低代码
+ - [ ] bug 删除节点脚本一起删
+ - [ ] monacoEditor研究
 
- - [ ] 前端优化 打包大小
- - 
- - [ ] 告警管理- 规划中
- - [ ] 审计管理- 规划中
- - 
- - [x] 优化画布操作 拖动锁定
- - [x] 前端gzipExtensions completed
- - [x] 任务记录 节点样式丢失
- - [x] 变量复制
- - [x] 白色主题布局左侧菜单修改
- - 
+ - [ ] 前端页面风格优化
+ - [ ] 没有功能隐藏
+ 
+
+ 
  - ## install tips
 sudo apt-get install libmysqlclient-dev python3-dev

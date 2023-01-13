@@ -3,9 +3,9 @@
     <bk-form ref="form" class="process-form" label-position="top" :rules="rules" :model="_value">
         <bk-form-item v-if="item.name !== 'SpanLayout' && item.name !== 'Description'" :prop="item.id"
             :label="item.title" v-for="(item, index) in forms" :key="item.name + index">
-            <form-design-render :ref="`sub-item_${item.id}`" v-model="_value[item.id]" mode="PC" :config="item" />
+            <form-design-render :ref="`sub-item_${item.id}`" v-model="_value[item.props.key]" :mode="mode" :config="item" />
         </bk-form-item>
-        <form-design-render ref="span-layout" v-else v-model="_value" mode="PC" :config="item" />
+        <form-design-render ref="span-layout" v-else v-model="_value" :mode="mode" :config="item" />
     </bk-form>
 </template>
 
@@ -27,6 +27,10 @@
                 default: () => {
                     return {}
                 }
+            },
+            mode: {
+                type: String,
+                default: 'PC'
             }
         },
         data() {

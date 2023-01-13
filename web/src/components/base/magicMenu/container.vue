@@ -71,9 +71,9 @@
 }
 
 .header-title {
-    background-color: #fff;
+    background-color: #FAFBFD;
     height: 40px;
-    border-bottom: 1px solid #dcdee4;
+    border-bottom: 1px solid #F5F7FA;
     flex-direction: row;
     align-items: center;
     display: flex;

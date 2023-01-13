@@ -21,7 +21,8 @@ export const baseComponents = [
                 valueType: ValueType.string,
                 props: {
                     required: false,
-                    enablePrint: true
+                    enablePrint: true,
+                    key: ''
                 }
             },
             {
@@ -32,7 +33,8 @@ export const baseComponents = [
                 valueType: ValueType.string,
                 props: {
                     required: false,
-                    enablePrint: true
+                    enablePrint: true,
+                    key: ''
                 }
             },
             {
@@ -43,7 +45,8 @@ export const baseComponents = [
                 valueType: ValueType.number,
                 props: {
                     required: false,
-                    enablePrint: true
+                    enablePrint: true,
+                    key: ''
                 }
             },
             {
@@ -56,7 +59,8 @@ export const baseComponents = [
                     required: false,
                     enablePrint: true,
                     expanding: false,
-                    options: ['选项1', '选项2']
+                    key: '',
+                    options: [{id: 1, name: '选项1'}, {id: 2, name: '选项2'}]
                 }
             },
             {
@@ -69,7 +73,23 @@ export const baseComponents = [
                     required: false,
                     enablePrint: true,
                     expanding: false,
-                    options: ['选项1', '选项2']
+                    value: [],
+                    key: '',
+                    options: [{id: 1, name: '选项1'}, {id: 2, name: '选项2'}]
+                }
+            },
+            {
+                title: '字典对象',
+                name: 'DictMap',
+                icon: 'iconfont icon-duoxuankuang',
+                value: [],
+                valueType: ValueType.object,
+                props: {
+                    required: false,
+                    enablePrint: true,
+                    expanding: false,
+                    key: '',
+                    defaultValue: []
                 }
             }
         ]

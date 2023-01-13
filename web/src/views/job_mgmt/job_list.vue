@@ -99,11 +99,10 @@
             </bk-table>
         </div>
         <div>
-            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500"
+            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="600"
                 ext-cls="custom-sidelider">
                 <div slot="content" style="height: 100%;">
-                    <job-dialog :job-from="jobFrom" :key="dialogKey">
-                    </job-dialog>
+                    <job-dialog slot="content" :node-data="{ 'data': jobFrom }" :is-show-btn="false"></job-dialog>
                 </div>
             </bk-sideslider>
         </div>

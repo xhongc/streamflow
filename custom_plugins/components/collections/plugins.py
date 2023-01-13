@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 import importlib
-import math
-from copy import deepcopy
+import json
+
+import requests
 
 from applications.utils.json_helper import try_json
 from applications.utils.notify_way import send_email
 from bamboo_engine.api import logger
-from bamboo_engine.builder import Var
-from pipeline.core.flow.activity import Service, StaticIntervalGenerator
 from pipeline.component_framework.component import Component
-import json
-import time
-import requests
+from pipeline.core.flow.activity import Service, StaticIntervalGenerator
 
 
 # to adapter window pc
@@ -89,7 +86,7 @@ class HttpRequestService(Service, ServiceMixin):
             headers = self.parse_headers(inputs["header"])
             inputs["body"] = try_json(inputs["body"])
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
-            res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=inputs["timeout"],
+            res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=int(inputs["timeout"]),
                                    verify=False,
                                    **req_data)
             _result_content = res.text

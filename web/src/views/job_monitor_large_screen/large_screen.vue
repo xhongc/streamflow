@@ -40,7 +40,7 @@
                                                 <!--<i class="el-icon-copy-document" @click="copy"></i>-->
                                                 <bk-icon type="close" @click="del(id)"></bk-icon>
                                             </div>
-                                            <form-design-render :config="cp"></form-design-render>
+                                            <form-design-render :config="cp" v-model="cp.props.defaultValue"></form-design-render>
                                         </div>
                                     </div>
                                 </draggable>
@@ -91,7 +91,13 @@
                 select: null,
                 drag: false,
                 forms: [],
-                selectFormItem: {},
+                selectFormItem: {
+                    props: {
+                        required: false,
+                        enablePrint: true,
+                        key: ''
+                    }
+                },
                 nodeMap: []
             }
         },
@@ -151,17 +157,22 @@
                 this.viewFormVisible = true
             },
             selectItem(cp) {
-                console.log(cp)
                 this.selectFormItem = cp
             },
             getSelectedClass(cp) {
                 return this.selectFormItem && this.selectFormItem.id === cp.id ? 'border-left: 4px solid #409eff' : ''
             },
             validateItem(err, titleSet, item) {
-                if (titleSet.has(item.title) && item.name !== 'SpanLayout') {
-                    err.push(`表单 ${item.title} 名称重复`)
+                console.log(titleSet, item)
+                if (!item.props.key) {
+                    err.push(`${item.title} 英文名称不能为空`)
+                } else {
+                    if (titleSet.has(item.props.key)) {
+                        err.push(`表单 ${item.title} 英文名称重复`)
+                    } else {
+                        titleSet.add(item.props.key)
+                    }
                 }
-                titleSet.add(item.title)
                 if (item.name === 'SelectInput' || item.name === 'MultipleSelect') {
                     if (item.props.options.length === 0) {
                         err.push(`${item.title} 未设置选项`)

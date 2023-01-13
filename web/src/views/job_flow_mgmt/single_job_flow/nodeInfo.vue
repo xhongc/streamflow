@@ -53,50 +53,7 @@
                         <bk-divider
                             style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
                         <p class="title">输入参数</p>
-                        <bk-form-item v-for="(item,index) in form.inputs_component" :label="item.label" :key="index">
-                            <div v-if="item.type === 'textarea'">
-                                <bk-input v-model="form.inputs[item.key]" type="textarea"
-                                    style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </div>
-                            <div v-else-if="item.type === 'select'">
-                                <bk-select :clearable="true"
-                                    style="background-color: #fff;width: 130px;margin-right: 14px;"
-                                    v-model="form.inputs[item.key]" placeholder="请选择" :disabled="disabled">
-                                    <bk-option v-for="(item2, index2) in item.choices || []" :key="index2"
-                                        :id="item2.value" :name="item2.label">
-                                    </bk-option>
-                                </bk-select>
-                            </div>
-                            <div v-else-if="item.type === 'dict_map'">
-                                <div v-for="(item3, index3) in form.inputs[item.key]" class="pre-commands" :key="index3"
-                                    style="margin-bottom: 12px;">
-                                    <bk-compose-form-item>
-                                        <bk-input v-model="item3.key" type="text"
-                                            style="width: 130px;margin-right: 9px;" :disabled="disabled"
-                                            :min="0"></bk-input>
-                                        <bk-input v-model="item3.value" type="text"
-                                            style="width: 130px;margin-right: 9px;" :disabled="disabled"
-                                            :min="0"></bk-input>
-                                    </bk-compose-form-item>
-                                    <i class="iconfont icon-changyongtubiao-chahao btn" style="margin-left: 8px;"
-                                        @click="handleDeleteCommand(index3)"
-                                        v-if="!disabled && form.inputs[item.key].length > 1"></i>
-                                    <i class="iconfont icon-changyongtubiao-jiahao btn" @click="handleAddCommand"
-                                        v-if="!disabled"></i>
-                                </div>
-                            </div>
-                            <div v-else-if="item.type === 'number'">
-                                <bk-input v-model="form.inputs[item.key]" type="number"
-                                    style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </div>
-                            <div v-else-if="item.type === 'text'">
-                                <bk-input v-model="form.inputs[item.key]" type="text"
-                                    style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                            </div>
-                            <div v-else>
-                                <div style="color: red;">ERROR:不支持的类型</div>
-                            </div>
-                        </bk-form-item>
+                        <form-render ref="form_render" :forms="form.inputs_component" v-model="form.inputs" :mode="disabled ? 'DESIGN' : 'PC'"></form-render>
                         <bk-divider
                             style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
                     </bk-form>
@@ -136,7 +93,9 @@
 </template>
 
 <script>
+    import FormRender from '@/common/form/FormRender'
     export default {
+        components: {FormRender},
         props: {
             nodeData: {
                 type: Object,
@@ -152,6 +111,7 @@
             return {
                 disabled: false,
                 isChecking: false,
+                inputsData: {},
                 rules: {
                     node_name: [
                         {

@@ -8,13 +8,13 @@
                 <div class="option-item-label">
                     <span>选项设置</span>
                     <bk-button size="small" icon="plus" class="mr10" :text="true"
-                        @click="value.options.push('新选项')">新选项
+                        @click="addOption">新选项
                     </bk-button>
                 </div>
                 <draggable :list="value.options" group="option" handler=".el-icon-rank" :options="dragOption">
                     <div v-for="(op, index) in value.options" :key="index" class="option-item">
                         <i class="el-icon-rank"></i>
-                        <bk-input v-model="value.options[index]" size="medium" placeholder="请设置选项值" clearable>
+                        <bk-input v-model="value.options[index].name" size="medium" placeholder="请设置选项值" clearable>
                             <template slot="append">
                                 <bk-button size="small" icon="delete" :text="true"
                                     @click="value.options.splice(index, 1)">
@@ -25,8 +25,15 @@
                 </draggable>
             </bk-form-item>
         </bk-form>
-        <bk-form-item label="选项展开" :label-width="100">
-            <bk-switcher v-model="value.expanding"></bk-switcher>
+        <bk-form-item label="默认值" :label-width="100">
+            <bk-select class="max-fill" v-model="value.defaultValue" multiple
+                :placeholder="value.placeholder">
+                <bk-option v-for="option in value.options"
+                    :key="option.id"
+                    :id="option.name"
+                    :name="option.name">
+                </bk-option>
+            </bk-select>
         </bk-form-item>
 
     </div>
@@ -54,7 +61,12 @@
                 }
             }
         },
-        methods: {}
+        methods: {
+            addOption() {
+                const count = this.value.options.length + 1
+                this.value.options.push({id: count, name: ''})
+            }
+        }
     }
 </script>
 

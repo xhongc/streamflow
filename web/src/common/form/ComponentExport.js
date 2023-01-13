@@ -4,6 +4,7 @@ const AmountInput = () => import('./components/AmountInput.vue')
 const TextareaInput = () => import('./components/TextareaInput.vue')
 const SelectInput = () => import('./components/SelectInput.vue')
 const MultipleSelect = () => import('./components/MultipleSelect.vue')
+const DictMap = () => import('./components/DictMap.vue')
 // const DateTime = () => import('./components/DateTime.vue')
 // const DateTimeRange = () => import('./components/DateTimeRange.vue')
 //
@@ -26,7 +27,8 @@ export default {
     AmountInput,
     TextareaInput,
     SelectInput,
-    MultipleSelect
+    MultipleSelect,
+    DictMap
     // DateTime,
     // DateTimeRange,
     // UserPicker,

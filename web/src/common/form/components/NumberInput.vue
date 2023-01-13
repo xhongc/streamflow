@@ -4,7 +4,7 @@
             <bk-input disabled :placeholder="placeholder" type="number" v-model="value"></bk-input>
         </div>
         <div v-else>
-            <bk-input v-model="value" size="medium" clearable :placeholder="placeholder" type="number"></bk-input>
+            <bk-input v-model="_value" clearable :placeholder="placeholder" type="number"></bk-input>
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
         mixins: [componentMinxins],
         props: {
             value: {
-                type: Number,
+                type: String,
                 default: null
             },
             placeholder: {

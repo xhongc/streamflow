@@ -4,7 +4,7 @@
             <bk-input :disabled="true" :placeholder="placeholder" :rows="2" :type="'textarea'" v-model="value"></bk-input>
         </div>
         <div v-else>
-            <bk-input v-model="value" clearable :maxlength="255" :placeholder="placeholder"
+            <bk-input v-model="_value" clearable :maxlength="255" :placeholder="placeholder"
                 :rows="3" :type="'textarea'"></bk-input>
         </div>
     </div>

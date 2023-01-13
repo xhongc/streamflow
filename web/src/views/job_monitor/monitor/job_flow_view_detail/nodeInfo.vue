@@ -43,32 +43,7 @@
                         </bk-form-item>
                         <bk-divider style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
                         <p class="title">输入参数</p>
-                        <bk-form-item label="请求地址:">
-                            <bk-input v-model="form.inputs.url" type="textarea" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                        </bk-form-item>
-                        <bk-form-item label="请求类型:">
-                            <bk-select :clearable="true" style="background-color: #fff;width: 130px;margin-right: 14px;" v-model="form.inputs.method" placeholder="请选择" :disabled="disabled">
-                                <bk-option v-for="(item, index) in requestTypeList" :key="index" :id="item.value" :name="item.label">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                        <bk-form-item label="Header:">
-                            <div v-for="(item, index) in form.inputs.header" class="pre-commands" :key="index" style="margin-bottom: 12px;">
-                                <bk-compose-form-item>
-                                    <bk-input v-model="item.key" type="text" style="width: 130px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                    <bk-input v-model="item.value" type="text" style="width: 130px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                                </bk-compose-form-item>
-                                <i class="iconfont icon-changyongtubiao-chahao btn" style="margin-left: 8px;" @click="handleDeleteCommand(index)"
-                                    v-if="!disabled && form.inputs.header.length > 1"></i>
-                                <i class="iconfont icon-changyongtubiao-jiahao btn" @click="handleAddCommand" v-if="!disabled"></i>
-                            </div>
-                        </bk-form-item>
-                        <bk-form-item label="Body:">
-                            <bk-input v-model="form.inputs.body" type="textarea" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                        </bk-form-item>
-                        <bk-form-item label="超时时间:">
-                            <bk-input v-model="form.inputs.timeout" type="number" style="width: 350px;margin-right: 9px;" :disabled="disabled" :min="0"></bk-input>
-                        </bk-form-item>
+                        <form-render ref="form_render" :forms="form.inputs_component" v-model="form.inputs" :mode="'DESIGN'"></form-render>
                         <bk-divider style="width: 540px;position: relative;right: 20px;border-color: #dcdee5;"></bk-divider>
                         <p class="title">输出结果</p>
                         <bk-form-item label="输出日志:">
@@ -97,10 +72,12 @@
 <script>
     import statusList from './statusList.js'
     import editor from '@/components/monacoEditor'
+    import FormRender from '@/common/form/FormRender'
 
     export default {
         components: {
-            editor
+            editor,
+            FormRender
         },
         // props: ['nodeData'],
         props: {
@@ -125,14 +102,11 @@
                             }
                 ],
                 reviewList: [{ // 执行前人工复核单选列表
-                    label: '无',
-                    value: 0
-                }, {
-                    label: '单人复核',
+                    label: '正常运行',
                     value: 1
                 }, {
-                    label: '双人复核',
-                    value: 2
+                    label: '禁止运行',
+                    value: 0
                 }],
                 timeTypeList: [
                     { // 执行时长告警时间类型下拉列表

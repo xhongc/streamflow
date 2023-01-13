@@ -7,16 +7,16 @@
             <bk-form-item label="选项设置" class="options" :label-width="100">
                 <div class="option-item-label">
                     <span>选项设置</span>
-                    <bk-button size="small" icon="plus" class="mr10" :text="true"
-                        @click="value.options.push('新选项')">新选项
+                    <bk-button icon="plus" class="mr10" :text="true"
+                        @click="addOption">新选项
                     </bk-button>
                 </div>
                 <draggable :list="value.options" group="option" handler=".el-icon-rank" :options="dragOption">
                     <div v-for="(op, index) in value.options" :key="index" class="option-item">
                         <i class="el-icon-rank"></i>
-                        <bk-input v-model="value.options[index]" size="medium" placeholder="请设置选项值" clearable>
+                        <bk-input v-model="value.options[index].name" placeholder="请设置选项值" clearable>
                             <template slot="append">
-                                <bk-button size="small" icon="delete" :text="true"
+                                <bk-button icon="delete" :text="true"
                                     @click="value.options.splice(index, 1)">
                                 </bk-button>
                             </template>
@@ -25,15 +25,12 @@
                 </draggable>
             </bk-form-item>
         </bk-form>
-        <bk-form-item label="选项展开" :label-width="100">
-            <bk-switcher v-model="value.expanding"></bk-switcher>
-        </bk-form-item>
-        <bk-form-item label="选择值" :label-width="100">
-            <bk-select class="max-fill" v-model="value.value"
+        <bk-form-item label="默认值" :label-width="100">
+            <bk-select class="max-fill" v-model="value.defaultValue"
                 :placeholder="value.placeholder">
                 <bk-option v-for="option in value.options"
                     :key="option.id"
-                    :id="option.id"
+                    :id="option.name"
                     :name="option.name">
                 </bk-option>
             </bk-select>
@@ -63,7 +60,12 @@
                 }
             }
         },
-        methods: {}
+        methods: {
+            addOption() {
+                const count = this.value.options.length + 1
+                this.value.options.push({id: count, name: ''})
+            }
+        }
     }
 </script>
 

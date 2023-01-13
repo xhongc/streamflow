@@ -1,8 +1,11 @@
 <template>
     <div>
-        <bk-form label-width="90px" v-if="form.name !== 'SpanLayout'">
+        <bk-form :label-width="90" v-if="form.name !== 'SpanLayout'">
             <bk-form-item label="表单名称" :label-width="100">
                 <bk-input clearable v-model="form.title" />
+            </bk-form-item>
+            <bk-form-item label="英文名称" :label-width="100">
+                <bk-input clearable v-model="form.props.key" />
             </bk-form-item>
             <component :is="form.name" v-model="form.props" />
             <bk-form-item label="必填项" :label-width="100">
@@ -27,6 +30,7 @@
     import FileUpload from './config/FileUploadConfig.vue'
     import Description from './config/DescriptionConfig.vue'
     import MoneyInput from './config/MoneyInputConfig.vue'
+    import DictMap from './config/DictMapConfig.vue'
     // import DeptPicker from './config/OrgPickerConfig.vue'
     // import UserPicker from './config/OrgPickerConfig.vue'
     import TableList from './config/TableListConfig.vue'
@@ -48,7 +52,8 @@
             MoneyInput,
             // DeptPicker,
             // UserPicker,
-            TableList
+            TableList,
+            DictMap
         },
         props: {
             form: {
@@ -59,6 +64,8 @@
             return {}
         },
         computed: {
+        },
+        created() {
         },
         methods: {}
     }

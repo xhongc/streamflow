@@ -1,18 +1,21 @@
 <template>
     <div id="jobList">
         <div class="header">
-            <div style="float: left;">
-                <bk-button theme="primary" @click="handleExportFiles">导出</bk-button>
+            <div class="search-box">
+                <div class="add-in">
+                </div>
+                <div class="search-in" v-if="auth.search">
+                    <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
+                        :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
+                        @enter="handleSearch">
+                    </bk-input>
+                    <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
+                        @click="handleOpenSeniorSearch"
+                        :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
+                    </bk-button>
+                </div>
             </div>
-            <div style="float: right;" v-if="auth.search">
-                <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
-                    :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
-                    @enter="handleSearch">
-                </bk-input>
-                <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
-                    @click="handleOpenSeniorSearch"
-                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
-                </bk-button>
+            <div style="float: left;">
             </div>
             <div class="senior-search-box" v-if="isDropdownShow">
                 <bk-container :margin="0">
@@ -477,5 +480,15 @@
             overflow-y: hidden;
         }
     }
+}
+.search-box {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #dcdee4;
+    height: 65px;
+    align-items: center;
 }
 </style>
