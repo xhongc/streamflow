@@ -70,6 +70,7 @@ const LargeScreen = () => import('@/views/job_monitor_large_screen/large_screen'
 const TaskList = () => import('@/views/task_mgmt/task_list')
 
 const TaskCreate = () => import('@/views/task_mgmt/task_create')
+const Login = () => import('@/views/login/login')
 
 // const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 
@@ -433,6 +434,14 @@ router.beforeEach((to, from, next) => {
                         'fatherName': 'TaskList',
                         'back': 'true'
                     }
+                },
+                {
+                    'path': '/login',
+                    'name': 'login',
+                    'component': 'Login',
+                    'meta': {
+                        'title': '登录'
+                    }
                 }
             ]
             getButton = [
@@ -652,7 +661,8 @@ const ROUTER_MAP = {
     'JobViewDetail': JobViewDetail,
     'LargeScreen': LargeScreen,
     'TaskList': TaskList,
-    'TaskCreate': TaskCreate
+    'TaskCreate': TaskCreate,
+    'Login': Login
 }
 
 function filterAsyncRouter(asyncRouterMap) { // 遍历后台传来的路由字符串，转换为组件对象

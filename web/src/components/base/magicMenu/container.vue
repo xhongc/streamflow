@@ -1,6 +1,6 @@
 <template>
     <div id="container">
-        <div class="header-title" v-if="$route.name !== 'home'">
+        <div class="header-title" v-if="['home', 'login'].indexOf($route.name) === -1">
             <div v-if="$route.meta.hasOwnProperty('back')" class="header-title2">
                 <span class="header-title-icon" @click="handleBack">
                     <svg class="icon"

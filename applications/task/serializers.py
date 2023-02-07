@@ -20,6 +20,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = super(TaskSerializer, self).create(validated_data)
+        # todo 改为clock schedule 模式
         if validated_data["run_type"] == "time":
             when_start = string_to_datetime(instance.when_start)
             when_start = timezone.make_aware(when_start)
@@ -29,7 +30,7 @@ class TaskSerializer(serializers.ModelSerializer):
         elif validated_data["run_type"] == "cycle":
             when_start = string_to_datetime(instance.when_start)
             when_start = timezone.make_aware(when_start)
-
+            # todo 改为clock schedule 模式
             celery_task_id = cycle_run_by_task_in_celery.apply_async(args=[instance.id], eta=when_start)
             instance.celery_task_id = celery_task_id
             instance.save()

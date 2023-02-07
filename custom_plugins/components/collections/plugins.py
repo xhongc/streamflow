@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import importlib
 import json
+import time
 
 import requests
 
@@ -49,6 +50,7 @@ class HttpRequestService(Service, ServiceMixin):
     def execute(self, data, parent_data):
         return True
 
+    # 使用schedule模式重试
     def schedule(self, data, parent_data, callback_data=None):
         node_info = data.get_one_of_inputs("node_info")
         fail_retry_count = node_info["fail_retry_count"]
@@ -83,6 +85,7 @@ class HttpRequestService(Service, ServiceMixin):
         _result_content = ""
         inputs = node_info["inputs"]
         try:
+            time.sleep(100)
             headers = self.parse_headers(inputs["header"])
             inputs["body"] = try_json(inputs["body"])
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]

@@ -183,7 +183,12 @@
         },
         methods: {
             handCreate() {
-                this.$router.push({'path': '/newjob'})
+                this.$router.push({
+                    path: '/singlejob',
+                    query: {
+                        type: 'add'
+                    }
+                })
             },
             handleJumpHistory(row) {
                 this.$store.commit('changeTabActive', 'jobviewhistory')

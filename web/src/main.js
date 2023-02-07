@@ -69,6 +69,24 @@ Vue.config.productionTip = false
 Vue.prototype.cloneDeep = function(data) {
     return lodash.cloneDeep(data)
 }
+Vue.prototype.setCookie = function(name, value, day) {
+    if (day !== 0) {
+        const expdate = new Date()
+        expdate.setTime(expdate.getTime() + 7 * 24 * 60 * 60 * 1000)
+        document.cookie = name + '=' + escape(value) + ';expires=' + expdate.toGMTString()
+    } else {
+        document.cookie = name + '=' + escape(value)
+    }
+}
+Vue.prototype.getCookie = function(name) {
+    const reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)')
+    const arr = document.cookie.match(reg)
+    if (arr) {
+        return unescape(arr[2])
+    } else {
+        return null
+    }
+}
 Validator.extend('cronRlue', {
     getMessage: (field, args) => args + '输入定时表达式非法，请校验',
     validate: value => cron.validate(value).status
@@ -78,7 +96,7 @@ Validator.extend('integer', {
     validate: value => Number(value) >= 1 && Number(value) % 1 === 0
 })
 /* eslint-disable no-new */
-new Vue({
+const vue = new Vue({
     el: '#app',
     router,
     store,
@@ -90,3 +108,4 @@ new Vue({
     },
     template: '<App/>'
 })
+export default vue

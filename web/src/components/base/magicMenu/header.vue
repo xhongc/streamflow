@@ -20,9 +20,12 @@
                     <i class="bk-icon icon-down-shape"></i>
                 </div>
                 <template slot="content">
-                    <ul class="monitor-navigation-admin" @click="handleUserListClick">
-                        <li class="nav-item" v-for="userItem in user.list" :key="userItem" :data-key="userItem" @click="redirectUrl">
-                            {{ userItem }}
+                    <ul class="monitor-navigation-admin">
+                        <li class="nav-item" @click="redirectLogin" v-if="userData.is_login">
+                            退出
+                        </li>
+                        <li class="nav-item" @click="redirectLogin" v-else>
+                            登录
                         </li>
                     </ul>
                 </template>
@@ -42,7 +45,7 @@
                 logout_url: '',
                 pageTitle: '测试',
                 userData: {
-                    username: 'admin'
+                    username: ''
                 },
                 user: {
                     list: [
@@ -82,12 +85,16 @@
         },
         computed: {},
         created() {
-            // this.loginUser()
+            this.loginUser()
         },
         methods: {
             redirectUrl(item) {
                 this.header.active = item.id
                 this.$router.push({name: item.pathName})
+            },
+            redirectLogin() {
+                this.setCookie('AUTHORIZATION', '')
+                this.$router.push({name: 'login'})
             },
             changeTitle() {
             },
@@ -99,10 +106,9 @@
                 clearStore()
             },
             loginUser() {
-                this.$api.user.login().then(res => {
+                this.$api.login.info().then(res => {
                     if (res.result) {
                         this.userData = res.data
-                        this.logout_url = res.data.logout_url
                     }
                 })
             }

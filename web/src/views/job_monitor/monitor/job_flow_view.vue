@@ -2,9 +2,9 @@
     <div id="jobFlowView">
         <div class="header" v-if="auth.operate || auth.search">
             <div style="float: left;" v-if="auth.operate">
-                <bk-button class="operationBtn" @click="handleOperation('pause')">挂起</bk-button>
+                <bk-button class="operationBtn" @click="handleOperation('pause')">暂停</bk-button>
                 <bk-button class="operationBtn" @click="handleOperation('resume')">恢复</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('cancel')">取消</bk-button>
+                <bk-button class="operationBtn" @click="handleOperation('cancel')">终止</bk-button>
             </div>
             <div style="float: right;" v-if="auth.search">
                 <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
@@ -534,6 +534,7 @@
                 }
                 const params = {
                     name: this.midSearchForm.name, // 作业流名
+                    run_type: this.midSearchForm.run_type,
                     eta_gte: this.midSearchForm.eta[0], // 计划开始时间
                     eta_lte: this.midSearchForm.eta[1], // 计划开始时间
                     start_time_gte: this.midSearchForm.start_time[0], // 实际开始时间

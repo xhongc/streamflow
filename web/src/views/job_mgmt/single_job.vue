@@ -282,7 +282,7 @@
                     ],
                     coding: 'class Task:\n' +
                         '    def execute(self):\n' +
-                        '        pass'
+                        '        return True'
                 },
                 cloneForm: {},
                 otherRules: {
@@ -506,7 +506,6 @@
                     if (this.controllableSteps.curStep === 2) {
                         const err = this.$refs.form_design.validate()
                         if (err.length > 0) {
-                            console.log(err)
                             this.$cwMessage(err.toString(), 'error')
                             return false
                         } else {

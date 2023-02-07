@@ -11,3 +11,4 @@ flow_router.register(r"category", viewset=views.CategoryViewSet, base_name="cate
 
 node_router = DefaultRouter()
 node_router.register(r"template", viewset=views.NodeTemplateViewSet, base_name="template")
+node_router.register(r"node_run", viewset=views.NodeRunViewSets, base_name="node_run")

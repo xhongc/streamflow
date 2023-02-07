@@ -4,13 +4,13 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from component.drf.constants import ResponseCodeStatus
+from component.drf.permissions import ApiPermission
 
 
 class ApiGenericMixin(object):
     """API视图类通用函数"""
 
-    # TODO 权限部分加载基类中
-    permission_classes = ()
+    permission_classes = (ApiPermission,)
 
     def finalize_response(self, request, response, *args, **kwargs):
         """统一数据返回格式"""

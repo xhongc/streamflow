@@ -304,7 +304,12 @@
                 window.open(window.siteUrl + '/export/process/?id=' + ids.join(','))
             },
             handleCreate() {
-                this.$router.push({'path': '/newjobflow'})
+                this.$router.push({
+                    path: '/singlejobflow',
+                    query: {
+                        type: 'add'
+                    }
+                })
             },
             // 处理搜索
             handleSearch() {

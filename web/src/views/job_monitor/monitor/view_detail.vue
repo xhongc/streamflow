@@ -33,9 +33,9 @@
             <div class="title" style="display: flex;justify-content: space-between;">
                 <div>执行详情</div>
                 <div style="cursor: pointer;">
-                    <bk-icon type="play2" />
-                    <bk-icon type="pause" />
-                    <bk-icon type="stop" style="color: red;" />
+                    <bk-icon type="play2" @click="handleOperation('resume', $route.query.id)" />
+                    <bk-icon type="pause" @click="handleOperation('pause', $route.query.id)"></bk-icon>
+                    <bk-icon type="stop" style="color: red;" @click="handleOperation('cancel', $route.query.id)" />
                 </div>
             </div>
             <div id="content" v-bkloading="{ isLoading: mainLoading, zIndex: 999 }">
@@ -541,12 +541,13 @@
                         const {
                             id
                         } = target
-                        _this.handleOperation(id, model.jobId)
+                        console.log(model)
+                        _this.handleOperationNode(id, model.id)
                     }
                 })
             },
-            // 处理执行节点操作
-            handleOperation(str, id) {
+            // 处理节点操作
+            handleOperationNode(str, id) {
                 const contentMap = {
                     'pause': {
                         preState: '等待',
@@ -556,6 +557,11 @@
                     'resume': {
                         preState: '挂起',
                         content: '恢复挂起作业流',
+                        width: 400
+                    },
+                    'fail': {
+                        preState: '进行中',
+                        content: '终止后不会继续后面的执行，并且无法恢复。会强制终止此作业',
                         width: 400
                     },
                     'stop': {
@@ -619,18 +625,96 @@
                     }
                 })
             },
+            // 处理执行流程操作
+            handleOperation(str, id) {
+                const contentMap = {
+                    'pause': {
+                        preState: '等待',
+                        content: '作业暂停执行，不会继续后面的执行',
+                        width: 450
+                    },
+                    'resume': {
+                        preState: '挂起',
+                        content: '恢复挂起作业流',
+                        width: 400
+                    },
+                    'stop': {
+                        preState: '进行中',
+                        content: '终止后不会继续后面的执行，并且无法恢复。会强制终止此作业',
+                        width: 400
+                    },
+                    'fail': {
+                        preState: '进行中',
+                        content: '终止后不会继续后面的执行，并且无法恢复。会强制终止此作业',
+                        width: 400
+                    },
+                    'cancel': {
+                        preState: '除了正在执行',
+                        content: '将作业状态置为取消，可以继续往下执行',
+                        width: 400
+                    },
+                    'replay': {
+                        preState: '已完成、错误、失败，终止、取消',
+                        content: '复制一份该作业，并放入原作业流中。如果新的作业成功，那么对作业流就是成功了',
+                        width: 650
+                    },
+                    'release': {
+                        preState: '未执行、等待',
+                        content: '释放此作业的被依赖关系（包括时间依赖）',
+                        width: 400
+                    },
+                    'success': {
+                        preState: '错误，失败，终止',
+                        content: '针对错误，失败，终止的作业，设置为成功',
+                        width: 400
+                    },
+                    'confirm': {
+                        preState: '待复核',
+                        content: '针对待复核的作业，设置为等待',
+                        width: 400
+                    }
+                }
+                this.$bkInfo({
+                    type: 'primary',
+                    title: `执行前状态：${contentMap[str].preState}`,
+                    subTitle: `功能说明：${contentMap[str].content}`,
+                    width: contentMap[str].width,
+                    confirmLoading: false,
+                    confirmFn: async() => {
+                        this.mainLoading = true
+                        // 解决操作执行过程中，由于轮询接口渲染画布而导致mainLoading刷新。
+                        // 加入opreateFlag保证轮询过程中不会刷新画布
+                        this.opreateFlag = true
+                        this.$api.processRun.control({
+                            'event': str,
+                            'ids': [id]
+                        }).then(res => {
+                            if (res.result) {
+                                this.$cwMessage('操作成功！', 'success')
+                                // 清空画布并重新获取数据, 首屏刷新
+                                this.opreateFlag = false
+                                this.handleLoad(true, true)
+                            } else {
+                                this.$cwMessage(res.message, 'error')
+                                // 操作执行接口调用结束，放开轮询
+                                this.opreateFlag = false
+                                this.mainLoading = false
+                            }
+                        })
+                    }
+                })
+            },
             // 处理根据节点状态渲染左键菜单
             renderRightMenu(model) {
                 // 当前状态为等待wait，可执行操作为挂起(暂停)pause，释放依赖release，取消cancel
                 if (model.state === 'wait') {
-                    return `<p id="pause" class="right-click-menu">挂起</p>
-                            <p id="release" class="right-click-menu">释放依赖</p>
-                            <p id="cancel" class="right-click-menu">取消</p>`
+                    return `<p id="pause" class="right-click-menu">暂停</p>
+                            `
                 }
                 // 当前状态为暂停（挂起）pause，可执行操作为恢复resume，取消cancel
                 if (model.state === 'pause') {
                     return `<p id="resume" class="right-click-menu">恢复</p>
-                            <p id="cancel" class="right-click-menu">取消</p>`
+                            `
                 }
                 // 当前状态为取消cancel，可执行的操作为重新执行replay
                 if (model.state === 'cancel') {
@@ -638,14 +722,13 @@
                 }
                 // 当前状态为失败fail或错误error或终止stop，可执行的操作为取消cancel，强制成功success，重新执行replay
                 if (model.state === 'fail' || model.state === 'error' || model.state === 'stop') {
-                    return `<p id="cancel" class="right-click-menu">取消</p>
+                    return `
                             <p id="success" class="right-click-menu">强制成功</p>
                             <p id="replay" class="right-click-menu">重新执行</p>`
                 }
                 // 当前状态为成功，可执行的操作为取消cancel，重新执行replay
                 if (model.state === 'success') {
-                    return `<p id="cancel" class="right-click-menu">取消</p>
-                            <p id="replay" class="right-click-menu">重新执行</p>`
+                    return ''
                 }
                 // 当前状态为待复核need_confirm，可执行的操作为取消cancel，复核confirm
                 if (model.state === 'need_confirm') {
@@ -654,7 +737,7 @@
                 }
                 // 当前状态为正在执行run，可执行的操作为终止stop
                 if (model.state === 'run') {
-                    return '<p id="stop" class="right-click-menu">终止</p>'
+                    return '<p id="fail" class="right-click-menu">强制失败</p>'
                 }
             },
             handleLoad(clear = false, first = false) {

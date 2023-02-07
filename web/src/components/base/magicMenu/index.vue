@@ -4,6 +4,7 @@
         :header-title="headerTitle"
         :side-title="title"
         :need-menu="$route.name !== 'home'"
+        v-if="$route.name !== 'login'"
         @toggle="handleToggle"
         class="bk-wrapper">
         <!--      头部菜单      -->
@@ -31,6 +32,10 @@
         </container>
 
     </bk-navigation>
+    <div v-else>
+        <container>
+        </container>
+    </div>
 </template>
 
 <script>

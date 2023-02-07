@@ -158,7 +158,6 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                     node_data = node["node_data"]
                     node_obj = node_bulk.get(node["uuid"], None)
                     if node_obj:
-
                         node_obj.content = node.get("content", 0) or 0
                         node_obj.node_type = node.get("node_type", 3)
                         node_obj.show = node_data["show"]
@@ -180,16 +179,16 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                     else:
                         node_obj = Node()
                         node_obj.content = node.get("content", 0) or 0
-                        node_obj.name = node_data["node_name"]
+                        node_obj.name = node_data["name"]
                         node_obj.description = node_data["description"]
                         node_obj.fail_retry_count = node_data.get("fail_retry_count", 0) or 0
                         node_obj.fail_offset = node_data.get("fail_offset", 0) or 0
                         node_obj.fail_offset_unit = node_data.get("fail_offset_unit", "seconds")
-                        node_obj.node_type = node.get("type", 3)
+                        node_obj.node_type = node.get("node_type", 3)
                         node_obj.is_skip_fail = node_data["is_skip_fail"]
                         node_obj.is_timeout_alarm = node_data["is_timeout_alarm"]
                         node_obj.inputs = node_data["inputs"]
-                        node_obj.show = node["show"]
+                        node_obj.show = node_data["show"]
                         node_obj.top = node["top"]
                         node_obj.left = node["left"]
                         node_obj.ico = node["ico"]

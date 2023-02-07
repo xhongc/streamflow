@@ -242,7 +242,8 @@
                         job_flow_data: row.process,
                         job_name: row.process_name,
                         type: 'detail',
-                        task_type: 'update'
+                        task_type: 'update',
+                        task_id: row.id
                     }
                 })
             },

@@ -198,7 +198,7 @@
                         this.validateItem(err, titleSet, item)
                     })
                 } else {
-                    err.push('表单为空，请添加组件')
+                    // err.push('表单为空，请添加组件')
                 }
                 return err
             }

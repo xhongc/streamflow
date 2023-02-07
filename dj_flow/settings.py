@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 import sys
 import os
@@ -135,7 +136,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "component.drf.pagination.CustomPageNumberPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
@@ -143,11 +148,21 @@ REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
     "NON_FIELD_ERRORS_KEY": "params_error",
 }
+JWT_AUTH = {
+    # 过期时间，生成的took七天之后不能使用
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    # 刷新时间 之后的token时间值
+    # 'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 请求头携带的参数
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 43200}
+
 try:
     from local_settings import *  # noqa
 except ImportError:
     pass
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 43200}
 
-CELERY_ALWAYS_EAGER = True
-CELERY_TASK_ALWAYS_EAGER = True
+# CELERY_ALWAYS_EAGER = True
+# CELERY_TASK_ALWAYS_EAGER = True

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from applications.flow.constants import NodeTemplateType
 from applications.flow.filters import NodeTemplateFilter, ProcessRunFilter, SubProcessRunFilter
-from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun, Category
+from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun, Category, NodeRun
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
     RetrieveProcessViewSetsSerializer, ExecuteProcessSerializer, ListProcessRunViewSetsSerializer, \
     RetrieveProcessRunViewSetsSerializer, NodeTemplateSerializer, ListSubProcessRunViewSetsSerializer, \
@@ -87,6 +87,33 @@ class ProcessRunViewSets(mixins.ListModelMixin,
             return self.failure_response(msg=result.exc.args[0])
 
 
+class NodeRunViewSets(GenericViewSet):
+    queryset = NodeRun.objects.order_by("-update_time")
+    serializer_class = CtrlSerializer
+
+    @action(methods=["POST"], detail=False)
+    def control(self, request, *args, **kwargs):
+        validated_data = self.is_validated_data(request.data)
+        action_event = validated_data["event"]
+        ids = validated_data["ids"]
+        if action_event == "replay":
+            runtime = BambooDjangoRuntime()
+            api.retry_node(runtime=runtime, node_id=ids[0])
+        elif action_event == "success":
+            runtime = BambooDjangoRuntime()
+            api.skip_node(runtime=runtime, node_id=ids[0])
+        elif action_event == "fail":
+            runtime = BambooDjangoRuntime()
+            api.forced_fail_activity(runtime=runtime, node_id=ids[0], ex_data="强制失败")
+        elif action_event == "pause":
+            runtime = BambooDjangoRuntime()
+            api.pause_node_appoint(runtime=runtime, node_id=ids[0])
+        elif action_event == "resume":
+            runtime = BambooDjangoRuntime()
+            api.resume_node_appoint(runtime=runtime, node_id=ids[0])
+        return self.success_response()
+
+
 class SubProcessRunViewSets(mixins.ListModelMixin,
                             mixins.RetrieveModelMixin,
                             GenericViewSet):
@@ -98,6 +125,10 @@ class SubProcessRunViewSets(mixins.ListModelMixin,
             return ListSubProcessRunViewSetsSerializer
         elif self.action == "retrieve":
             return RetrieveSubProcessRunViewSetsSerializer
+
+    @action(methods=["POST"], detail=False)
+    def control(self, request, *args, **kwargs):
+        return self.success_response()
 
 
 class TestViewSets(GenericViewSet):

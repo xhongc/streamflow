@@ -230,17 +230,31 @@
                         confirmFn: async() => {
                             this.tableLoading = true
                             console.log(this.formData)
-                            this.$api.task.create(this.formData).then(res => {
-                                if (res.result) {
-                                    this.$cwMessage('执行成功!', 'success')
-                                    this.$router.push({
-                                        path: '/taskList'
-                                    })
-                                } else {
-                                    this.$cwMessage(res.message, 'error')
-                                }
-                                this.tableLoading = false
-                            })
+                            if (this.$route.query.task_type === 'update') {
+                                this.$api.task.update(this.$route.query.task_id, this.formData).then(res => {
+                                    if (res.result) {
+                                        this.$cwMessage('执行成功!', 'success')
+                                        this.$router.push({
+                                            path: '/taskList'
+                                        })
+                                    } else {
+                                        this.$cwMessage(res.message, 'error')
+                                    }
+                                    this.tableLoading = false
+                                })
+                            } else {
+                                this.$api.task.create(this.formData).then(res => {
+                                    if (res.result) {
+                                        this.$cwMessage('执行成功!', 'success')
+                                        this.$router.push({
+                                            path: '/taskList'
+                                        })
+                                    } else {
+                                        this.$cwMessage(res.message, 'error')
+                                    }
+                                    this.tableLoading = false
+                                })
+                            }
                         }
                     })
                 }

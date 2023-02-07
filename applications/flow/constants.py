@@ -45,28 +45,3 @@ class NodeTemplateType:
     ContentTemplate = "2"
     # 用户自定义模版
     CustomTemplate = "1"
-
-
-a = [
-    {"key": "url", "type": "textarea", "label": "请求地址："},
-    {"key": "method", "type": "select", "label": "请求类型：", "choices": [{"label": "GET", "value": "get"}]},
-    {"key": "header", "type": "dict_map", "label": "Header"},
-    {"key": "body", "type": "textarea", "label": "Body："},
-    {"key": "timeout", "type": "number", "label": "超时时间："}
-]
-i = {
-    "url": "",
-    "method": "get",
-    "header": [
-        {
-            "key": "",
-            "value": ""
-        }],
-    "body": "{}",
-    "timeout": 60,
-    "check_point": {
-        "key": "",
-        "condition": "",
-        "values": ""
-    }
-}

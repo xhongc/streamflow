@@ -8,7 +8,7 @@ export default {
         return GET(reUrl + '/process/sub_run/' + JSON.stringify(id) + '/', params)
     },
     control: function(params) {
-        return POST(reUrl + '/node_run/control/', params)
+        return POST(reUrl + '/node/node_run/control/', params)
     },
     node_snapshot: function(params) {
         return GET(reUrl + '/node_snapshot/', params)
