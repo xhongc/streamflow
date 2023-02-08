@@ -77,7 +77,7 @@ def init_node_template(sender, **kwargs):
         "inputs_component": [
                              {"id": "field6242437192692", "icon": "el-icon-edit-outline", "name": "NumberInput",
                               "props": {"key": "timing", "required": False, "enablePrint": True},
-                              "title": "定时时间", "value": "", "valueType": "Number"}
+                              "title": "定时时间", "value": 0, "valueType": "Number"}
                              ],
         "content": 0,
         "template_type": "0",
