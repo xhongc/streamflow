@@ -8,13 +8,9 @@ def send_email(title, msg, from_email, to_emails, smtp_host, smtp_port, from_ema
     message['From'] = Header(from_email_alias, 'utf-8')
     message['Subject'] = Header(title, 'utf-8')
 
-    try:
-        server = smtplib.SMTP_SSL(smtp_host, smtp_port)
-        server.login(from_email, from_email_pwd)
-        server.sendmail(from_email, to_emails, message.as_string())
-        return True
-    except smtplib.SMTPException:
-        return False
+    server = smtplib.SMTP_SSL(smtp_host, smtp_port)
+    server.login(from_email, from_email_pwd)
+    server.sendmail(from_email, to_emails, message.as_string())
 
 
 if __name__ == '__main__':

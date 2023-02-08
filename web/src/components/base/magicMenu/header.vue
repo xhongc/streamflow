@@ -218,7 +218,7 @@
     bottom: 10px;
     width: 0;
     height: 2px;
-    background: #699DF4;
+    background: #465e65;
     transition: all .3s;
 }
 
@@ -239,7 +239,7 @@
     left: 0;
     bottom: 10px;
     height: 2px;
-    background: #699DF4;
+    background: #465e65;
     width: calc(100% - 40px);
 }
 </style>

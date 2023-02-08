@@ -102,7 +102,7 @@
 
 .back-text2 {
     font-size: 14px;
-    color: #313238;
+    color: #465e65;
     margin-left: 3px;
 }
 </style>

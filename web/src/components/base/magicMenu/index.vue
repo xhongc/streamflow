@@ -108,7 +108,7 @@
 
     .bk-navigation-header {
         background-color: #ffffff !important;
-        border-bottom: 1px solid #dcdee4;
+        border-bottom: 1px solid #eeeeee;
     }
 
     .monitor-navigation-footer {

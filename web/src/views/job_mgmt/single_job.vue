@@ -103,7 +103,7 @@
                 <p class="job-title" style="margin-bottom: 10px;">执行代码</p>
                 <div class="job-content">
                     <bk-form-item label="后端逻辑: ">
-                        <editor :height="'200px'" ref="editor3" :codes="form.coding"
+                        <editor :height="'600px'" ref="editor3" :codes="form.coding"
                             :read-only="false" :language="'python'"></editor>
                     </bk-form-item>
                 </div>

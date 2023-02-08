@@ -106,7 +106,6 @@
                 default: true
             }
         },
-        inject: ['father_this'],
         data() {
             return {
                 disabled: false,
@@ -251,7 +250,7 @@
                 this.tableList = this.form.outputs
             }
 
-            this.controlType = this.father_this.controlType
+            // this.controlType = this.father_this.controlType
             if (this.$route.query.type === 'detail') {
                 this.disabled = true
             }

@@ -1,6 +1,8 @@
 import random
 from datetime import datetime
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.gzip import gzip_page
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -133,15 +135,16 @@ class SubProcessRunViewSets(mixins.ListModelMixin,
 
 class TestViewSets(GenericViewSet):
     def list(self, request, *args, **kwargs):
-        random_list = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        random_list = [0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
         sign = random.choice(random_list)
-
+        print("sign:", sign)
         if sign:
             return Response({"now": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "data": request.query_params})
         else:
             return Response({"result": False, "data": [], "code": "300", "message": ""}, status=400)
 
 
+@method_decorator(gzip_page, name="dispatch")
 class NodeTemplateViewSet(mixins.ListModelMixin,
                           mixins.CreateModelMixin,
                           mixins.UpdateModelMixin,

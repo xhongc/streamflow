@@ -6,7 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(1, os.path.join(os.getcwd(), 'lib'))
 
-BROKER_URL = "redis://localhost:6379/3"
+BROKER_URL = "redis://localhost:6379/4"
 
 SECRET_KEY = 'django-insecure-u5_r=pekio0@zt!y(kgbufuosb9mddu8*qeejkzj@=7uyvb392'
 

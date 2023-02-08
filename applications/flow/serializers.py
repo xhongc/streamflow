@@ -228,7 +228,7 @@ class ListProcessRunViewSetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProcessRun
-        fields = "__all__"
+        exclude = ("dag", "gateways")
 
     def _get_state(self, obj):
         if obj.state:

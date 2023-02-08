@@ -18,7 +18,7 @@
         mixins: [componentMinxins],
         props: {
             value: {
-                type: String,
+                type: Number,
                 default: null
             },
             placeholder: {
