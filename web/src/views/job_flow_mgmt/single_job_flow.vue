@@ -336,11 +336,9 @@
             },
             // 处理渲染，true为详情方式渲染，false为编辑或新增方式渲染
             handleRender(detail) {
-                console.log('handlerender')
                 this.mainLoading = true
                 const _this = this
                 setTimeout(() => {
-                    console.log('handlerender2222')
                     const data = {
                         edges: _this.jobFlowFrom.pipeline_tree.lines.map(line => {
                             const item = {
@@ -639,6 +637,8 @@
             // 创建画布
             createGraphic() {
                 this.mainLoading = true
+                // 选择节点工具
+
                 // 创建内容超出提示
                 const tooltip = new G6.Tooltip({
                     offsetX: 50,
