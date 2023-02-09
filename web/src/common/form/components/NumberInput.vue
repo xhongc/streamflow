@@ -1,6 +1,7 @@
 <template>
     <div>
         <div v-if="mode === 'DESIGN'">
+            <div> </div>
             <bk-input disabled :placeholder="placeholder" type="number" v-model="value"></bk-input>
         </div>
         <div v-else>
