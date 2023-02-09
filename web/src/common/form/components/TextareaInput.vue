@@ -1,7 +1,6 @@
 <template>
     <div>
         <div v-if="mode === 'DESIGN'">
-            <div>123</div>
             <bk-input :disabled="true" :placeholder="placeholder" :rows="2" :type="'textarea'" v-model="value"></bk-input>
         </div>
         <div v-else>
