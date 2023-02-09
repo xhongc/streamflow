@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="mode === 'DESIGN'">
-            <div style="display: none;">123</div>
+            <div>123</div>
             <bk-input disabled :placeholder="placeholder" type="number" v-model="value"></bk-input>
         </div>
         <div v-else>
