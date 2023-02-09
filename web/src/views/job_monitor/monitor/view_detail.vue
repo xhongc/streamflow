@@ -541,7 +541,6 @@
                         const {
                             id
                         } = target
-                        console.log(model)
                         _this.handleOperationNode(id, model.id)
                     }
                 })
@@ -761,7 +760,16 @@
                         const processState = res.data.pipeline_tree.process_state
                         if (processState === 'success' || processState === 'fail') {
                             clearInterval(this.timer)
+                            this.timer = null
                         }
+                        console.log(this.timer)
+                        if (!this.timer && processState === 'run') {
+                            this.timer = setInterval(() => {
+                                // 不需要清空画布，非首屏刷新
+                                this.handleLoad(false, false)
+                            }, 3000)
+                        }
+                        console.log(this.timer)
                     } else {
                         this.$cwMessage(res.message, 'error')
                     }
