@@ -51,8 +51,9 @@ const config = {
     errorBagName: 'veeErrors',
     fieldsBagName: 'veeFields'
 }
-Vue.use(VeeValidate, config)
 Vue.use(bkMagic)
+
+Vue.use(VeeValidate, config)
 Vue.use(Echarts)
 Vue.use(G6)
 // Vue.use(Component)
