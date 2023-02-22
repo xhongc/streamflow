@@ -84,3 +84,23 @@ def init_node_template(sender, **kwargs):
         "uuid": get_uuid()
 
     })
+
+    NodeTemplate.objects.update_or_create(component_code="shell", defaults={
+        "name": "Shell",
+        "description": "执行shell命令",
+        "inputs": {"command": "", "timeout": 15},
+        "outputs": [{"key": "_result", "name": "执行结果", "reference": 1},
+                    {"key": "_log_outputs", "name": "作业输出变量", "reference": 0}],
+        "inputs_component": [
+            {"id": "field6242437192692", "icon": "el-icon-edit-outline", "name": "NumberInput",
+             "props": {"key": "timeout", "required": False, "enablePrint": True},
+             "title": "超时时间", "value": 15, "valueType": "Number"},
+            {"id": "field2556437102366", "icon": "el-icon-edit", "name": "TextInput",
+             "props": {"key": "command", "required": False, "enablePrint": True}, "title": "shell命令",
+             "value": "", "valueType": "String"}
+        ],
+        "content": 0,
+        "template_type": "0",
+        "uuid": get_uuid()
+
+    })
