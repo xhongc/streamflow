@@ -67,13 +67,17 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
+                        <span v-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                         <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'hand'">单次</span>
-                            <span v-else-if="props.row.run_type === 'cron'">自定义</span>
-                            <span v-else-if="props.row.run_type === 'time'">定时</span>
-                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
+                            <span v-if="props.row.run_type === 'hand'">
+                                <bk-tag radius="5px">单次</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'cron'">
+                                <bk-tag radius="5px">自定义</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'time'">
+                                <bk-tag radius="5px">定时</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'cycle'">
+                                <bk-tag radius="5px">周期</bk-tag></span>
                         </div>
                         <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id] }}</span>
                     </template>
@@ -81,11 +85,11 @@
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10" theme="primary" text @click="handleImplement(props.row)">执行
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)">执行
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleOpenDetail(props.row)">修改
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleOpenDetail(props.row)">修改
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)">删除
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)">删除
                             </bk-button>
                             <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
                                 trigger="click" :arrow="false" :distance="0" offset="15">
@@ -491,5 +495,8 @@
     border: 1px solid #dcdee4;
     height: 65px;
     align-items: center;
+}
+.btn-color {
+    color: rgb(1, 158, 213);
 }
 </style>

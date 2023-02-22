@@ -76,13 +76,17 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <div v-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
+                        <div v-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
                         <div v-else-if="item.id === 'state'" :class="props.row.state">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</div>
                         <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'null'">单次</span>
-                            <span v-else-if="props.row.run_type === 'time'">定时</span>
-                            <span v-else-if="props.row.run_type === 'cycle'">周期</span>
-                            <span v-else-if="props.row.run_type === 'calendar'">日历</span>
+                            <span v-if="props.row.run_type === 'null'">
+                                <bk-tag radius="5px">单次</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'time'">
+                                <bk-tag radius="5px">定时</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'cycle'">
+                                <bk-tag radius="5px">周期</bk-tag></span>
+                            <span v-else-if="props.row.run_type === 'calendar'">
+                                <bk-tag radius="5px">日历</bk-tag></span>
                         </div>
                         <div v-else>
                             <span>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
@@ -91,7 +95,7 @@
                 </bk-table-column>
                 <bk-table-column label="子作业流" width="150">
                     <template slot-scope="props">
-                        <bk-button theme="primary" text @click="handleCheckJob(props.row)">查看</bk-button>
+                        <bk-button theme="primary" text @click="handleCheckJob(props.row)" class="btn-color">查看</bk-button>
                     </template>
                 </bk-table-column>
                 <bk-table-column type="setting">
@@ -569,6 +573,9 @@
 </script>
 
 <style lang="scss" scoped>
+    .btn-color {
+        color: rgb(1, 158, 213);
+    }
     #jobFlowView {
         height: 100%;
         overflow: auto;

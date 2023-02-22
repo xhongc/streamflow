@@ -3,7 +3,7 @@
         <div class="header">
             <div class="search-box">
                 <div class="add-in">
-                    <bk-button theme="primary" @click="handleCreate" style="width: 110px;margin-left: 20px;">新建</bk-button>
+                    <button theme="primary" @click="handleCreate" class="button">新建</button>
                 </div>
                 <div class="search-in" v-if="auth.search">
                     <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
@@ -56,7 +56,6 @@
                 @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
                 ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
                 :max-height="maxTableHeight">
-                <bk-table-column type="selection" width="60"></bk-table-column>
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
@@ -65,7 +64,7 @@
                                 (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
                             }}
                         </div>
-                        <div v-else-if="item.id === 'name'" style="color: #3a84ff;cursor: pointer;"
+                        <div v-else-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
                         </div>
                         <div v-else-if="item.id === 'category'">
@@ -81,13 +80,13 @@
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10" theme="primary" text @click="handleImplement(props.row)"
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)"
                                 v-if="auth.operate">新建任务
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleOpenUpdate(props.row)"
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleOpenUpdate(props.row)"
                                 v-if="auth.modify">修改
                             </bk-button>
-                            <bk-button class="mr10" theme="primary" text @click="handleDelete(props.row)"
+                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)"
                                 v-if="auth.del">删除
                             </bk-button>
                             <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
@@ -470,5 +469,62 @@
     border: 1px solid #dcdee4;
     height: 65px;
     align-items: center;
+}
+.btn-color {
+    color: rgb(1, 158, 213);
+}
+.button {
+    --color: rgb(138, 171, 202);
+    padding: 0 2.3em;
+    background-color: rgb(17, 64, 108);
+    border-radius: .3em;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: .5s;
+    font-weight: 400;
+    font-size: 17px;
+    border: 1px solid;
+    font-family: inherit;
+    text-transform: uppercase;
+    color: #fff;
+    z-index: 1;
+    line-height: 30px;
+}
+
+.button::before, .button::after {
+    content: " ";
+    display: block;
+    width: 50px;
+    height: 50px;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    border-radius: 50%;
+    z-index: -1;
+    background-color: var(--color);
+    transition: 1s ease;
+}
+
+.button::before {
+    top: -1em;
+    left: -1em;
+}
+
+.button::after {
+    left: calc(100% + 1em);
+    top: calc(100% + 1em);
+}
+
+.button:hover::before, .button:hover::after {
+    height: 410px;
+    width: 410px;
+}
+
+.button:hover {
+    color: #fff;
+}
+
+.button:active {
+    filter: brightness(.8);
 }
 </style>

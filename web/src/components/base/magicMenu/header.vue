@@ -187,7 +187,7 @@
 }
 
 .monitor-navigation-admin .nav-item:hover {
-    color: #3A84FF;
+    color: rgb(1, 158, 213);
     cursor: pointer;
     background-color: #F0F1F5;
 }
@@ -218,7 +218,7 @@
     bottom: 10px;
     width: 0;
     height: 2px;
-    background: #465e65;
+    background: rgb(1, 158, 213);
     transition: all .3s;
 }
 
@@ -229,7 +229,7 @@
 }
 
 .item-active {
-    color: #000;
+    color: rgb(3, 41, 81);
 }
 
 .item-active::before {
@@ -239,7 +239,7 @@
     left: 0;
     bottom: 10px;
     height: 2px;
-    background: #465e65;
+    background: rgb(1, 158, 213);
     width: calc(100% - 40px);
 }
 </style>

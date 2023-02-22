@@ -1,6 +1,6 @@
 <template>
     <bk-navigation-menu ref="menu" :default-active="navName" :before-nav-change="beforeNavChange"
-        :toggle-active="nav.toggle">
+        :toggle-active="nav.toggle" :item-active-bg-color="'linear-gradient(90deg, rgb(17, 64, 108) 0%, rgb(17, 64, 108) 100%)'">
         <bk-navigation-menu-item v-for="item in nav.menuMap[navName]" :key="item.name"
             :has-child="item.children && !!item.children.length"
             :group="item.group" :icon="item.icon" :disabled="item.disabled" :url="item.to"
