@@ -3,7 +3,7 @@ Anything can be thought of as a process
 
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=for-the-badge&label=license)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![stars](https://img.shields.io/github/stars/xhongc/streamflow?style=for-the-badge&label=stars)](https://github.com/apache/incubator-streampark/stargazers)
+[![stars](https://img.shields.io/github/stars/xhongc/streamflow?style=for-the-badge&label=stars)](https://github.com/xhongc/streamflow)
 
 ## 🚀 What is StreamFlow?
 > 通过可视化的图形界面进行任务流程编排和执行的系统，一款轻量级的调度编排软件。
