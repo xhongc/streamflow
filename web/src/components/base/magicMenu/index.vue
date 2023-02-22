@@ -14,8 +14,8 @@
         <template slot="side-icon" class="monitor-logo">
             <img class="monitor-logo-icon" :src="imgPath">
             <div class="logo-title" @click="redirectHome">
-                <span class="actual-text">&nbsp;任务调度平台&nbsp;</span>
-                <span class="hover-text" aria-hidden="true">&nbsp;任务调度平台&nbsp;</span>
+                <span class="actual-text">&nbsp;StreamFlow&nbsp;</span>
+                <span class="hover-text" aria-hidden="true">&nbsp;StreamFlow&nbsp;</span>
             </div>
         </template>
         <!--      左侧菜单      -->
@@ -58,7 +58,7 @@
         },
         computed: {
             imgPath() {
-                return require('@/assets/base/img/execute.png')
+                return require('@/assets/base/img/StreamStudio.png')
             }
         },
         created() {
@@ -129,7 +129,7 @@
     font-size: 20px;
     --border-right: 0;
     //--text-stroke-color: rgba(255, 255, 255, 0.6);
-    --animation-color: #c33779;
+    --animation-color: #13227a;
     --fs-size: 2em;
     letter-spacing: 3px;
     text-decoration: none;

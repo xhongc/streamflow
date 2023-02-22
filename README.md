@@ -1,6 +1,10 @@
 ![img.png](logo.png)
 Anything can be thought of as a process
 
+
+[![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=for-the-badge&label=license)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![stars](https://img.shields.io/github/stars/xhongc/streamflow?style=for-the-badge&label=stars)](https://github.com/apache/incubator-streampark/stargazers)
+
 ## 🚀 What is StreamFlow?
 > 通过可视化的图形界面进行任务流程编排和执行的系统，一款轻量级的调度编排软件。
 >
@@ -32,21 +36,13 @@ python manage.py runserver
 ```
 ### 2. docker安装
 待完成
-## 👍User interface presentation
+## 👍User Interface Screenshots
 ### 首页
 ![img.png](img.png)
 
 ## 自定义节点
 ![img_1.png](img_1.png)
 ![img_2.png](img_2.png)
-## todo list
-
-- [ ] 首页统计
-- [ ] monacoEditor研究
-- [ ] 执行时间统计
-- [ ] 网关节点样式优化
-
-
-- ## install tips
-
-sudo apt-get install libmysqlclient-dev python3-dev
+## 💬 Contact me
+各位大佬有什么意见需求可以加Q群交流
+![s](WechatIMG176.jpeg)
