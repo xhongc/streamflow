@@ -12,7 +12,7 @@ class ServiceMixin:
         old_outputs = data.get_one_of_outputs("outputs", "")
         if old_outputs:
             old_outputs += "\n"
-        new_outputs = old_outputs + _result_content
+        new_outputs = old_outputs + str(_result_content)
         data.set_outputs("outputs", new_outputs)
         self.set_result_outputs(node_info["outputs"], data, _result_sign, new_outputs)
 

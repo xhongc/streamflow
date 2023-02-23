@@ -75,10 +75,10 @@ def init_node_template(sender, **kwargs):
         "outputs": [{"key": "_result", "name": "执行结果", "reference": 1},
                     {"key": "_log_outputs", "name": "作业输出变量", "reference": 0}],
         "inputs_component": [
-                             {"id": "field6242437192692", "icon": "el-icon-edit-outline", "name": "NumberInput",
-                              "props": {"key": "timing", "required": False, "enablePrint": True},
-                              "title": "定时时间", "value": 0, "valueType": "Number"}
-                             ],
+            {"id": "field6242437192692", "icon": "el-icon-edit-outline", "name": "NumberInput",
+             "props": {"key": "timing", "required": False, "enablePrint": True},
+             "title": "定时时间", "value": 0, "valueType": "Number"}
+        ],
         "content": 0,
         "template_type": "0",
         "uuid": get_uuid()
@@ -99,6 +99,42 @@ def init_node_template(sender, **kwargs):
              "props": {"key": "command", "required": False, "enablePrint": True}, "title": "shell命令",
              "value": "", "valueType": "String"}
         ],
+        "content": 0,
+        "template_type": "0",
+        "uuid": get_uuid()
+
+    })
+
+    NodeTemplate.objects.update_or_create(component_code="sql", defaults={
+        "name": "SQL",
+        "description": "执行SQL语句",
+        "inputs": {"db_port": "3306", "db_type": "mysql", "db_user": "root"},
+        "outputs": [{"key": "_result", "name": "执行结果", "reference": 1},
+                    {"key": "_log_outputs", "name": "作业输出变量", "reference": 0}],
+        "inputs_component": [{"id": "field5872740859200", "icon": "el-icon-circle-check", "name": "SelectInput",
+                              "props": {"key": "db_type",
+                                        "options": [{"id": 1, "name": "mysql"}, {"id": 2, "name": "postgresql"}],
+                                        "required": False, "expanding": False, "enablePrint": True,
+                                        "placeholder": "选择数据库类型", "defaultValue": "mysql"}, "title": "数据库类型",
+                              "value": "", "valueType": "String"},
+                             {"id": "field6002840970782", "icon": "el-icon-edit", "name": "TextInput",
+                              "props": {"key": "db_host", "required": False, "enablePrint": True,
+                                        "defaultValue": ""}, "title": "数据库IP", "value": "", "valueType": "String"},
+                             {"id": "field6543340925183", "icon": "el-icon-edit", "name": "TextInput",
+                              "props": {"key": "db_user", "required": False, "enablePrint": True,
+                                        "defaultValue": "root"}, "title": "数据库账户", "value": "", "valueType": "String"},
+                             {"id": "field6718240954166", "icon": "el-icon-edit", "name": "TextInput",
+                              "props": {"key": "db_pwd", "required": False, "enablePrint": True}, "title": "数据库密码",
+                              "value": "", "valueType": "String"},
+                             {"id": "field6002840970782", "icon": "el-icon-edit", "name": "TextInput",
+                              "props": {"key": "db_port", "required": False, "enablePrint": True,
+                                        "defaultValue": "3306"}, "title": "端口号", "value": "", "valueType": "String"},
+                             {"id": "field5205640992111", "icon": "el-icon-edit", "name": "TextInput",
+                              "props": {"key": "database", "required": False, "enablePrint": True}, "title": "数据库名",
+                              "value": "", "valueType": "String"},
+                             {"id": "field1579641008295", "icon": "el-icon-more-outline", "name": "TextareaInput",
+                              "props": {"key": "sql_text", "required": False, "enablePrint": True}, "title": "执行SQL语句",
+                              "value": "", "valueType": "String"}],
         "content": 0,
         "template_type": "0",
         "uuid": get_uuid()

@@ -82,8 +82,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "bomboo",  # noqa
-        "USER": "root",
-        "PASSWORD": "",
+        " USER": "root",
+        "PASSWORD": "123456",
         "HOST": "localhost",
         "PORT": "3306",
         # 单元测试 DB 配置，建议不改动
@@ -165,5 +165,5 @@ try:
 except ImportError:
     pass
 
-# CELERY_ALWAYS_EAGER = True
-# CELERY_TASK_ALWAYS_EAGER = True
+CELERY_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = True
