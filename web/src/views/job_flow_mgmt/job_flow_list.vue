@@ -30,7 +30,7 @@
                                 (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
                             }}
                         </div>
-                        <div v-else-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;"
+                        <div v-else-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
                         </div>
                         <div v-else-if="item.id === 'category'">
@@ -422,6 +422,7 @@
     .content {
 
         .customTable {
+            border: 0 !important;
             /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
             }

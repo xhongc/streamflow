@@ -24,7 +24,7 @@
         </template>
         <template slot="footer">
             <footer class="monitor-navigation-footer">
-                <div>Copyright © 2022 Charles Xie. All Rights Reserved. V1.0.0</div>
+                <div>Copyright © 2023 StreamFlow. All Rights Reserved. V1.0.0</div>
             </footer>
         </template>
         <!--      内容区域      -->

@@ -31,7 +31,7 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;"
+                        <span v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                         <span v-else-if="item.id === 'template_type'">
                             <span v-if="props.row.template_type === '0'">
@@ -466,7 +466,7 @@
 
     .content {
         .customTable {
-            border-radius: 5px;
+            border: 0 !important;
             /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
             }

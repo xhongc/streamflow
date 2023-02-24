@@ -25,8 +25,10 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <div v-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
-                        <div v-else-if="item.id === 'state'" :class="props.row.state">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</div>
+                        <div v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
+                        <div v-else-if="item.id === 'state'">
+                            <bk-tag :class="props.row.state">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</bk-tag>
+                        </div>
                         <div v-else-if="item.id === 'run_type'">
                             <span v-if="props.row.run_type === 'null'">
                                 <bk-tag radius="5px">单次</bk-tag></span>
@@ -642,6 +644,7 @@
         .content {
 
             .customTable {
+                border: 0 !important;
                 /deep/ .bk-table-pagination-wrapper {
                     background-color: #fff;
                 }
@@ -652,14 +655,23 @@
             }
         }
     }
+
     .fail {
-        color: #FF5656;
+        background-color: rgba(234, 53, 54, .1);
+        border-color: rgba(234, 53, 54, .3);
+        color: #ea3536;
     }
+
     .success {
-        color: #45E35F;
+        color: #14a568;
+        border-color: rgba(20, 165, 104, .3);
+        background-color: rgba(20, 165, 104, .1);
+        border-radius: 2px;
     }
     .run {
-        color: #FFB848;
+        background-color: rgba(254, 156, 0, .1);
+        border-color: rgba(254, 156, 0, .3);
+        color: #fe9c00;
     }
     /deep/ .search-input-chip {
         background: #83a7ca !important;

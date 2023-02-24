@@ -23,11 +23,10 @@
                 @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
                 ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
                 :max-height="maxTableHeight">
-                <bk-table-column type="selection" width="60"></bk-table-column>
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span v-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;"
+                        <span v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                         <div v-else-if="item.id === 'run_type'">
                             <span v-if="props.row.run_type === 'hand'">
@@ -453,6 +452,7 @@
     .content {
 
         .customTable {
+            border: 0 !important;
             /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
             }
