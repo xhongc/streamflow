@@ -35,88 +35,127 @@
     }
 </script>
 <style lang="scss">
-    html,
-    body {
-        height: 100%;
-        min-width: 1280px;
+html,
+body {
+    height: 100%;
+    min-width: 1280px;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255, 0, 0, .4)
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, .07)
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: rgba(17, 64, 108, 0.5);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .5)
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background-color: rgba(255, 255, 255, .07)
+}
+
+.pm-title {
+    margin-left: 10px;
+
+    .pm-title-block {
+        width: 20px;
+        height: 22px;
+        margin-top: 2px;
+        float: left;
     }
 
-    ::-webkit-scrollbar-thumb:window-inactive {
-        background: rgba(255, 0, 0, .4)
+    .ivu-icon-md-settings {
+        font-size: 22px;
+        color: #1facdd;
     }
+}
 
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 8px;
-        background-color: rgba(255, 255, 255, .07)
-    }
+.pm-top {
+    border: 1px solid rgb(227, 227, 227);
+    background-color: white;
+    height: 80px;
 
-    ::-webkit-scrollbar-thumb {
-        -webkit-border-radius: 10px;
-        border-radius: 10px;
-        background: rgba(11, 54, 106, .52);
-        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .5)
-    }
+    > div {
 
-    ::-webkit-scrollbar-thumb:window-inactive {
-        background-color: rgba(255, 255, 255, .07)
-    }
-
-    .pm-title {
-        margin-left: 10px;
-
-        .pm-title-block {
-            width: 20px;
-            height: 22px;
-            margin-top: 2px;
-            float: left;
+        > div,
+        > span,
+        > button {
+            vertical-align: middle;
         }
-
-        .ivu-icon-md-settings {
-            font-size: 22px;
-            color: #1facdd;
-        }
     }
+}
 
-    .pm-top {
-        border: 1px solid rgb(227, 227, 227);
-        background-color: white;
-        height: 80px;
+.base {
+    position: absolute;
+    width: 98%;
+    left: 1%;
+    top: 42px;
+    padding: 10px;
+    z-index: 9;
+    border: 1px solid #e3e3e3;
+    font-size: 0;
+    text-align: center;
 
-        >div {
+    .base_box {
+        display: inline-block;
+        padding-right: 30px;
+        vertical-align: top;
 
-            >div,
-            >span,
-            >button {
-                vertical-align: middle;
-            }
-        }
-    }
-
-    .base {
-        position: absolute;
-        width: 98%;
-        left: 1%;
-        top: 42px;
-        padding: 10px;
-        z-index: 9;
-        border: 1px solid #e3e3e3;
-        font-size: 0;
-        text-align: center;
-
-        .base_box {
+        > span {
             display: inline-block;
-            padding-right: 30px;
-            vertical-align: top;
-
-            >span {
-                display: inline-block;
-                font-size: 12px;
-                float: left;
-                line-height: 32px;
-                height: 64px;
-                overflow: auto;
-            }
+            font-size: 12px;
+            float: left;
+            line-height: 32px;
+            height: 64px;
+            overflow: auto;
         }
     }
+}
+
+button.bk-primary {
+    background-color: rgb(17, 64, 108) !important;
+    border-color: rgb(17, 64, 108) !important;
+}
+
+button.bk-button-text {
+    background-color: transparent !important;
+}
+
+.bk-form-checkbox.is-checked .bk-checkbox {
+    border-color: rgb(17, 64, 108) !important;
+    background-color: rgb(17, 64, 108) !important;
+    background-clip: border-box !important;
+}
+
+.bk-button-group .bk-button.is-selected {
+    border-color: rgb(17, 64, 108) !important;
+    color: rgb(17, 64, 108) !important;
+}
+
+.bk-button.bk-default:hover {
+    border-color: rgb(17, 64, 108) !important;
+    color: rgb(17, 64, 108) !important;
+}
+
+.bk-form-radio input[type=radio].is-checked {
+    color: rgb(17, 64, 108) !important;
+}
+
+.bk-steps .bk-step.current .bk-step-icon, .bk-steps .bk-step.current .bk-step-number, .bk-steps .bk-step.current .bk-step-text {
+    border-color: rgb(17, 64, 108) !important;
+    background-color: rgb(17, 64, 108) !important;
+}
+
+.bk-steps .bk-step.done .bk-step-icon, .bk-steps .bk-step.done .bk-step-number, .bk-steps .bk-step.done .bk-step-text {
+    border-color: rgb(17, 64, 108) !important;
+    color: rgb(17, 64, 108) !important;
+}
 </style>
