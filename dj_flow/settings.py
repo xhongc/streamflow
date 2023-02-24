@@ -17,6 +17,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_NAME = "dj-flow_csrftoken"
 CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
     "http://127.0.0.1:8082"
 ]
 
