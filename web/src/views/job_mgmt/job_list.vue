@@ -581,11 +581,11 @@
     color: #fff !important;
 }
 /deep/ .bk-search-select {
-    border-bottom: 1px solid #07386d;
-    border-top: 0;
-    border-left: 0;
-    border-right: 1px solid #07386d;
-    border-bottom-right-radius: 6px;
+    border-bottom: 1px solid #07386d !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 1px solid #07386d !important;
+    border-bottom-right-radius: 6px !important;
 }
 /deep/ .search-select-wrap .bk-search-select.is-focus {
     border-color: #052150 !important;
