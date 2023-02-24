@@ -142,6 +142,7 @@ class SubNodeRun(BaseNode):
     subprocess_run = models.ForeignKey(SubProcessRun, on_delete=models.CASCADE, null=True, db_constraint=False,
                                        related_name="sub_nodes_run")
     inputs_component = JSONField("前端参数组件", default=list)
+    subprocess_runtime_id = models.IntegerField("嵌套子流程的运行时id", null=True, blank=True)
 
     @staticmethod
     def field_names():
@@ -152,6 +153,7 @@ class NodeRun(BaseNode):
     process_run = models.ForeignKey(ProcessRun, on_delete=models.CASCADE, null=True, db_constraint=False,
                                     related_name="nodes_run")
     inputs_component = JSONField("前端参数组件", default=list)
+    subprocess_runtime_id = models.IntegerField("子流程的运行时id", null=True, blank=True)
 
     @staticmethod
     def field_names():

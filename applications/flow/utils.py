@@ -27,14 +27,22 @@ def build_and_create_process(task_id):
     for pipeline_id, node in node_map.items():
         _node = {k: v for k, v in node.__dict__.items() if k in NodeRun.field_names()}
         _node["uuid"] = process_run_uuid[pipeline_id].id
-        node_run_bulk.append(NodeRun(process_run=process_run, **_node))
         if node.node_type == Node.SUB_PROCESS_NODE:
-            create_subprocess(node.content, process_run.id, process_run_uuid, pipeline["id"])
+            subprocess_run_id = create_subprocess(node.content, process_run.id, process_run_uuid, pipeline["id"])
+            node_run_bulk.append(NodeRun(process_run=process_run, subprocess_runtime_id=subprocess_run_id, **_node))
+        else:
+            node_run_bulk.append(NodeRun(process_run=process_run, **_node))
+
     NodeRun.objects.bulk_create(node_run_bulk, batch_size=500)
     return pipeline
 
 
 def create_subprocess(process_id, process_run_id, process_run_uuid, root_id):
+    """
+    创建子流程运行时记录
+    process_id: 子流程id
+    process_id: 主流程运行实例id
+    """
     process = Process.objects.filter(id=process_id).first()
     process_run_data = process.clone_data
     process_run_data["dag"] = instance_dag(process_run_data["dag"], process_run_uuid)
@@ -45,7 +53,12 @@ def create_subprocess(process_id, process_run_id, process_run_uuid, root_id):
     for pipeline_id, node in subprocess_node_map.items():
         _node = {k: v for k, v in node.__dict__.items() if k in NodeRun.field_names()}
         _node["uuid"] = process_run_uuid[pipeline_id].id
-        node_run_bulk.append(SubNodeRun(subprocess_run=process_run, **_node))
         if node.node_type == Node.SUB_PROCESS_NODE:
-            create_subprocess(node.content, process_run_id, process_run_uuid, root_id)
+            subprocess_run_id = create_subprocess(node.content, process_run_id, process_run_uuid, root_id)
+            node_run_bulk.append(
+                SubNodeRun(subprocess_run=process_run, subprocess_runtime_id=subprocess_run_id, **_node))
+        else:
+            node_run_bulk.append(SubNodeRun(subprocess_run=process_run, **_node))
+
     SubNodeRun.objects.bulk_create(node_run_bulk, batch_size=500)
+    return process_run.id

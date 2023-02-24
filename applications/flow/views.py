@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from applications.flow.constants import NodeTemplateType
-from applications.flow.filters import NodeTemplateFilter, ProcessRunFilter, SubProcessRunFilter
+from applications.flow.filters import NodeTemplateFilter, ProcessRunFilter, SubProcessRunFilter, ProcessFilter
 from applications.flow.models import Process, ProcessRun, NodeTemplate, SubProcessRun, Category, NodeRun
 from applications.flow.serializers import ProcessViewSetsSerializer, ListProcessViewSetsSerializer, \
     RetrieveProcessViewSetsSerializer, ExecuteProcessSerializer, ListProcessRunViewSetsSerializer, \
@@ -27,6 +27,7 @@ class ProcessViewSets(mixins.ListModelMixin,
                       mixins.UpdateModelMixin,
                       GenericViewSet):
     queryset = Process.objects.order_by("-update_time")
+    filterset_class = ProcessFilter
 
     def get_serializer_class(self):
         if self.action == "list":

@@ -7,64 +7,13 @@
                 <bk-button class="operationBtn" @click="handleOperation('cancel')">终止</bk-button>
             </div>
             <div style="float: right;" v-if="auth.search">
-                <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
-                    :right-icon="'bk-icon icon-search'" v-model="searchForm.name" @right-icon-click="handleSearch"
-                    @enter="handleSearch">
-                </bk-input>
-                <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'" @click="handleOpenSeniorSearch"
-                    :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索</bk-button>
-            </div>
-            <div class="senior-search-box" v-if="isDropdownShow">
-                <bk-container :margin="0">
-                    <bk-form :label-width="110">
-                        <bk-row>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业流名">
-                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchForm.name" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="执行方式:">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchForm.run_type">
-                                        <bk-option v-for="(item, index) in runTypeList" :key="index" :id="item.id"
-                                            :name="item.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="状态">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchForm.state">
-                                        <bk-option v-for="(item, index) in stateList" :key="index" :id="item.name"
-                                            :name="item.label">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="计划开始">
-                                    <bk-date-picker :value="searchForm.eta" :placeholder="'选择日期时间'" :type="'datetimerange'"
-                                        format="yyyy-MM-dd HH:mm:ss" style="width: 100%;" :transfer="true" @change="handleEtaChange"></bk-date-picker>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="margin-top: 24px;">
-                            <bk-col :span="6">
-                                <bk-form-item label="完成时间">
-                                    <bk-date-picker :value="searchForm.end_time" :placeholder="'选择日期时间'" :type="'datetimerange'"
-                                        format="yyyy-MM-dd HH:mm:ss" style="width: 100%;" :transfer="true" @change="handleEndTimeChange"></bk-date-picker>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="display: flex;justify-content: center;margin-top: 16px;">
-                            <bk-button theme="primary" @click="handleSearch">查询</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleReset">重置</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleOpenSeniorSearch">取消</bk-button>
-                        </bk-row>
-                    </bk-form>
-                </bk-container>
+                <bk-search-select
+                    :show-popover-tag-change="true"
+                    :data="searchData"
+                    :show-condition="false"
+                    :placeholder="'请输入过滤条件'"
+                    @change="handleSearch"
+                    v-model="demo1.value"></bk-search-select>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -165,6 +114,90 @@
                 sortable: true
             }]
             return {
+                searchData: [
+                    {
+                        name: '作业流名称',
+                        id: 'name',
+                        multiable: false,
+                        children: []
+                    },
+                    {
+                        name: '执行方式',
+                        id: 'run_type',
+                        multiable: true,
+                        children: [
+                            {id: 'null', name: '单次'},
+                            {id: 'time', name: '定时'},
+                            {id: 'cycle', name: '周期'},
+                            {id: 'cron', name: '自定义'}
+                        ]
+                    },
+                    {
+                        name: '任务状态',
+                        id: 'state',
+                        multiable: true,
+                        children: [
+                            {
+                                id: 1,
+                                value: 'wait',
+                                name: '等待'
+                            },
+                            {
+                                id: 2,
+                                value: 'run',
+                                name: '正在执行'
+                            },
+                            {
+                                id: 3,
+                                value: 'fail',
+                                name: '失败'
+                            },
+                            {
+                                id: 4,
+                                value: 'error',
+                                name: '错误'
+                            },
+                            {
+                                id: 5,
+                                value: 'success',
+                                name: '成功'
+                            },
+                            {
+                                id: 6,
+                                value: 'pause',
+                                name: '挂起'
+                            },
+                            {
+                                id: 7,
+                                value: 'cancel',
+                                name: '取消'
+                            },
+                            {
+                                id: 8,
+                                value: 'positive',
+                                name: '就绪'
+                            },
+                            {
+                                id: 9,
+                                value: 'stop',
+                                name: '终止'
+                            },
+                            {
+                                id: 10,
+                                value: 'need_confirm',
+                                name: '待审核'
+                            },
+                            {
+                                id: 11,
+                                value: 'ignore',
+                                name: '忽略'
+                            }
+                        ]
+                    }
+                ],
+                demo1: {
+                    value: []
+                },
                 maxTableHeight: '',
                 setting: {
                     size: 'small', // 表格大小
@@ -173,6 +206,7 @@
                 },
                 opreateFlag: false,
                 midSearchForm: {},
+                searchFrom: {},
                 auth: {},
                 timer: null, // 轮询定时器
                 selectionList: [],
@@ -451,12 +485,27 @@
                 }
             },
             // 处理查询
-            handleSearch() {
+            handleSearch(list) {
                 // 更新缓存
-                this.selectionList = []
-                this.$store.commit('getJobFlowViewSearch', this.searchForm)
-                this.midSearchForm = deepClone(this.searchForm)
+                // this.selectionList = []
+                // this.$store.commit('getJobFlowViewSearch', this.searchForm)
+                // this.midSearchForm = deepClone(this.searchForm)
+                const params = {}
+                list.forEach((r) => {
+                    if (!params[r.id]) {
+                        params[r.id] = r.values.map((s) => s.value || s.id)
+                    } else {
+                        params[r.id] = params[r.id].concat(
+                            r.values.map((s) => s.value || s.id)
+                        )
+                    }
+                })
+
+                for (const key in params) {
+                    params[key] = params[key].join(',')
+                }
                 this.pagination.current = 1
+                this.searchFrom = params
                 // 首屏刷新
                 this.handleLoad(true)
             },
@@ -537,25 +586,12 @@
                 if (first) {
                     this.tableLoading = true
                 }
-                const params = {
-                    name: this.midSearchForm.name, // 作业流名
-                    run_type: this.midSearchForm.run_type,
-                    eta_gte: this.midSearchForm.eta[0], // 计划开始时间
-                    eta_lte: this.midSearchForm.eta[1], // 计划开始时间
-                    start_time_gte: this.midSearchForm.start_time[0], // 实际开始时间
-                    start_time_lte: this.midSearchForm.start_time[1], // 实际开始时间
-                    end_time_gte: this.midSearchForm.end_time[0], // 完成时间
-                    end_time_lte: this.midSearchForm.end_time[1], // 完成时间
-                    total_job_count: this.midSearchForm.total_job_count, // 作业总数
-                    total_not_execute_job_count: this.midSearchForm.total_not_execute_job_count, // 未执行作业数
-                    category: this.midSearchForm.category, // 跑批系统
-                    is_release_dependency: this.midSearchForm.is_release_dependency, // 是否释放依赖
-                    state: this.midSearchForm.state, // 状态
+                this.$api.processRun.list({
+                    ...this.searchFrom,
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     process_id: this.$route.query.job_flow_id
-                }
-                this.$api.processRun.list(params).then(res => {
+                }).then(res => {
                     if (res.result) {
                         this.tableList = res.data.items
                         this.pagination.count = res.data.count
@@ -624,5 +660,24 @@
     }
     .run {
         color: #FFB848;
+    }
+    /deep/ .search-input-chip {
+        background: #83a7ca !important;
+        color: #fff !important;
+    }
+    /deep/ .bk-search-select {
+        border-bottom: 1px solid #07386d;
+        border-top: 0;
+        border-left: 0;
+        border-right: 1px solid #07386d;
+        border-bottom-right-radius: 6px;
+    }
+    /deep/ .search-select-wrap .bk-search-select.is-focus {
+        border-color: #052150 !important;
+        color: #052150 !important;
+    }
+    /deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
+        border-color: #052150 !important;
+        color: #052150 !important;
     }
 </style>

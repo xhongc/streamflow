@@ -6,48 +6,14 @@
                     <button theme="primary" @click="handleCreate" class="button">新建</button>
                 </div>
                 <div class="search-in" v-if="auth.search">
-                    <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业流名称'"
-                        :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
-                        @enter="handleSearch">
-                    </bk-input>
-                    <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
-                        @click="handleOpenSeniorSearch"
-                        :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
-                    </bk-button>
+                    <bk-search-select
+                        :show-popover-tag-change="true"
+                        :data="searchData"
+                        :show-condition="false"
+                        :placeholder="'请输入过滤条件'"
+                        @change="handleSearch"
+                        v-model="demo1.value"></bk-search-select>
                 </div>
-            </div>
-            <div class="senior-search-box" v-if="isDropdownShow">
-                <bk-container :margin="0">
-                    <bk-form :label-width="100">
-                        <bk-row>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业流名称:">
-                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchFrom.name" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="创建人:">
-                                    <bk-input :placeholder="'请输入创建人'" v-model="searchFrom.creator" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="分类:">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchFrom.category">
-                                        <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id"
-                                            :name="item.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="display: flex;justify-content: center;margin-top: 16px;">
-                            <bk-button theme="primary" @click="handleSearch">查询</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleReset">重置</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleOpenSeniorSearch">取消</bk-button>
-                        </bk-row>
-                    </bk-form>
-                </bk-container>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -166,6 +132,23 @@
                     size: 'small', // 表格大小
                     fields: fields, // 表格所有列
                     selectedFields: fields.slice(0, 6) // 表格当前显示列
+                },
+                searchData: [
+                    {
+                        name: '作业流名称',
+                        id: 'name',
+                        multiable: false,
+                        children: []
+                    },
+                    {
+                        name: '创建人',
+                        id: 'create_by',
+                        multiable: false,
+                        children: []
+                    }
+                ],
+                demo1: {
+                    value: []
                 }
             }
         },
@@ -311,8 +294,23 @@
                 })
             },
             // 处理搜索
-            handleSearch() {
+            handleSearch(list) {
+                const params = {}
+                list.forEach((r) => {
+                    if (!params[r.id]) {
+                        params[r.id] = r.values.map((s) => s.value || s.id)
+                    } else {
+                        params[r.id] = params[r.id].concat(
+                            r.values.map((s) => s.value || s.id)
+                        )
+                    }
+                })
+
+                for (const key in params) {
+                    params[key] = params[key].join(',')
+                }
                 this.pagination.current = 1
+                this.searchFrom = params
                 this.handleLoad()
             },
             // 处理搜索重置
@@ -466,7 +464,7 @@
     background-color: #fff;
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #dcdee4;
+    border: 1px solid #07386d;
     height: 65px;
     align-items: center;
 }
@@ -526,5 +524,24 @@
 
 .button:active {
     filter: brightness(.8);
+}
+/deep/ .search-input-chip {
+    background: #83a7ca !important;
+    color: #fff !important;
+}
+/deep/ .bk-search-select {
+    border-bottom: 1px solid #07386d;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid #07386d;
+    border-bottom-right-radius: 6px;
+}
+/deep/ .search-select-wrap .bk-search-select.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
+/deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
 }
 </style>

@@ -8,51 +8,12 @@
                 <div class="search-in" v-if="auth.search">
                     <bk-search-select
                         :show-popover-tag-change="true"
-                        :data="data"
+                        :data="searchData"
                         :show-condition="false"
                         :placeholder="'请输入过滤条件'"
                         @change="handleSearch"
                         v-model="demo1.value"></bk-search-select>
                 </div>
-            </div>
-            <div class="senior-search-box" v-if="isDropdownShow">
-                <bk-container :margin="0">
-                    <bk-form :label-width="100">
-                        <bk-row>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业名称:">
-                                    <bk-input :placeholder="'请输入作业名称'" v-model="searchFrom.name" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="模版类型:">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchFrom.template_type">
-                                        <bk-option v-for="(item, index) in runSysList" :key="index" :id="item.id"
-                                            :name="item.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业描述:">
-                                    <bk-input :placeholder="'请输入作业描述'" v-model="searchFrom.description"
-                                        clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="创建人:">
-                                    <bk-input :placeholder="'请输入创建人'" v-model="searchFrom.creator" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="display: flex;justify-content: center;margin-top: 16px;">
-                            <bk-button theme="primary" @click="handleSearch">查询</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleReset">重置</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleOpenSeniorSearch">取消</bk-button>
-                        </bk-row>
-                    </bk-form>
-                </bk-container>
             </div>
         </div>
         <div class="content">
@@ -119,6 +80,7 @@
 
 <script>
     import jobDialog from './job_dialog.vue'
+    import _ from 'lodash'
 
     export default {
         components: {
@@ -142,63 +104,50 @@
                 sortable: false
             }]
             return {
-                data: [
+                searchData: [
                     {
-                        name: '实例状态',
-                        id: '1',
+                        name: '作业名称',
+                        id: 'name',
+                        multiable: false,
+                        children: []
+                    },
+                    {
+                        name: '模版类型',
+                        id: 'template_type',
                         multiable: true,
                         children: [
                             {
-                                name: '创建中',
-                                id: '1-2'
+                                id: '0',
+                                name: '标准节点',
+                                value: '0'
                             },
                             {
-                                name: '运行中',
-                                id: '1-3'
+                                id: '1',
+                                name: '自定义节点',
+                                value: '1'
                             },
                             {
-                                name: '已关机',
-                                id: '1-4'
+                                id: '2',
+                                name: '节点模版',
+                                value: '2'
                             }
                         ]
                     },
                     {
-                        name: '实例业务',
-                        id: '2',
-                        children: [
-                            {
-                                name: '王者荣耀',
-                                id: '2-1'
-                            },
-                            {
-                                name: '刺激战场',
-                                id: '2-2'
-                            },
-                            {
-                                name: '绝地求生',
-                                id: '2-3'
-                            }
-                        ]
+                        name: '作业描述',
+                        id: 'description',
+                        multiable: false,
+                        children: []
                     },
                     {
-                        name: 'IP地址',
-                        id: '3'
-                    },
-                    {
-                        name: '实例名',
-                        id: '4'
-                    },
-                    {
-                        name: '实例地址',
-                        id: '5'
-                    },
-                    {
-                        name: '测试六',
-                        id: '6'
+                        name: '创建人',
+                        id: 'creator',
+                        multiable: false,
+                        children: []
                     }
                 ],
                 demo1: {
-                    value: [{ name: 'hello world' }]
+                    value: []
                 },
                 maxTableHeight: '',
                 auth: {},
@@ -238,7 +187,8 @@
                     limit: 10
                 },
                 selectionList: [], // 表格多选
-                dialogShow: false
+                dialogShow: false,
+                searchVal: ''
             }
         },
         created() {
@@ -365,6 +315,20 @@
                     }
                 })
             },
+            getSearchVal(interimList) {
+                const arr = _.cloneDeep(interimList)
+                this.searchVal = arr.map((item) => {
+                    return item.multiable
+                        ? item
+                        : Object.assign(item, {
+                            values: item.values
+                                ? item.values.length
+                                    ? [item.values[item.values.length - 1]]
+                                    : []
+                                : []
+                        })
+                })
+            },
             // 处理搜索重置
             handleReset() {
                 this.searchFrom = {
@@ -388,10 +352,24 @@
                 this.handleLoad()
             },
             // 处理查找
-            handleSearch(v) {
+            handleSearch(list) {
+                const params = {}
+                list.forEach((r) => {
+                    if (!params[r.id]) {
+                        params[r.id] = r.values.map((s) => s.value || s.id)
+                    } else {
+                        params[r.id] = params[r.id].concat(
+                            r.values.map((s) => s.value || s.id)
+                        )
+                    }
+                })
+
+                for (const key in params) {
+                    params[key] = params[key].join(',')
+                }
                 this.pagination.current = 1
-                // this.handleLoad()
-                console.log(v)
+                this.searchFrom = params
+                this.handleLoad()
             },
             // 处理页面跳转
             handlePageChange(page) {

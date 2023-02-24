@@ -2,7 +2,7 @@ import django_filters as filters
 
 
 class NodeTemplateFilter(filters.FilterSet):
-    template_type = filters.CharFilter(lookup_expr="iexact")
+    template_type = filters.CharFilter(method="filter_template_type")
     name = filters.CharFilter(lookup_expr="icontains")
     description = filters.CharFilter(lookup_expr="icontains")
     template_mode = filters.CharFilter(method="filter_template_mode")
@@ -14,6 +14,13 @@ class NodeTemplateFilter(filters.FilterSet):
             return queryset.filter(template_type__in=[2])
         return queryset
 
+    def filter_template_type(self, queryset, first_name, value):
+        value_list = value.split(",")
+        return queryset.filter(template_type__in=value_list)
+
+class ProcessFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr="icontains")
+    create_by = filters.CharFilter(lookup_expr="icontains")
 
 class ProcessRunFilter(filters.FilterSet):
     process_id = filters.CharFilter(lookup_expr="exact")

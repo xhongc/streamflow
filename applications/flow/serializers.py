@@ -152,6 +152,7 @@ class ProcessViewSetsSerializer(serializers.Serializer):
                 instance.save()
 
                 bulk_update_nodes, bulk_create_nodes = [], []
+                Node.objects.filter(process_id=instance.id).exclude(uuid__in=list(node_map.keys())).delete()
                 node_bulk = Node.objects.filter(process_id=instance.id).in_bulk(field_name="uuid")
 
                 for node in node_map.values():
@@ -398,6 +399,7 @@ class RetrieveProcessRunViewSetsSerializer(serializers.ModelSerializer):
                           "name": node["name"],
                           "state": flow_state,
                           "content": node["content"],
+                          "subprocess_runtime_id": node.get("subprocess_runtime_id", None),
                           "node_data": {
                               "inputs": node["inputs"],
                               "inputs_component": node.get("inputs_component", []),

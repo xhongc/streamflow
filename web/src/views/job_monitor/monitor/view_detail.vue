@@ -54,7 +54,7 @@
                 </node-info>
             </bk-sideslider>
         </div>
-        <bk-dialog title="连线模式选择"
+        <bk-dialog title="子流程节点"
             v-model="flowModeDialog.show"
             :confirm-fn="handleFlowAddEdgeConfirm"
             ext-cls="add-mode-dialog"
@@ -74,7 +74,7 @@
                     <span style="color: #313237;">当前作业流：{{flowModeDialog.childDialog.title}}</span>
                     <span class="iconfont icon-mianxingtubiao-wenti" style="margin-left: 4px;color: #979BA5;font-size: 16px;" v-bk-tooltips="flowModeTipConfig"></span>
                 </div>
-                <pre-flow-canvas :options="flowModeDialog.curObj" :pre-edges="flowModeDialog.preEdges" ref="preFlowCanvas"></pre-flow-canvas>
+                <pre-flow-run-canvas :options="flowModeDialog.curObj" :pre-edges="flowModeDialog.preEdges" ref="preFlowCanvas"></pre-flow-run-canvas>
             </bk-dialog>
         </bk-dialog>
     </div>
@@ -89,13 +89,13 @@
     import statusList from './job_flow_view_detail/statusList.vue'
     import nodeInfo from './job_flow_view_detail/nodeInfo.vue'
     import addModeDialog from '@/views/job_flow_mgmt/single_job_flow/addModeDialog.vue'
-    import preFlowCanvas from '@/views/job_flow_mgmt/single_job_flow/preFlowCanvas.vue'
+    import preFlowRunCanvas from '@/views/job_flow_mgmt/single_job_flow/preFlowRunCanvas.vue'
     export default {
         components: {
             statusList,
             nodeInfo,
             addModeDialog, // 前置作业流连线模式选择弹窗
-            preFlowCanvas // 前置作业流详情画布
+            preFlowRunCanvas // 前置作业流详情画布
         },
         props: {
             pid: {
@@ -284,7 +284,6 @@
             handleOpenFlowDrawer(e) {
                 this.flowModeDialog.preEdges = []
                 const edges = e.item.getEdges()
-                console.log(1234, e.item.getModel())
                 // 表明已有其他前置连线，收集前置节点连线
                 if (edges.length) {
                     this.flowModeDialog.preEdges = edges.filter(item => {
@@ -481,7 +480,6 @@
                         // 允许拖拽画布、缩放画布、拖拽节点
                         default: [
                             'drag-canvas', // 官方内置的行为
-                            'zoom-canvas',
                             'hover-node',
                             'drag-node',
                             'hover-edge',

@@ -5,56 +5,16 @@
                 <div class="add-in">
                 </div>
                 <div class="search-in" v-if="auth.search">
-                    <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
-                        :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
-                        @enter="handleSearch">
-                    </bk-input>
-                    <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
-                        @click="handleOpenSeniorSearch"
-                        :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
-                    </bk-button>
+                    <bk-search-select
+                        :show-popover-tag-change="true"
+                        :data="searchData"
+                        :show-condition="false"
+                        :placeholder="'请输入过滤条件'"
+                        @change="handleSearch"
+                        v-model="demo1.value"></bk-search-select>
                 </div>
             </div>
             <div style="float: left;">
-            </div>
-            <div class="senior-search-box" v-if="isDropdownShow">
-                <bk-container :margin="0">
-                    <bk-form :label-width="100">
-                        <bk-row>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业名称:">
-                                    <bk-input :placeholder="'请输入作业名称'" v-model="searchFrom.name" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="作业流名称:">
-                                    <bk-input :placeholder="'请输入作业流名称'" v-model="searchFrom.process__name" clearable>
-                                    </bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="执行方式:">
-                                    <bk-select class="header-select" :clearable="true" style="background-color: #fff;"
-                                        v-model="searchFrom.run_type">
-                                        <bk-option v-for="(item, index) in runTypeList" :key="index" :id="item.id"
-                                            :name="item.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                            </bk-col>
-                            <bk-col :span="6">
-                                <bk-form-item label="创建人:">
-                                    <bk-input :placeholder="'请输入创建人'" v-model="searchFrom.creator" clearable></bk-input>
-                                </bk-form-item>
-                            </bk-col>
-                        </bk-row>
-                        <bk-row style="display: flex;justify-content: center;margin-top: 16px;">
-                            <bk-button theme="primary" @click="handleSearch">查询</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleReset">重置</bk-button>
-                            <bk-button style="margin-left: 8px;" @click="handleOpenSeniorSearch">取消</bk-button>
-                        </bk-row>
-                    </bk-form>
-                </bk-container>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -147,6 +107,40 @@
             }
             ]
             return {
+                searchData: [
+                    {
+                        name: '任务名称',
+                        id: 'name',
+                        multiable: false,
+                        children: []
+                    },
+                    {
+                        name: '作业流名称',
+                        id: 'process__name',
+                        multiable: false,
+                        children: []
+                    },
+                    {
+                        name: '模版类型',
+                        id: 'run_type',
+                        multiable: true,
+                        children: [
+                            {id: 'hand', name: '单次'},
+                            {id: 'time', name: '定时'},
+                            {id: 'cycle', name: '周期'},
+                            {id: 'cron', name: '自定义'}
+                        ]
+                    },
+                    {
+                        name: '创建人',
+                        id: 'creator',
+                        multiable: false,
+                        children: []
+                    }
+                ],
+                demo1: {
+                    value: []
+                },
                 maxTableHeight: '',
                 auth: {
                     modify: true,
@@ -343,8 +337,23 @@
                 this.handleLoad()
             },
             // 处理查找
-            handleSearch() {
+            handleSearch(list) {
+                const params = {}
+                list.forEach((r) => {
+                    if (!params[r.id]) {
+                        params[r.id] = r.values.map((s) => s.value || s.id)
+                    } else {
+                        params[r.id] = params[r.id].concat(
+                            r.values.map((s) => s.value || s.id)
+                        )
+                    }
+                })
+
+                for (const key in params) {
+                    params[key] = params[key].join(',')
+                }
                 this.pagination.current = 1
+                this.searchFrom = params
                 this.handleLoad()
             },
             // 处理页面跳转
@@ -436,7 +445,7 @@
             width: 100%;
             margin-top: 20px;
             float: left;
-            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .1);
             border: 1px solid rgba(0, 0, 0, .2);
         }
     }
@@ -492,11 +501,30 @@
     background-color: #fff;
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #dcdee4;
+    border: 1px solid #07386d;
     height: 65px;
     align-items: center;
 }
 .btn-color {
     color: rgb(1, 158, 213) !important;
+}
+/deep/ .search-input-chip {
+    background: #83a7ca !important;
+    color: #fff !important;
+}
+/deep/ .bk-search-select {
+    border-bottom: 1px solid #07386d;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid #07386d;
+    border-bottom-right-radius: 6px;
+}
+/deep/ .search-select-wrap .bk-search-select.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
+/deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
 }
 </style>

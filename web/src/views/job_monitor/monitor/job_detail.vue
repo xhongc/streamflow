@@ -102,6 +102,12 @@
             addModeDialog, // 前置作业流连线模式选择弹窗
             preFlowCanvas // 前置作业流详情画布
         },
+        props: {
+            nodeId: {
+                type: Number,
+                default: null
+            }
+        },
         data() {
             return {
                 formLoading: false,
@@ -225,6 +231,7 @@
         },
         created() {
             // 不需要清空画布，首屏刷新
+            console.log(this.nodeId)
             this.handleLoad(false, true)
         },
         mounted() {
@@ -309,7 +316,6 @@
             handleOpenFlowDrawer(e) {
                 this.flowModeDialog.preEdges = []
                 const edges = e.item.getEdges()
-                console.log(1234, e.item.getModel())
                 // 表明已有其他前置连线，收集前置节点连线
                 if (edges.length) {
                     this.flowModeDialog.preEdges = edges.filter(item => {
@@ -415,9 +421,10 @@
                         })
                     }
                     _this.graph.read(data)
+                    console.log(data)
                     // _this.graph.fitCenter()
                     _this.mainLoading = false
-                }, 100)
+                }, 300)
             },
             initOption() {
                 // 工厂函数注册自定义节点
@@ -679,14 +686,12 @@
                     this.formLoading = true
                 }
                 // 在操作接口未调用结束的情况下不做轮询
-                this.$api.nodeRun.retrieve(parseInt(this.$route.query.id)).then(res => {
+                this.$api.nodeRun.retrieve(this.nodeId || parseInt(this.$route.query.id)).then(res => {
                     if (res.result) {
                         this.form = res.data
-                        if (this.form.hasOwnProperty('pre_commands')) {
-                            this.$refs.editor.monacoEditor.setValue(this.form.pre_commands)
-                        }
                         // 是否需要清空画布重新渲染
                         if (clear) {
+                            console.log('clearr')
                             this.graph.clear()
                         }
                         // this.nodeDrawer.show = false
