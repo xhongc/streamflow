@@ -32,12 +32,11 @@ class TaskViewSets(mixins.ListModelMixin,
     def execute(self, request, *args, **kwargs):
         validated_data = self.is_validated_data(request.data)
         task_id = validated_data["task_id"]
-        is_ok = run_by_task(task_id)
+        is_ok, msg = run_by_task(task_id)
         if is_ok:
             return Response({})
         else:
-            # todo add error response
-            return Response({})
+            return self.failure_response(msg=msg)
 
     def perform_destroy(self, instance):
         from dj_flow.celery_app import app

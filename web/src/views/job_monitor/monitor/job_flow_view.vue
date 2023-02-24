@@ -95,7 +95,8 @@
                 </bk-table-column>
                 <bk-table-column label="子作业流" width="150">
                     <template slot-scope="props">
-                        <bk-button theme="primary" text @click="handleCheckJob(props.row)" class="btn-color">查看</bk-button>
+                        <bk-button theme="primary" text @click="handleCheckJob(props.row)" class="btn-color" v-if="props.row.has_sub">查看</bk-button>
+                        <div v-else>--</div>
                     </template>
                 </bk-table-column>
                 <bk-table-column type="setting">
@@ -574,7 +575,7 @@
 
 <style lang="scss" scoped>
     .btn-color {
-        color: rgb(1, 158, 213);
+        color: rgb(1, 158, 213) !important;
     }
     #jobFlowView {
         height: 100%;

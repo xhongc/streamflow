@@ -11,9 +11,9 @@ def run_by_task(task_id):
         # 执行
         runtime = BambooDjangoRuntime()
         api.run_pipeline(runtime=runtime, pipeline=pipeline)
-        return True
-    except Exception:
-        return False
+        return True, "success"
+    except Exception as e:
+        return False, str(e)
 
 
 @app.task

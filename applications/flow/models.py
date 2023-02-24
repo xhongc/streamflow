@@ -141,6 +141,7 @@ class SubProcessRun(models.Model):
 class SubNodeRun(BaseNode):
     subprocess_run = models.ForeignKey(SubProcessRun, on_delete=models.CASCADE, null=True, db_constraint=False,
                                        related_name="sub_nodes_run")
+    inputs_component = JSONField("前端参数组件", default=list)
 
     @staticmethod
     def field_names():

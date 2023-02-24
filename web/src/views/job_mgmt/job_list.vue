@@ -6,14 +6,13 @@
                     <button theme="primary" @click="handCreate" class="button">新建</button>
                 </div>
                 <div class="search-in" v-if="auth.search">
-                    <bk-input clearable width="240px" style="width: 240px;margin-right: 8px;" :placeholder="'请输入作业名称'"
-                        :right-icon="'bk-icon icon-search'" v-model="searchFrom.name" @right-icon-click="handleSearch"
-                        @enter="handleSearch">
-                    </bk-input>
-                    <bk-button slot="dropdown-trigger" :theme="isDropdownShow === true ? 'primary' : 'default'"
-                        @click="handleOpenSeniorSearch"
-                        :icon-right="isDropdownShow === true ? 'angle-double-up' : 'angle-double-down'">高级搜索
-                    </bk-button>
+                    <bk-search-select
+                        :show-popover-tag-change="true"
+                        :data="data"
+                        :show-condition="false"
+                        :placeholder="'请输入过滤条件'"
+                        @change="handleSearch"
+                        v-model="demo1.value"></bk-search-select>
                 </div>
             </div>
             <div class="senior-search-box" v-if="isDropdownShow">
@@ -71,7 +70,7 @@
                 <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
                     :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
                     <template slot-scope="props">
-                        <span v-if="item.id === 'name'" style="color: rgb(1, 158, 213);cursor: pointer;"
+                        <span v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;"
                             @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
                         <span v-else-if="item.id === 'template_type'">
                             <span v-if="props.row.template_type === '0'">
@@ -143,6 +142,64 @@
                 sortable: false
             }]
             return {
+                data: [
+                    {
+                        name: '实例状态',
+                        id: '1',
+                        multiable: true,
+                        children: [
+                            {
+                                name: '创建中',
+                                id: '1-2'
+                            },
+                            {
+                                name: '运行中',
+                                id: '1-3'
+                            },
+                            {
+                                name: '已关机',
+                                id: '1-4'
+                            }
+                        ]
+                    },
+                    {
+                        name: '实例业务',
+                        id: '2',
+                        children: [
+                            {
+                                name: '王者荣耀',
+                                id: '2-1'
+                            },
+                            {
+                                name: '刺激战场',
+                                id: '2-2'
+                            },
+                            {
+                                name: '绝地求生',
+                                id: '2-3'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'IP地址',
+                        id: '3'
+                    },
+                    {
+                        name: '实例名',
+                        id: '4'
+                    },
+                    {
+                        name: '实例地址',
+                        id: '5'
+                    },
+                    {
+                        name: '测试六',
+                        id: '6'
+                    }
+                ],
+                demo1: {
+                    value: [{ name: 'hello world' }]
+                },
                 maxTableHeight: '',
                 auth: {},
                 dialogKey: 0,
@@ -331,9 +388,10 @@
                 this.handleLoad()
             },
             // 处理查找
-            handleSearch() {
+            handleSearch(v) {
                 this.pagination.current = 1
-                this.handleLoad()
+                // this.handleLoad()
+                console.log(v)
             },
             // 处理页面跳转
             handlePageChange(page) {
@@ -417,7 +475,6 @@
         margin-bottom: 16px;
         float: left;
         // position: relative;
-
         .senior-search-box {
             background-color: #fff;
             padding: 20px;
@@ -480,12 +537,12 @@
     background-color: #fff;
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #dcdee4;
+    border: 1px solid #07386d;
     height: 65px;
     align-items: center;
 }
 .btn-color {
-    color: rgb(1, 158, 213);
+    color: rgb(1, 158, 213) !important;
 }
 .button {
     --color: rgb(138, 171, 202);
@@ -541,5 +598,23 @@
 .button:active {
     filter: brightness(.8);
 }
-
+/deep/ .search-input-chip {
+    background: #83a7ca !important;
+    color: #fff !important;
+}
+/deep/ .bk-search-select {
+    border-bottom: 1px solid #07386d;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid #07386d;
+    border-bottom-right-radius: 6px;
+}
+/deep/ .search-select-wrap .bk-search-select.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
+/deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
 </style>

@@ -262,7 +262,7 @@ class PipelineBuilder:
                 )
             elif node.node_type == Node.SUB_PROCESS_NODE:
                 process_id = node.content
-                p_builder = PipelineBuilder(process_id)
+                p_builder = PipelineBuilder(process_id=process_id)
                 pipeline = p_builder.build(is_subprocess=True)
                 pipeline_instance[p_id] = pipeline
                 # 子流程的pid一并加入pipeline_instance

@@ -225,6 +225,7 @@ class ListProcessViewSetsSerializer(serializers.ModelSerializer):
 
 class ListProcessRunViewSetsSerializer(serializers.ModelSerializer):
     state = serializers.SerializerMethodField()
+    has_sub = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessRun
@@ -253,6 +254,9 @@ class ListProcessRunViewSetsSerializer(serializers.ModelSerializer):
         except Exception as e:
             print(f"{e}")
             return "error"
+
+    def get_has_sub(self, obj):
+        return obj.sub.exists()
 
 
 class ListSubProcessRunViewSetsSerializer(serializers.ModelSerializer):

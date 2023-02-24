@@ -497,6 +497,6 @@
     align-items: center;
 }
 .btn-color {
-    color: rgb(1, 158, 213);
+    color: rgb(1, 158, 213) !important;
 }
 </style>
