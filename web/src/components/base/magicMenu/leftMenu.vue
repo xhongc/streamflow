@@ -29,7 +29,7 @@
                                 'name': 'JobList',
                                 'cnName': '节点列表',
                                 'to': '/joblist',
-                                'icon': 'iconfont icon-mianxingtubiao-shouye',
+                                'icon': 'iconfont icon-mianxingtubiao-fangkuai',
                                 'hasChild': false,
                                 'children': []
                             }
@@ -38,14 +38,14 @@
                             'name': 'VariableMgmt',
                             'cnName': '变量管理',
                             'to': '/variablemgmt',
-                            'icon': 'iconfont icon-mianxingtubiao-shouye',
+                            'icon': 'iconfont icon-mianxingtubiao-mokuai',
                             'hasChild': false
                         },
                             {
                                 'name': 'JobFlowList',
                                 'cnName': '作业流列表',
                                 'to': '/jobflowlist',
-                                'icon': 'iconfont icon-mianxingtubiao-shouye',
+                                'icon': 'iconfont icon-mianxingtubiao-zuzhiguanli',
                                 'hasChild': false
                             }],
                         'TaskList': [{
@@ -59,7 +59,7 @@
                             'name': 'JobMonitor',
                             'cnName': '作业监视',
                             'to': '/jobmonitor',
-                            'icon': 'iconfont icon-mianxingtubiao-zuoyejiankong',
+                            'icon': 'iconfont icon-mianxingtubiao-yingyongqiang',
                             'hasChild': false
                         }]
                     },

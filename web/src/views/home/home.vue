@@ -10,7 +10,7 @@
                             <div class="text">当日异常作业数</div>
                         </div>
                         <div class="first-line-box-right">
-                            <div class="circle" style="background-color: #FFDDDD;color: #FF5656;"><i class="iconfont icon-mianxingtubiao-shijianzhongxin"></i></div>
+                            <div class="circle" style="background-color: #052150;color: #fff;"><i class="iconfont icon-mianxingtubiao-shijianzhongxin"></i></div>
                         </div>
                     </div>
                 </bk-col>
@@ -21,7 +21,7 @@
                             <div class="text">当日作业数</div>
                         </div>
                         <div class="first-line-box-right">
-                            <div class="circle" style="background-color: #E1ECFF;color: #3A84FF;"><i class="iconfont icon-mianxingtubiao-dangrizuoyezongshu"></i></div>
+                            <div class="circle" style="background-color: #07386d;color: #fff;"><i class="iconfont icon-mianxingtubiao-dangrizuoyezongshu"></i></div>
                         </div>
                     </div>
                 </bk-col>
@@ -32,7 +32,7 @@
                             <div class="text">当日未执行作业数</div>
                         </div>
                         <div class="first-line-box-right">
-                            <div class="circle" style="background-color: #FFE8C3;color: #FF9C01;"><i class="iconfont icon-mianxingtubiao-zuoyelishi"></i></div>
+                            <div class="circle" style="background-color: #83a7ca;color: #fff;"><i class="iconfont icon-mianxingtubiao-zuoyelishi"></i></div>
                         </div>
                     </div>
                 </bk-col>
@@ -43,11 +43,35 @@
                             <div class="text">当日作业流数</div>
                         </div>
                         <div class="first-line-box-right">
-                            <div class="circle" style="background-color: #DCFFE2;color: #45E35F;"><i class="iconfont icon-mianxingtubiao-dangrizuoyeliushu"></i></div>
+                            <div class="circle" style="background-color: #0797d4;color: #fff;"><i class="iconfont icon-mianxingtubiao-dangrizuoyeliushu"></i></div>
                         </div>
                     </div>
                 </bk-col>
             </bk-row>
+            <bk-row class="third-line">
+                <bk-col :span="8">
+                    <div class="third-line-box" v-bkloading="{ isLoading: top5AgentLoading, zIndex: 10 }">
+                        <div class="content">
+                            <div :id="top5AgentId" style="height: 100%;width: 100%;"></div>
+                        </div>
+                    </div>
+                </bk-col>
+                <bk-col :span="8">
+                    <div class="third-line-box" v-bkloading="{ isLoading: top5AgentLoading, zIndex: 10 }">
+                        <div class="content">
+                            <div :id="top5AgentId2" style="height: 100%;width: 100%;"></div>
+                        </div>
+                    </div>
+                </bk-col>
+                <bk-col :span="8">
+                    <div class="third-line-box" v-bkloading="{ isLoading: top5AgentLoading, zIndex: 10 }">
+                        <div class="content">
+                            <div :id="top5AgentId3" style="height: 100%;width: 100%;"></div>
+                        </div>
+                    </div>
+                </bk-col>
+            </bk-row>
+
             <bk-row class="second-line">
                 <bk-col :span="12">
                     <div class="second-line-box" v-bkloading="{ isLoading: todayJobLoading, zIndex: 10 }">
@@ -64,32 +88,14 @@
                     </div>
                 </bk-col>
             </bk-row>
-            <bk-row class="third-line">
-                <bk-col :span="12">
-                    <div class="third-line-box" v-bkloading="{ isLoading: top5AgentLoading, zIndex: 10 }">
-                        <div class="content">
-                            <div :id="top5AgentId" style="height: 100%;width: 100%;"></div>
-                        </div>
-                    </div>
-                </bk-col>
-                <bk-col :span="12">
-                    <div class="third-line-box" v-bkloading="{ isLoading: jobDynamicLoading, zIndex: 10 }">
-                        <div class="header">
-                            <p style="color: rgb(60,60,60);margin-left: 5px;">作业管理动态</p>
-                            <span @click="handleCheckMore">查看更多</span>
-                        </div>
-                        <div class="content">
-                            <bk-timeline :list="jobDynamicState" ext-cls="custom-timeline">
-                            </bk-timeline>
-                        </div>
-                    </div>
-                </bk-col>
-            </bk-row>
         </bk-container>
     </div>
 </template>
 
 <script>
+    import {
+        deepClone
+    } from '@/common/util.js'
     export default {
         data() {
             return {
@@ -154,7 +160,8 @@
                     today_job_flow_num: 0, // 当日作业流数
                     today_error_job_num: 0, // 当日异常作业数
                     jobDynamicState: []
-                }
+                },
+                eventSource: null
             }
         },
         computed: {
@@ -164,19 +171,17 @@
             top5AgentId() {
                 return 'top5AgentId' + this._uid
             },
+            top5AgentId2() {
+                return 'top5AgentId2' + this._uid
+            },
+            top5AgentId3() {
+                return 'top5AgentId3' + this._uid
+            },
             todayJobId() {
                 return 'todayJobId' + this._uid
             }
         },
         mounted() {
-            // if (typeof (EventSource) !== 'undefined') {
-            //     const source = new EventSource('http://127.0.0.1:8001/stream/')
-            //     source.onmessage = function(event) {
-            //         document.getElementById('result').innerHTML += event.data + '<br>'
-            //     }
-            // } else {
-            //     document.getElementById('result').innerHTML = 'Sorry, your browser does not support server-sent events...'
-            // }
             this.getWeeklyJob()
             this.getTop5Agent()
             this.getTodayJob()
@@ -190,12 +195,20 @@
                 erd.listenTo(document.getElementById('home'), function(element) {
                     _this.weeklyJobChart.resize()
                     _this.top5AgentChart.resize()
+                    _this.top5AgentChart2.resize()
+                    _this.top5AgentChart3.resize()
                     _this.todayJobChart.resize()
                 })
             })
         },
         created() {
             this.getOverViewData()
+        },
+        beforeDestroy() {
+            if (this.eventSource) {
+                this.eventSource.close()
+                this.eventSource = null
+            }
         },
         methods: {
             // 处理查看更多
@@ -225,7 +238,7 @@
                 this.weeklyJobLoading = true
                 this.weeklyJobChart = this.$echarts.init(document.getElementById(this.weeklyJobId))
                 const option = {
-                    color: ['#3A84FF', '#FF5656'],
+                    color: ['#0b254f', '#FF5656'],
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
@@ -338,100 +351,128 @@
             },
             // 获取日均作业top5的agent
             getTop5Agent() {
-                this.top5AgentLoading = true
+                const _this = this
                 this.top5AgentChart = this.$echarts.init(document.getElementById(this.top5AgentId))
+                this.top5AgentChart2 = this.$echarts.init(document.getElementById(this.top5AgentId2))
+                this.top5AgentChart3 = this.$echarts.init(document.getElementById(this.top5AgentId3))
                 const option = {
-                    color: ['#3A84FF'],
-                    xAxis: {
-                        type: 'category',
-                        data: this.top5Agent.top5_agent_name,
-                        axisTick: {
-                            show: false
-                        },
-                        axisLine: {
-                            lineStyle: {
-                                color: '#DCDEE5'
-                            }
-                        },
-                        axisLabel: {
-                            color: 'rgba(0, 0, 0, 0.45)'
-                        }
-                    },
-                    legend: {
-                        data: []
-                    },
-                    title: {
-                        text: '日均作业Top5的Agent'
-                    },
-                    grid: {
-                        height: 210,
-                        width: '100%',
-                        left: '20px',
-                        bottom: '30px',
-                        containLabel: true
-                    },
-                    toolbox: {
-                        feature: {
-                            saveAsImage: {
+                    series: [
+                        {
+                            type: 'gauge',
+                            progress: {
                                 show: true,
-                                emphasis: {
-                                    iconStyle: {
-                                        textFill: '#fff'
-                                    }
+                                width: 10,
+                                itemStyle: {
+                                    color: '#0b254f'
                                 }
-                            }
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    width: 10
+                                }
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            splitLine: {
+                                length: 10,
+                                lineStyle: {
+                                    width: 2,
+                                    color: '#999'
+                                }
+                            },
+                            axisLabel: {
+                                distance: 25,
+                                color: '#999',
+                                fontSize: 12
+                            },
+                            anchor: {
+                                show: true,
+                                showAbove: true,
+                                size: 13,
+                                itemStyle: {
+                                    borderWidth: 6
+                                }
+                            },
+                            title: {
+                                show: true
+                            },
+                            detail: {
+                                valueAnimation: true,
+                                fontSize: 40,
+                                offsetCenter: [0, '70%']
+                            },
+                            pointer: {
+                                itemStyle: {
+                                }
+                            },
+                            data: [
+                                {
+                                    value: 66,
+                                    name: 'CPU占用率'
+                                }
+                            ]
                         }
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLine: { // y轴
-                            show: false
-                        },
-                        axisTick: {
-                            show: false
-                        },
-                        splitLine: {
-                            lineStyle: {
-                                color: '#F0F1F5'
-                            }
-                        },
-                        name: '日均作业数',
-                        nameTextStyle: {
-                            color: '#63656E'
-                        },
-                        min: 0,
-                        minInterval: 1,
-                        axisLabel: {
-                            formatter: '{value}',
-                            color: 'rgba(0, 0, 0, 0.45)'
-                        }
-                    },
-                    series: [{
-                        data: this.top5Agent.top5_agent_num,
-                        barWidth: 24,
-                        type: 'bar'
-                    }]
+                    ]
                 }
-                this.$api.home.top5_agent().then(res => {
-                    if (res.result) {
-                        this.top5Agent.top5_agent_name = res.data.top5_agent_name
-                        this.top5Agent.top5_agent_num = res.data.top5_agent_num
-                        // option.xAxis[0].data = this.top5Agent.top5_agent_name
-                        option.xAxis.data = this.top5Agent.top5_agent_name
-                        option.series[0].data = this.top5Agent.top5_agent_num
-                        this.drawline(this.top5AgentChart, option)
-                    } else {
-                        this.$cwMessage(res.message, 'error')
-                        this.drawline(this.top5AgentChart, option)
+                const cpuOption = deepClone(option)
+                const memOption = deepClone(option)
+                const diskOption = deepClone(option)
+                cpuOption['series'][0]['data'] = [
+                    {
+                        value: 0,
+                        name: 'CPU占用率'
                     }
-                    this.top5AgentLoading = false
-                })
+                ]
+                memOption['series'][0]['data'] = [
+                    {
+                        value: 0,
+                        name: '内存占用率'
+                    }
+                ]
+                diskOption['series'][0]['data'] = [
+                    {
+                        value: 0,
+                        name: '磁盘占用率'
+                    }
+                ]
+                _this.top5AgentChart.setOption(cpuOption)
+                _this.top5AgentChart2.setOption(memOption)
+                _this.top5AgentChart3.setOption(diskOption)
+                if (typeof (EventSource) !== 'undefined') {
+                    const source = new EventSource('http://127.0.0.1:8001/stream/')
+                    this.eventSource = source
+                    source.onmessage = function(event) {
+                        console.log(event.data.split(','))
+                        const monitorData = event.data.split(',')
+                        _this.top5AgentChart.setOption({
+                            series: {
+                                data: [{
+                                    name: 'CPU占用率',
+                                    value: monitorData[0]
+                                }]
+                            }
+                        })
+                        _this.top5AgentChart2.setOption({
+                            series: {
+                                data: [{
+                                    name: '内存占用率',
+                                    value: monitorData[1]
+                                }]
+                            }
+                        })
+                        _this.top5AgentChart3.setOption({
+                            series: {
+                                data: [{
+                                    name: '磁盘占用率',
+                                    value: monitorData[2]
+                                }]
+                            }
+                        })
+                    }
+                } else {
+                    console.log('error')
+                }
             },
             // 获取当日作业执行情况
             getTodayJob() {
@@ -439,7 +480,7 @@
                 this.todayJobChart = this.$echarts.init(document.getElementById(this.todayJobId))
                 // 当日作业执行情况
                 const option = {
-                    color: ['#45E35F', '#FF9C01', '#FF5656'],
+                    color: ['#0b254f', '#8ba9c9', '#163c6b'],
                     tooltip: {
                         trigger: 'axis',
                         // formatter: '{b0}<br/>{a0}: {c0}<br />{a1}: {c1}<br />{a2}: {c2}',
@@ -655,14 +696,14 @@
             margin-top: 16px;
 
             .third-line-box {
-                padding: 16px 20px 0 20px;
-                height: 356px;
+                padding: 0 20px 0 20px;
+                height: 256px;
                 background: #FFFFFF;
                 border-radius: 2px;
-                box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 
                 &:hover {
-                    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
+                    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
                 }
 
                 .header {
@@ -683,22 +724,9 @@
                 }
 
                 .content {
-                    height: 340px;
+                    height: 300px;
                     width: 100%;
                     overflow: hidden;
-
-                    .custom-timeline {
-                        margin-left: 15px;
-
-                        /deep/ li {
-                            padding-bottom: 10px;
-
-                            .timeline-update-time {
-                                font-size: 12px;
-                                color: #979BA5;
-                            }
-                        }
-                    }
                 }
             }
         }

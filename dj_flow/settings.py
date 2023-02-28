@@ -91,9 +91,17 @@ DATABASES = {
         "TEST": {"NAME": "test_db", "CHARSET": "utf8", "COLLATION": "utf8_general_ci"},
     },
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 定义django中redis的位置,指定用redis的db1
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            # django使用redis的默认客户端来进行操作.
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -166,5 +174,5 @@ try:
 except ImportError:
     pass
 
-# CELERY_ALWAYS_EAGER = True
-# CELERY_TASK_ALWAYS_EAGER = True
+CELERY_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = True

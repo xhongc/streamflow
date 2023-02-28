@@ -1,3 +1,5 @@
+import random
+
 from django.shortcuts import render
 from rest_framework.response import Response
 
@@ -12,8 +14,9 @@ from django.http import StreamingHttpResponse
 def stream(request):
     def event_stream():
         while True:
-            time.sleep(3)
-            yield 'data: The server time is: %s\n\n' % datetime.datetime.now()
+            time.sleep(5)
+            cpu=random.randint(1,100)
+            yield f'data:{cpu},{cpu},{cpu}\n\n'
 
     return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
 
@@ -42,17 +45,18 @@ class WeeklyJobViewSet(GenericViewSet):
 class TopAgentViewSet(GenericViewSet):
     def list(self, request, *args, **kwargs):
         return Response({
-            "top5_agent_name": ["host", "localhost", "remote"],
-            "top5_agent_num": [1, 2, 3]
+            "cpu": "22",
+            "disk": "33",
+            "mem": "33",
         })
 
 
 class TodayJobViewSet(GenericViewSet):
     def list(self, request, *args, **kwargs):
         return Response({
-            "finished_job_num": [2, 2, 2],
-            "error_job_num": [1, 2, 3],
-            "unfinished_job_num": [3, 2, 1],
+            "finished_job_num": [1, 2, 3],
+            "error_job_num": [1, 0, 1],
+            "unfinished_job_num": [0, 2, 1],
             "time_line": ["2020-01-01", "2020-01-02", "2020-01-03"],
         })
 

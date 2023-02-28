@@ -9,9 +9,12 @@
                             <bk-input v-model="form.name" :disabled="disabled"></bk-input>
                         </bk-form-item>
                         <bk-form-item label="表达式:" :error-display-type="'normal'" :required="true" :property="'expression'">
-                            <bk-input :type="'textarea'" :rows="20" ext-cls="custom-textarea" v-model="form.expression" :disabled="disabled"></bk-input>
+                            <bk-input :type="'textarea'" :rows="5" ext-cls="custom-textarea" v-model="form.expression" :disabled="disabled"></bk-input>
                         </bk-form-item>
                     </bk-form>
+                    <div style="margin-top: 10px;margin-left: 90px;"> 提示：表达式写法支持变量比较<div>
+                        ${act_1_output}&lt;0
+                    </div></div>
                 </div>
             </div>
         </div>

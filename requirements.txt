@@ -47,3 +47,4 @@ zipp==3.6.0
 djangorestframework-jwt==1.11.0
 sqlalchemy==1.4.23
 pymysql==1.0.2
+django-redis==5.2.0
