@@ -358,7 +358,15 @@
                         }),
                         nodes: _this.jobFlowFrom.pipeline_tree.nodes.map((node, index) => {
                             let style = {}
+                            let nodeShape = 'rect-node'
+                            let nodeLabel = ''
+                            if ([0, 1, 4, 5, 6, 7].indexOf(node.type) !== -1) {
+                                nodeShape = 'circle-node'
+                            } else {
+                                nodeLabel = node.name.length > 8 ? `${node.name.substr(0, 8)}...` : node.name
+                            }
                             if (node.type === 0 || node.type === 1) {
+                                nodeLabel = node.name
                                 style = {
                                     fill: '#fff',
                                     stroke: '#DCDEE5',
@@ -385,7 +393,7 @@
                             return {
                                 ...node,
                                 detail: detail,
-                                label: node.name.length > 8 ? `${node.name.substr(0, 8)}...` : node.name,
+                                label: nodeLabel,
                                 name: node.name,
                                 icon: node.ico,
                                 id: node.hasOwnProperty(node.end_uuid) ? node.end_uuid : node.uuid,
@@ -393,7 +401,7 @@
                                 x: node.left,
                                 y: node.top,
                                 nodeType: node.type,
-                                type: (node.type === 0 || node.type === 1 || node.type === '4') ? 'circle-node' : 'rect-node',
+                                type: nodeShape,
                                 labelCfg: {
                                     style: {
                                         textAlign: (node.type === 0 || node.type === 1) ? 'center' : 'left'
@@ -782,6 +790,14 @@
                     x,
                     y
                 } = this.graph.getPointByClient(e.x, e.y)
+                const nodeType = parseInt(e.target.dataset.nodetype)
+                let nodeShape = 'rect-node'
+                let nodeLabel = ''
+                if ([4, 5, 6, 7].indexOf(nodeType) !== -1) {
+                    nodeShape = 'circle-node'
+                } else {
+                    nodeLabel = e.target.innerText.length > 8 ? `${e.target.innerText.substr(0, 8)}...` : e.target.innerText
+                }
                 const model = {
                     detail: false,
                     style: {
@@ -807,15 +823,16 @@
                         is_skip_fail: false,
                         is_timeout_alarm: false
                     },
-                    label: e.target.innerText.length > 8 ? `${e.target.innerText.substr(0, 8)}...` : e.target.innerText,
+                    label: nodeLabel,
                     name: e.target.innerText,
                     icon: e.target.dataset.icon,
                     endUuid: e.target.dataset.enduuid,
                     id: e.target.dataset.enduuid ? e.target.dataset.enduuid : getUUID(32, 16), // 外部作业流uuid和enduuid要一致
                     // uuid: e.target.dataset.enduuid ? e.target.dataset.enduuid : getUUID(32, 16),
-                    nodeType: parseInt(e.target.dataset.nodetype), // 节点类型
+                    nodeType: nodeType, // 节点类型
                     content: parseInt(e.target.dataset.content), // 作业id
-                    type: 'rect-node',
+                    // eslint-disable-next-line no-constant-condition
+                    type: nodeShape,
                     x,
                     y
                 }

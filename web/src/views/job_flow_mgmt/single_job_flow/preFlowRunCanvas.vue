@@ -136,7 +136,15 @@
                         }),
                         nodes: _this.jobFlowFrom.pipeline_tree.nodes.map((node, index) => {
                             let style = {}
+                            let nodeShape = 'rect-node'
+                            let nodeLabel = ''
+                            if ([0, 1, 4, 5, 6, 7].indexOf(node.type) !== -1) {
+                                nodeShape = 'circle-node'
+                            } else {
+                                nodeLabel = node.name.length > 8 ? `${node.name.substr(0, 8)}...` : node.name
+                            }
                             if (node.type === 0 || node.type === 1) {
+                                nodeLabel = node.name
                                 style = {
                                     fill: '#fff',
                                     stroke: '#DCDEE5',
@@ -158,8 +166,7 @@
                             return {
                                 ...node,
                                 detail: detail,
-                                label: node.name.length > 8 ? `${node.name.substr(0, 8)}...` : node
-                                    .name,
+                                label: nodeLabel,
                                 name: node.name,
                                 icon: node.ico,
                                 id: node.hasOwnProperty(node.end_uuid) ? node.end_uuid : node.uuid,
@@ -168,8 +175,7 @@
                                 x: Number(node.left),
                                 y: Number(node.top),
                                 nodeType: node.type,
-                                type: (node.type === 0 || node.type === 1) ? 'circle-node'
-                                    : 'rect-node',
+                                type: nodeShape,
                                 labelCfg: {
                                     style: {
                                         textAlign: (node.type === 0 || node.type === 1) ? 'center'

@@ -62,7 +62,7 @@ export default G6 => {
     G6.registerNode('circle-node', {
       shapeType: 'circle',
       getShapeStyle(cfg) {
-        const r = cfg.style.r || 30;
+        const r = cfg.style.r || 23;
 
         return getStyle.call(this, {
           r, // 半径

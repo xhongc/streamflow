@@ -67,7 +67,8 @@ export default G6 => {
             //当前节点拥有icon且不为开始和结束节点
             if (item.attrs.hasOwnProperty('icon') && (attrs.nodeType != 0 || attrs.nodeType != 1)) {
                 //分支节点和作业节点显示同一个icon
-                if (attrs.nodeType === 2 || attrs.nodeType === 4 || attrs.nodeType === 6 || attrs.nodeType === 7) {
+                if (attrs.nodeType === 2) {
+                    console.log(attrs.nodeType)
                     const icon = group.addShape('text', {
                         attrs: {
                             fontFamily: 'iconfont',
@@ -81,9 +82,8 @@ export default G6 => {
                         },
                         draggable: true,
                     })
-                }
-                //表明是作业流节点
-                if (attrs.nodeType === 3) {
+                } else if (attrs.nodeType === 3){
+                    //表明是作业流节点
                     const icon = group.addShape('text', {
                         attrs: {
                             fontFamily: 'iconfont',
@@ -97,14 +97,58 @@ export default G6 => {
                         },
                         draggable: true,
                     })
-                }
-                if (attrs.nodeType === 5) {
+                } else if (attrs.nodeType === 5) {
                     const icon = group.addShape('text', {
                         attrs: {
                             fontFamily: 'iconfont',
-                            text: '\ue6d6',
+                            text: '\ue699',
                             fontSize: 24,
-                            x: -60,
+                            x: -12,
+                            y: 12,
+                            cursor: 'pointer',
+                            fill: (attrs.hasOwnProperty('state') && attrs.state !== '') ? colorList[
+                                attrs.state].color : attrs.style.iconCfg.fill
+                        },
+                        draggable: true,
+                    })
+                } else if (attrs.nodeType === 4){
+                    //表明是条件网关
+                    const icon = group.addShape('text', {
+                        attrs: {
+                            fontFamily: 'iconfont',
+                            text: '\ue6d4',
+                            fontSize: 24,
+                            x: -14,
+                            y: 12,
+                            cursor: 'pointer',
+                            fill: (attrs.hasOwnProperty('state') && attrs.state !== '') ? colorList[
+                                attrs.state].color : attrs.style.iconCfg.fill
+                        },
+                        draggable: true,
+                    })
+                } else if (attrs.nodeType === 6){
+                    //表明是并行网关
+                    const icon = group.addShape('text', {
+                        attrs: {
+                            fontFamily: 'iconfont',
+                            text: '\ue734',
+                            fontSize: 24,
+                            x: -12,
+                            y: 12,
+                            cursor: 'pointer',
+                            fill: (attrs.hasOwnProperty('state') && attrs.state !== '') ? colorList[
+                                attrs.state].color : attrs.style.iconCfg.fill
+                        },
+                        draggable: true,
+                    })
+                } else if (attrs.nodeType === 7){
+                    //表明是条件并行网关
+                    const icon = group.addShape('text', {
+                        attrs: {
+                            fontFamily: 'iconfont',
+                            text: '\ue687',
+                            fontSize: 24,
+                            x: -12,
                             y: 12,
                             cursor: 'pointer',
                             fill: (attrs.hasOwnProperty('state') && attrs.state !== '') ? colorList[
