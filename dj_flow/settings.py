@@ -94,8 +94,8 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # 定义django中redis的位置,指定用redis的db1
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        # 定义django中redis的位置,指定用redis的dbs
+        "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             # django使用redis的默认客户端来进行操作.
             "CLIENT_CLASS": "django_redis.client.DefaultClient",

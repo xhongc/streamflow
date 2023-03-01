@@ -43,7 +43,7 @@ class SendEmailService(Service, ServiceMixin):
             return True
         else:
             retry_count = data.get_one_of_outputs("retry_count", 0)
-            if retry_count < fail_retry_count + 1:
+            if retry_count < fail_retry_count:
                 data.set_outputs("retry_count", retry_count + 1)
                 self.interval.interval = int(fail_offset)
                 data.set_outputs("outputs", f"重试次数：{retry_count}")
