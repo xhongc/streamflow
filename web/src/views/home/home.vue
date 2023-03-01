@@ -440,7 +440,7 @@
                 _this.top5AgentChart2.setOption(memOption)
                 _this.top5AgentChart3.setOption(diskOption)
                 if (typeof (EventSource) !== 'undefined') {
-                    const source = new EventSource('/stream/')
+                    const source = new EventSource('/es/stream/')
                     this.eventSource = source
                     source.onmessage = function(event) {
                         console.log(event.data.split(','))

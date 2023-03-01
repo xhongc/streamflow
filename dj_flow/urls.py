@@ -17,7 +17,7 @@ urlpatterns = [
     path("task/", include(task_router.urls)),
     path("home/", include(home_router.urls)),
     path("user/", include(user_router.urls)),
-    path('stream/', views.stream, name='stream'),
+    path('es/stream/', views.stream, name='stream'),
     path(r'token/', obtain_jwt_token),
 
 ]
