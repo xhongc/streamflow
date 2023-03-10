@@ -168,6 +168,7 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 43200}
+SCHEDULE_TASK_POINT = "applications.task.tasks.run_by_task_in_celery"
 
 try:
     from local_settings import *  # noqa

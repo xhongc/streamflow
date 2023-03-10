@@ -7,6 +7,9 @@ export default {
     create: function(params) {
         return POST(reUrl + '/task/task/', params)
     },
+    retrieve: function(id, params) {
+        return GET(reUrl + '/task/task/' + JSON.stringify(id) + '/', params)
+    },
     update: function(id, params) {
         return PUT(reUrl + '/task/task/' + JSON.stringify(id) + '/', params)
     },

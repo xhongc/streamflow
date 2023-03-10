@@ -7,7 +7,7 @@ from applications.flow.utils import build_and_create_process
 from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
-    VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer
+    VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer, ReadTaskSerializer
 from applications.task.tasks import run_by_task
 from applications.task.utils import CronTaskUtils
 from component.drf.viewsets import GenericViewSet
@@ -26,6 +26,8 @@ class TaskViewSets(mixins.ListModelMixin,
     def get_serializer_class(self):
         if self.action == "execute":
             return ExecuteTaskSerializer
+        elif self.action == "retrieve":
+            return ReadTaskSerializer
         return TaskSerializer
 
     @action(methods=["POST"], detail=False)

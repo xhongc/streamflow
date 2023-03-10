@@ -6,6 +6,7 @@ from applications.task.models import Task
 
 
 def create_check_task_period(task_id):
+    """周期任务"""
     try:
         task_obj = Task.objects.get(id=task_id)
 
@@ -85,3 +86,5 @@ class CronTaskUtils:
         """
         PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").update(enabled=False)
         PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").delete()
+
+

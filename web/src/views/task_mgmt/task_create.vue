@@ -9,10 +9,10 @@
             </bk-steps>
             <div style="display: flex;margin-right: 2%;">
                 <div class="next-icon left-icon" @click="lastStep">
-                    <bk-icon type="arrows-m-left-shape" />
+                    <bk-icon type="arrows-m-left-shape"></bk-icon>
                 </div>
                 <div class="next-icon right-icon" @click="nextStep">
-                    <bk-icon type="arrows-m-right-shape" />
+                    <bk-icon type="arrows-m-right-shape"></bk-icon>
                 </div>
             </div>
         </div>
@@ -199,11 +199,24 @@
             }
         },
         created() {
-            this.$api.process.var_table({'process_id': this.$route.query.job_flow_data}).then(res => {
-                this.formData.var_table = res.data
-            })
+            this.getVarTable()
+            this.getTaskDetail()
         },
         methods: {
+            getVarTable() {
+                this.$api.process.var_table({'process_id': this.$route.query.job_flow_data}).then(res => {
+                    this.formData.var_table = res.data
+                })
+            },
+            getTaskDetail() {
+                if (this.$route.query.task_id) {
+                    this.$api.task.retrieve(this.$route.query.task_id).then((res) => {
+                        if (res.result) {
+                            this.formData = res.data
+                        }
+                    })
+                }
+            },
             stepChanged(index) {
                 this.controllableSteps.curStep = index
             },
@@ -229,7 +242,6 @@
                         confirmLoading: false,
                         confirmFn: async() => {
                             this.tableLoading = true
-                            console.log(this.formData)
                             if (this.$route.query.task_type === 'update') {
                                 this.$api.task.update(this.$route.query.task_id, this.formData).then(res => {
                                     if (res.result) {
@@ -292,6 +304,7 @@
     height: 50px;
     border-top: 1px solid #cacedb;
 }
+
 .next-icon {
     background-color: #ffffff;
     border-radius: 20px;
@@ -303,15 +316,19 @@
     color: #979BA5;
     margin-left: 15px;
 }
+
 .left-icon {
     padding-left: 14px;
 }
+
 .right-icon {
     padding-left: 15px;
 }
+
 .next-icon:hover {
     color: #699DF4;
 }
+
 .next-btn {
     margin: 13px 20px;
     width: 100px;

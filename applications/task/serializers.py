@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from applications.flow.models import Process
 from applications.task.models import Task, VarTable
+from applications.task.services.clock_task import create_clock_check_task
 from applications.task.tasks import run_by_task_in_celery, cycle_run_by_task_in_celery
 from applications.task.utils import create_cron_check_task
 from applications.utils.timer import string_to_datetime
@@ -22,11 +23,7 @@ class TaskSerializer(serializers.ModelSerializer):
         instance = super(TaskSerializer, self).create(validated_data)
         # todo 改为clock schedule 模式
         if validated_data["run_type"] == "time":
-            when_start = string_to_datetime(instance.when_start)
-            when_start = timezone.make_aware(when_start)
-            celery_task_id = run_by_task_in_celery.apply_async(args=[instance.id], eta=when_start)
-            instance.celery_task_id = celery_task_id
-            instance.save()
+            create_clock_check_task(instance.id)
         elif validated_data["run_type"] == "cycle":
             when_start = string_to_datetime(instance.when_start)
             when_start = timezone.make_aware(when_start)
@@ -38,6 +35,27 @@ class TaskSerializer(serializers.ModelSerializer):
             create_cron_check_task(instance.id)
         self._data = {}
         return instance
+
+    def update(self, instance, validated_data):
+        instance = super(TaskSerializer, self).update(instance, validated_data)
+        if validated_data["run_type"] == "time":
+            pass
+        elif validated_data["run_type"] == "cycle":
+            pass
+        elif validated_data["run_type"] == "cron":
+            pass
+        return instance
+
+
+class ReadTaskSerializer(serializers.ModelSerializer):
+    cron_time = serializers.CharField(allow_blank=True, allow_null=True)
+    when_start = serializers.CharField(allow_blank=True, allow_null=True)
+    process_id = serializers.CharField(source="process.id")
+    process_name = serializers.CharField(source="process.name", read_only=True)
+
+    class Meta:
+        model = Task
+        fields = "__all__"
 
 
 class VarTableSerializer(serializers.ModelSerializer):

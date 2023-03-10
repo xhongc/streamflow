@@ -25,7 +25,7 @@
                             </bk-tag>
                         </div>
                         <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'null'">
+                            <span v-if="props.row.run_type === 'hand'">
                                 <bk-tag radius="5px">单次</bk-tag></span>
                             <span v-else-if="props.row.run_type === 'time'">
                                 <bk-tag radius="5px">定时</bk-tag></span>

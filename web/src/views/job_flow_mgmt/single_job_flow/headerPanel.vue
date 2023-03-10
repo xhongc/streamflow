@@ -401,7 +401,7 @@
                             params.file_dependence = this.father_this.$refs.baseInfo.form.file_dependence // 前置文件参数
                         }
                         // 调度方式为无
-                        if (params.type === 'null') {
+                        if (params.type === 'hand') {
                             params.trigger_data = {}
                         }
                         // 调度方式为定时

@@ -56,7 +56,7 @@ class ProcessViewSets(mixins.ListModelMixin,
 class ProcessRunViewSets(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
                          GenericViewSet):
-    queryset = ProcessRun.objects.order_by("-update_time")
+    queryset = ProcessRun.objects.order_by("-id")
     filterset_class = ProcessRunFilter
 
     def get_serializer_class(self):

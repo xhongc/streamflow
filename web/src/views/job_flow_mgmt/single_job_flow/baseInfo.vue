@@ -103,7 +103,7 @@
                 calendarList: [], // 日历下拉列表
                 controlList: [{ // 调度方式单选列表
                     label: '无',
-                    value: 'null'
+                    value: 'hand'
                 }, {
                     label: '定时',
                     value: 'time'
