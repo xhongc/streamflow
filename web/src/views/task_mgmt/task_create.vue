@@ -46,7 +46,7 @@
                 </bk-form>
             </div>
         </div>
-        <div class="step-2" v-if="controllableSteps.curStep === 3">
+        <div class="step-2" v-show="controllableSteps.curStep === 3">
             <div style="padding-top: 26px;padding-left: 30px;">
                 <div style="font-size: 14px;color: #2b2929;">执行方式</div>
             </div>
@@ -224,9 +224,11 @@
                 this.formData.cron_time = val
             },
             changeTime(val) {
+                console.log(1112, val)
                 this.formData.when_start = val
             },
             lastStep() {
+                console.log(1113, this.formData)
                 if (this.controllableSteps.curStep === 1 || this.controllableSteps.curStep === 4) {
                     return false
                 } else {
