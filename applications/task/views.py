@@ -8,8 +8,10 @@ from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
     VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer, ReadTaskSerializer
+from applications.task.services.clock_task import delete_clock_task
+from applications.task.services.cycle_task import delete_cycle_task
 from applications.task.tasks import run_by_task
-from applications.task.utils import CronTaskUtils
+from applications.task.utils import CronTaskUtils, delete_cron_task
 from component.drf.viewsets import GenericViewSet
 from rest_framework import mixins
 
@@ -41,10 +43,12 @@ class TaskViewSets(mixins.ListModelMixin,
             return self.failure_response(msg=msg)
 
     def perform_destroy(self, instance):
-        from dj_flow.celery_app import app
-        if instance.celery_task_id:
-            app.control.revoke(instance.celery_task_id)
-        CronTaskUtils.del_task(instance.id)
+        if instance.run_type == "time":
+            delete_clock_task(instance.id)
+        elif instance.run_type == "cycle":
+            delete_cycle_task(instance.id)
+        elif instance.run_type == "cron":
+            delete_cron_task(instance.id)
         instance.delete()
 
 

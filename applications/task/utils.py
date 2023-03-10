@@ -1,34 +1,8 @@
 import json
 
-from django_celery_beat.models import IntervalSchedule, PeriodicTask, CrontabSchedule, ClockedSchedule
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 from applications.task.models import Task
-
-
-def create_check_task_period(task_id):
-    """周期任务"""
-    try:
-        task_obj = Task.objects.get(id=task_id)
-
-        cycle_type = task_obj.cycle_type
-        cycle_time = int(task_obj.cycle_time)
-
-        if cycle_type == "min":
-            schedule, _ = IntervalSchedule.objects.get_or_create(every=cycle_time, period="minutes")
-        elif cycle_type == "hour":
-            schedule, _ = IntervalSchedule.objects.get_or_create(every=cycle_time, period="hours")
-        else:
-            schedule, _ = IntervalSchedule.objects.get_or_create(every=cycle_time, period="days")
-        PeriodicTask.objects.update_or_create(
-            name=f"job_task.{task_id}",
-            defaults={
-                "task": "applications.task.tasks.run_by_task_in_celery",
-                "args": json.dumps([task_id]),
-                "interval": schedule,
-            },
-        )
-    except Exception as e:
-        print(str(e))
 
 
 def create_cron_check_task(task_id):
@@ -40,6 +14,10 @@ def create_cron_check_task(task_id):
     task_func = "applications.task.tasks.run_by_task_in_celery"
     task = CronTaskUtils(f"job_task.{task_id}", cron_interval, task_func, task_args)
     task.start_task()
+
+
+def delete_cron_task(task_id):
+    CronTaskUtils.del_task(task_id)
 
 
 class CronTaskUtils:
@@ -86,5 +64,3 @@ class CronTaskUtils:
         """
         PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").update(enabled=False)
         PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").delete()
-
-

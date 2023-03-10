@@ -13,6 +13,7 @@ from dj_flow.settings import SCHEDULE_TASK_POINT
 
 
 def create_clock_check_task(task_id):
+    """创建一个定时任务"""
     task_obj = Task.objects.get(id=task_id)
     when_start = string_to_datetime(task_obj.when_start)
     when_start = when_start - timedelta(hours=8)
@@ -25,6 +26,27 @@ def create_clock_check_task(task_id):
         kwargs={}
     )
     p.start_task()
+
+
+def create_clock_cycle_task(task_id):
+    """定时创建一个周期任务"""
+    task_obj = Task.objects.get(id=task_id)
+    when_start = string_to_datetime(task_obj.when_start)
+    when_start = when_start - timedelta(hours=8)
+    task = "applications.task.tasks.cycle_run_by_task_in_celery"
+    p = PeriodicTaskUtil()
+    p.create_periodic_task(
+        when_start=when_start,
+        task_name=f"job_task.{task_id}",
+        task=task,
+        task_args=json.dumps([task_id]),
+        kwargs={}
+    )
+    p.start_task()
+
+
+def delete_clock_task(task_id):
+    PeriodicTaskUtil.del_task(task_id)
 
 
 class PeriodicTaskUtil:

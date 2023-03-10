@@ -2,9 +2,10 @@ from rest_framework import serializers
 
 from applications.flow.models import Process
 from applications.task.models import Task, VarTable
-from applications.task.services.clock_task import create_clock_check_task
+from applications.task.services.clock_task import create_clock_check_task, create_clock_cycle_task, delete_clock_task
+from applications.task.services.cycle_task import delete_cycle_task
 from applications.task.tasks import run_by_task_in_celery, cycle_run_by_task_in_celery
-from applications.task.utils import create_cron_check_task
+from applications.task.utils import create_cron_check_task, delete_cron_task
 from applications.utils.timer import string_to_datetime
 from django.utils import timezone
 
@@ -21,29 +22,31 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = super(TaskSerializer, self).create(validated_data)
-        # todo 改为clock schedule 模式
         if validated_data["run_type"] == "time":
             create_clock_check_task(instance.id)
         elif validated_data["run_type"] == "cycle":
-            when_start = string_to_datetime(instance.when_start)
-            when_start = timezone.make_aware(when_start)
-            # todo 改为clock schedule 模式
-            celery_task_id = cycle_run_by_task_in_celery.apply_async(args=[instance.id], eta=when_start)
-            instance.celery_task_id = celery_task_id
-            instance.save()
+            create_clock_cycle_task(instance.id)
         elif validated_data["run_type"] == "cron":
             create_cron_check_task(instance.id)
         self._data = {}
         return instance
 
     def update(self, instance, validated_data):
+        if instance.run_type == "time":
+            delete_clock_task(instance.id)
+        elif instance.run_type == "cycle":
+            delete_cycle_task(instance.id)
+        elif instance.run_type == "cron":
+            delete_cron_task(instance.id)
+
         instance = super(TaskSerializer, self).update(instance, validated_data)
         if validated_data["run_type"] == "time":
-            pass
+            create_clock_check_task(instance.id)
         elif validated_data["run_type"] == "cycle":
-            pass
+            create_clock_cycle_task(instance.id)
         elif validated_data["run_type"] == "cron":
-            pass
+            create_cron_check_task(instance.id)
+        self._data = {}
         return instance
 
 

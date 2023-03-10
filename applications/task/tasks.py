@@ -1,8 +1,8 @@
 from applications.flow.utils import build_and_create_process
-from applications.task.utils import create_check_task_period
+from applications.task.services.cycle_task import create_cycle_task
+from bamboo_engine import api
 from dj_flow.celery_app import app
 from pipeline.eri.runtime import BambooDjangoRuntime
-from bamboo_engine import api
 
 
 def run_by_task(task_id):
@@ -23,4 +23,4 @@ def run_by_task_in_celery(task_id):
 
 @app.task
 def cycle_run_by_task_in_celery(task_id):
-    create_check_task_period(task_id)
+    create_cycle_task(task_id)

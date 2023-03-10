@@ -23,7 +23,7 @@
             </div>
             <!-- 自动生成 -->
             <bk-tab
-                style="background: #fff"
+                style="background: #fff;"
                 v-show="currentWay === 'selectGeneration'"
                 :type="'border-card'"
                 :active="tabName"
@@ -37,6 +37,11 @@
                         <bk-radio-group v-model="item.radio" @change="renderRule">
                             <bk-radio :value="0">{{ autoWay.loop.name }}</bk-radio>
                             <bk-radio :value="1">{{ autoWay.appoint.name }}</bk-radio>
+                            <span
+                                class="group-reset-btn"
+                                @click.stop="onResetGroupValue(item)"
+                            >清空</span
+                            >
                         </bk-radio-group>
                         <!-- 循环生成 -->
                         <div v-if="item.radio === 0" class="loop-select-bd">
@@ -348,6 +353,16 @@
                     this.$set(this.expressionList, i, data)
                 })
             },
+            onResetGroupValue(group) {
+                if (group.radio === 0) {
+                    this.$set(group.loop, "inter", 1);
+                } else {
+                    group.checkboxList.forEach((item) => {
+                        this.$set(item, "checked", false);
+                    });
+                }
+                this.renderRule();
+            },
             /**
              * 合并相近数字 1,2,3 => 1-3
              * @param {Object} arr 数字数组
@@ -538,10 +553,10 @@ $bgBlue: #3a84ff;
         .bk-button.bk-primary {
             position: relative;
             z-index: 4;
-            color: #3a84ff;
+            color: #fff;
             background-color: #c7dcff;
             border-radius: 2px;
-            border: 1px solid #3a84ff;
+            border: 1px solid #fff;
         }
     }
     // content
@@ -628,10 +643,18 @@ $bgBlue: #3a84ff;
         }
         /deep/ .bk-tooltip-inner {
             max-width: 520px;
-            padding: 0px;
+            padding: 0;
             border: none;
             background-color: transparent;
         }
     }
+}
+.group-reset-btn {
+    position: absolute;
+    right: 0;
+    top: 4px;
+    font-size: 12px;
+    color: #3a84ff;
+    cursor: pointer;
 }
 </style>
