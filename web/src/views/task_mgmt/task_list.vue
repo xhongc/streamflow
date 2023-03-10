@@ -44,8 +44,13 @@
                 <bk-table-column label="操作" width="180">
                     <template slot-scope="props">
                         <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)">执行
-                            </bk-button>
+                            <div v-if="props.row.run_type === 'hand'">
+                                <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)">执行
+                                </bk-button>
+                            </div>
+                            <div v-else-if="props.row.run_type">
+
+                            </div>
                             <bk-button class="mr10 btn-color" theme="primary" text @click="handleOpenDetail(props.row)">修改
                             </bk-button>
                             <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)">删除
