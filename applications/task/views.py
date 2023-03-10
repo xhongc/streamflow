@@ -1,9 +1,7 @@
-import importlib
-
+from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from applications.flow.utils import build_and_create_process
 from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
@@ -11,9 +9,8 @@ from applications.task.serializers import TaskSerializer, VarTableSerializer, Ex
 from applications.task.services.clock_task import delete_clock_task
 from applications.task.services.cycle_task import delete_cycle_task
 from applications.task.tasks import run_by_task
-from applications.task.utils import CronTaskUtils, delete_cron_task
+from applications.task.utils import delete_cron_task
 from component.drf.viewsets import GenericViewSet
-from rest_framework import mixins
 
 
 class TaskViewSets(mixins.ListModelMixin,

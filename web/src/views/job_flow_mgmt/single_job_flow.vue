@@ -421,7 +421,7 @@
             handleUpdateNode(data, id) {
                 const item = this.graph.findById(id).get('model')
                 console.log('处理更新节点的数据', data)
-                item.label = data.node_name
+                item.label = data.node_name.length > 8 ? `${data.node_name.substr(0, 8)}...` : data.node_name
                 item.node_data = data
                 this.graph.updateItem(id, item)
             },
