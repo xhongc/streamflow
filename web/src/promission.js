@@ -353,7 +353,7 @@ router.beforeEach((to, from, next) => {
                             'component': 'JobView',
                             'meta': {
                                 'title': '作业监视',
-                                'fatherName': 'JobMonitor'
+                                'fatherName': 'JobFlowView'
                             }
                         },
                         {
@@ -362,7 +362,7 @@ router.beforeEach((to, from, next) => {
                             'component': 'JobFlowView',
                             'meta': {
                                 'title': '作业监视',
-                                'fatherName': 'JobMonitor'
+                                'fatherName': 'JobFlowView'
                             }
                         }
                     ]

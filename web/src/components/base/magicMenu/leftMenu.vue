@@ -73,7 +73,7 @@
         computed: {
             navName() {
                 const name = this.$route.meta.hasOwnProperty('fatherName') ? this.$route.meta.fatherName : this.$route.name
-                console.log(name)
+                console.log("cur:", name)
                 return name
             }
         },

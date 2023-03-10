@@ -1,63 +1,82 @@
 <template>
-    <div id="jobFlowView">
-        <div class="header" v-if="auth.operate || auth.search">
-            <div style="float: left;" v-if="auth.operate">
-                <bk-button class="operationBtn" @click="handleOperation('pause')">暂停</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('resume')">恢复</bk-button>
-                <bk-button class="operationBtn" @click="handleOperation('cancel')">终止</bk-button>
+    <transition name="bk-slide-fade-down">
+        <div id="jobFlowView" v-show="!tableLoading">
+            <div class="header" v-if="auth.operate || auth.search">
+                <div style="float: left;" v-if="auth.operate">
+                    <bk-button class="operationBtn" @click="handleOperation('pause')">暂停</bk-button>
+                    <bk-button class="operationBtn" @click="handleOperation('resume')">恢复</bk-button>
+                    <bk-button class="operationBtn" @click="handleOperation('cancel')">终止</bk-button>
+                </div>
+                <div style="float: right;" v-if="auth.search">
+                    <bk-search-select
+                        :show-popover-tag-change="true"
+                        :data="searchData"
+                        :show-condition="false"
+                        :placeholder="'请输入过滤条件'"
+                        @change="handleSearch"
+                        v-model="demo1.value"></bk-search-select>
+                </div>
             </div>
-            <div style="float: right;" v-if="auth.search">
-                <bk-search-select
-                    :show-popover-tag-change="true"
-                    :data="searchData"
-                    :show-condition="false"
-                    :placeholder="'请输入过滤条件'"
-                    @change="handleSearch"
-                    v-model="demo1.value"></bk-search-select>
+            <div style="clear: both;"></div>
+            <div class="content">
+                <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
+                    @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
+                    ext-cls="customTable" @select="handleSelect" @select-all="handleSelectAll" :size="setting.size"
+                    :max-height="maxTableHeight">
+                    <bk-table-column type="selection" width="60"></bk-table-column>
+                    <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
+                        :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
+                        <template slot-scope="props">
+                            <div v-if="item.id === 'name'"
+                                style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
+                                @click="handleCheckDetail(props.row)">{{ props.row.name }}
+                            </div>
+                            <div v-else-if="item.id === 'state'">
+                                <bk-tag :class="props.row.state">
+                                    {{ stateList[stateList.findIndex(e => e.name === props.row.state)].label }}
+                                </bk-tag>
+                            </div>
+                            <div v-else-if="item.id === 'run_type'">
+                                <span v-if="props.row.run_type === 'hand'">
+                                    <bk-tag radius="5px">单次</bk-tag>
+                                </span>
+                                <span v-else-if="props.row.run_type === 'time'">
+                                    <bk-tag radius="5px">定时</bk-tag>
+                                </span>
+                                <span v-else-if="props.row.run_type === 'cycle'">
+                                    <bk-tag radius="5px">周期</bk-tag>
+                                </span>
+                                <span v-else-if="props.row.run_type === 'calendar'">
+                                    <bk-tag radius="5px">日历</bk-tag>
+                                </span>
+                            </div>
+                            <div v-else>
+                                <span>
+                                    {{
+                                        (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
+                                    }}
+                                </span>
+                            </div>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="子作业流" width="150">
+                        <template slot-scope="props">
+                            <bk-button theme="primary" text @click="handleCheckJob(props.row)" class="btn-color"
+                                v-if="props.row.has_sub">查看
+                            </bk-button>
+                            <div v-else>--</div>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column type="setting">
+                        <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
+                            @setting-change="handleSettingChange" :size="setting.size">
+                        </bk-table-setting-content>
+                    </bk-table-column>
+                </bk-table>
             </div>
         </div>
-        <div style="clear: both;"></div>
-        <div class="content">
-            <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
-                ext-cls="customTable" @select="handleSelect" @select-all="handleSelectAll" :size="setting.size" :max-height="maxTableHeight">
-                <bk-table-column type="selection" width="60"></bk-table-column>
-                <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
-                    :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
-                    <template slot-scope="props">
-                        <div v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;" @click="handleCheckDetail(props.row)">{{props.row.name}}</div>
-                        <div v-else-if="item.id === 'state'">
-                            <bk-tag :class="props.row.state">{{stateList[stateList.findIndex(e => e.name === props.row.state)].label}}</bk-tag>
-                        </div>
-                        <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'hand'">
-                                <bk-tag radius="5px">单次</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'time'">
-                                <bk-tag radius="5px">定时</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'cycle'">
-                                <bk-tag radius="5px">周期</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'calendar'">
-                                <bk-tag radius="5px">日历</bk-tag></span>
-                        </div>
-                        <div v-else>
-                            <span>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]}}</span>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="子作业流" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" text @click="handleCheckJob(props.row)" class="btn-color" v-if="props.row.has_sub">查看</bk-button>
-                        <div v-else>--</div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column type="setting">
-                    <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
-                        @setting-change="handleSettingChange" :size="setting.size">
-                    </bk-table-setting-content>
-                </bk-table-column>
-            </bk-table>
-        </div>
-    </div>
+    </transition>
+
 </template>
 
 <script>
@@ -67,6 +86,7 @@
     import {
         mapGetters
     } from 'vuex'
+
     export default {
         data() {
             const fields = [{
@@ -239,72 +259,74 @@
                     {id: 'cron', name: '自定义'}
                 ],
                 isDropdownShow: false,
-                replyList: [{
-                                id: 1,
-                                value: 'false',
-                                label: '否'
-                            },
-                            {
-                                id: 2,
-                                value: 'true',
-                                label: '是'
-                            }
+                replyList: [
+                    {
+                        id: 1,
+                        value: 'false',
+                        label: '否'
+                    },
+                    {
+                        id: 2,
+                        value: 'true',
+                        label: '是'
+                    }
                 ],
-                stateList: [{
-                                id: 1,
-                                name: 'wait',
-                                label: '等待'
-                            },
-                            {
-                                id: 2,
-                                name: 'run',
-                                label: '正在执行'
-                            },
-                            {
-                                id: 3,
-                                name: 'fail',
-                                label: '失败'
-                            },
-                            {
-                                id: 4,
-                                name: 'error',
-                                label: '错误'
-                            },
-                            {
-                                id: 5,
-                                name: 'success',
-                                label: '成功'
-                            },
-                            {
-                                id: 6,
-                                name: 'pause',
-                                label: '挂起'
-                            },
-                            {
-                                id: 7,
-                                name: 'cancel',
-                                label: '取消'
-                            },
-                            {
-                                id: 8,
-                                name: 'positive',
-                                label: '就绪'
-                            },
-                            {
-                                id: 9,
-                                name: 'stop',
-                                label: '终止'
-                            },
-                            {
-                                id: 10,
-                                name: 'need_confirm',
-                                label: '待审核'
-                            },
-                            {
-                                id: 11,
-                                name: 'ignore',
-                                label: '忽略'
-                            }
+                stateList: [
+                    {
+                        id: 1,
+                        name: 'wait',
+                        label: '等待'
+                    },
+                    {
+                        id: 2,
+                        name: 'run',
+                        label: '正在执行'
+                    },
+                    {
+                        id: 3,
+                        name: 'fail',
+                        label: '失败'
+                    },
+                    {
+                        id: 4,
+                        name: 'error',
+                        label: '错误'
+                    },
+                    {
+                        id: 5,
+                        name: 'success',
+                        label: '成功'
+                    },
+                    {
+                        id: 6,
+                        name: 'pause',
+                        label: '挂起'
+                    },
+                    {
+                        id: 7,
+                        name: 'cancel',
+                        label: '取消'
+                    },
+                    {
+                        id: 8,
+                        name: 'positive',
+                        label: '就绪'
+                    },
+                    {
+                        id: 9,
+                        name: 'stop',
+                        label: '终止'
+                    },
+                    {
+                        id: 10,
+                        name: 'need_confirm',
+                        label: '待审核'
+                    },
+                    {
+                        id: 11,
+                        name: 'ignore',
+                        label: '忽略'
+                    }
                 ]
             }
         },
@@ -592,7 +614,7 @@
                     ...this.searchFrom,
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    process_id: this.$route.query.job_flow_id
+                    task_id: this.$route.query.task_id
                 }).then(res => {
                     if (res.result) {
                         this.tableList = res.data.items
@@ -612,84 +634,91 @@
 </script>
 
 <style lang="scss" scoped>
-    .btn-color {
-        color: rgb(1, 158, 213) !important;
-    }
-    #jobFlowView {
-        height: 100%;
-        overflow: auto;
+.btn-color {
+    color: rgb(1, 158, 213) !important;
+}
 
-        .header {
+#jobFlowView {
+    height: 100%;
+    overflow: auto;
+
+    .header {
+        width: 100%;
+        font-size: 0;
+        float: left;
+        margin-bottom: 20px;
+        // position: relative;
+
+        .operationBtn {
+            margin-right: 8px;
+        }
+
+        .senior-search-box {
+            background-color: #fff;
+            padding: 20px;
             width: 100%;
-            font-size: 0;
+            margin-top: 20px;
             float: left;
-            margin-bottom: 20px;
-            // position: relative;
+            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
+            border: 1px solid rgba(0, 0, 0, .2);
+        }
+    }
 
-            .operationBtn {
-                margin-right: 8px;
-            }
+    .content {
 
-            .senior-search-box {
+        .customTable {
+            border: 0 !important;
+
+            /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
-                padding: 20px;
-                width: 100%;
-                margin-top: 20px;
-                float: left;
-                box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, .1);
-                border: 1px solid rgba(0, 0, 0, .2);
             }
-        }
 
-        .content {
-
-            .customTable {
-                border: 0 !important;
-                /deep/ .bk-table-pagination-wrapper {
-                    background-color: #fff;
-                }
-
-                /deep/ .bk-table-empty-block {
-                    background-color: #fff;
-                }
+            /deep/ .bk-table-empty-block {
+                background-color: #fff;
             }
         }
     }
+}
 
-    .fail {
-        background-color: rgba(234, 53, 54, .1);
-        border-color: rgba(234, 53, 54, .3);
-        color: #ea3536;
-    }
+.fail {
+    background-color: rgba(234, 53, 54, .1);
+    border-color: rgba(234, 53, 54, .3);
+    color: #ea3536;
+}
 
-    .success {
-        color: #14a568;
-        border-color: rgba(20, 165, 104, .3);
-        background-color: rgba(20, 165, 104, .1);
-        border-radius: 2px;
-    }
-    .run {
-        background-color: rgba(254, 156, 0, .1);
-        border-color: rgba(254, 156, 0, .3);
-        color: #fe9c00;
-    }
-    /deep/ .search-input-chip {
-        background: #83a7ca !important;
-        color: #fff !important;
-    }
-    /deep/ .bk-search-select {
-        border-bottom: 1px solid #07386d !important;
-        border-top: 0 !important;
-        border-left: 0 !important;
-        border-right: 1px solid #07386d !important;
-        border-bottom-right-radius: 6px !important;
-    }
-    /deep/ .search-select-wrap .bk-search-select.is-focus {
-        border-color: #052150 !important;
-        color: #052150 !important;
-    }
-    /deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
-        border-color: #052150 !important;
-        color: #052150 !important;
-    }
+.success {
+    color: #14a568;
+    border-color: rgba(20, 165, 104, .3);
+    background-color: rgba(20, 165, 104, .1);
+    border-radius: 2px;
+}
+
+.run {
+    background-color: rgba(254, 156, 0, .1);
+    border-color: rgba(254, 156, 0, .3);
+    color: #fe9c00;
+}
+
+/deep/ .search-input-chip {
+    background: #83a7ca !important;
+    color: #fff !important;
+}
+
+/deep/ .bk-search-select {
+    border-bottom: 1px solid #07386d !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 1px solid #07386d !important;
+    border-bottom-right-radius: 6px !important;
+}
+
+/deep/ .search-select-wrap .bk-search-select.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
+
+/deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
+    border-color: #052150 !important;
+    color: #052150 !important;
+}
 </style>

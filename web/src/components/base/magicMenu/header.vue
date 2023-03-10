@@ -7,7 +7,7 @@
                 @click.native="redirectUrl(item)"
                 placement="bottom"
                 :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
-                <li v-show="item.show" class="header-nav-item" :class="{ 'item-active': item.id === header.active }">
+                <li v-show="item.show" class="header-nav-item" :class="{ 'item-active': item.pathName === navName }">
                     {{ item.name }}
                 </li>
             </bk-popover>
@@ -83,7 +83,12 @@
                 }
             }
         },
-        computed: {},
+        computed: {
+            navName() {
+                const name = this.$route.meta.hasOwnProperty('fatherName') ? this.$route.meta.fatherName : this.$route.name
+                return name
+            }
+        },
         created() {
             this.loginUser()
         },

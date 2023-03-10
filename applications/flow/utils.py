@@ -20,7 +20,10 @@ def build_and_create_process(task_id):
     # 运算时节点uid重新生成所以需要映射回节点uid
     process_run_data["dag"] = instance_dag(process_run_data["dag"], process_run_uuid)
     process_run_data["gateways"] = instance_gateways(process_run_data["gateways"], process_run_uuid)
-    process_run = ProcessRun.objects.create(process_id=process.id, root_id=pipeline["id"], **process_run_data)
+    process_run = ProcessRun.objects.create(process_id=process.id,
+                                            root_id=pipeline["id"],
+                                            task_id=task_id,
+                                            **process_run_data)
     task.process_run_id = process_run.id
     task.save()
     node_run_bulk = []

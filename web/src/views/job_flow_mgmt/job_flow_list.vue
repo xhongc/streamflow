@@ -1,79 +1,87 @@
 <template>
-    <div id="jobFlowList">
-        <div class="header">
-            <div class="search-box">
-                <div class="add-in">
-                    <button theme="primary" @click="handleCreate" class="button">新建</button>
-                </div>
-                <div class="search-in" v-if="auth.search">
-                    <bk-search-select
-                        :show-popover-tag-change="true"
-                        :data="searchData"
-                        :show-condition="false"
-                        :placeholder="'请输入过滤条件'"
-                        @change="handleSearch"
-                        v-model="demo1.value"></bk-search-select>
+    <transition name="bk-slide-fade-down">
+        <div id="jobFlowList" v-show="!tableLoading">
+            <div class="header">
+                <div class="search-box">
+                    <div class="add-in">
+                        <button theme="primary" @click="handleCreate" class="button">新建</button>
+                    </div>
+                    <div class="search-in" v-if="auth.search">
+                        <bk-search-select
+                            :show-popover-tag-change="true"
+                            :data="searchData"
+                            :show-condition="false"
+                            :placeholder="'请输入过滤条件'"
+                            @change="handleSearch"
+                            v-model="demo1.value"></bk-search-select>
+                    </div>
                 </div>
             </div>
+            <div style="clear: both;"></div>
+            <div class="content">
+                <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
+                    @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
+                    ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
+                    :max-height="maxTableHeight">
+                    <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
+                        :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
+                        <template slot-scope="props">
+                            <div v-if="item.id !== 'run_type' && item.id !== 'name' && item.id !== 'category'">
+                                {{
+                                    (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
+                                }}
+                            </div>
+                            <div v-else-if="item.id === 'name'"
+                                style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
+                                @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
+                            </div>
+                            <div v-else-if="item.id === 'category'">
+                                <bk-tag
+                                    :key="each"
+                                    v-for="each in props.row[item.id]"
+                                    theme="info"
+                                >{{ each }}
+                                </bk-tag>
+                            </div>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="操作" width="180">
+                        <template slot-scope="props">
+                            <div style="display: flex;align-items: center;">
+                                <bk-button class="mr10 btn-color" theme="primary" text
+                                    @click="handleImplement(props.row)"
+                                    v-if="auth.operate">新建任务
+                                </bk-button>
+                                <bk-button class="mr10 btn-color" theme="primary" text
+                                    @click="handleOpenUpdate(props.row)"
+                                    v-if="auth.modify">修改
+                                </bk-button>
+                                <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)"
+                                    v-if="auth.del">删除
+                                </bk-button>
+                                <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
+                                    trigger="click" :arrow="false" :distance="0" offset="15">
+                                    <span class="dot-menu-trigger"></span>
+                                    <ul class="dot-menu-list" slot="content">
+                                        <li class="dot-menu-item" v-if="auth.modify" @click="handleClone(props.row)">
+                                            克隆
+                                        </li>
+                                        <li class="dot-menu-item" @click="handleJumpHistory(props.row)">执行历史</li>
+                                    </ul>
+                                </bk-popover>
+                            </div>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column type="setting">
+                        <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
+                            @setting-change="handleSettingChange" :size="setting.size">
+                        </bk-table-setting-content>
+                    </bk-table-column>
+                </bk-table>
+            </div>
         </div>
-        <div style="clear: both;"></div>
-        <div class="content">
-            <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
-                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
-                :max-height="maxTableHeight">
-                <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
-                    :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
-                    <template slot-scope="props">
-                        <div v-if="item.id !== 'run_type' && item.id !== 'name' && item.id !== 'category'">
-                            {{
-                                (props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id]
-                            }}
-                        </div>
-                        <div v-else-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
-                            @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}
-                        </div>
-                        <div v-else-if="item.id === 'category'">
-                            <bk-tag
-                                :key="each"
-                                v-for="each in props.row[item.id]"
-                                theme="info"
-                            >{{ each }}
-                            </bk-tag>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="操作" width="180">
-                    <template slot-scope="props">
-                        <div style="display: flex;align-items: center;">
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)"
-                                v-if="auth.operate">新建任务
-                            </bk-button>
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleOpenUpdate(props.row)"
-                                v-if="auth.modify">修改
-                            </bk-button>
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)"
-                                v-if="auth.del">删除
-                            </bk-button>
-                            <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
-                                trigger="click" :arrow="false" :distance="0" offset="15">
-                                <span class="dot-menu-trigger"></span>
-                                <ul class="dot-menu-list" slot="content">
-                                    <li class="dot-menu-item" v-if="auth.modify" @click="handleClone(props.row)">克隆</li>
-                                    <li class="dot-menu-item" @click="handleJumpHistory(props.row)">执行历史</li>
-                                </ul>
-                            </bk-popover>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column type="setting">
-                    <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
-                        @setting-change="handleSettingChange" :size="setting.size">
-                    </bk-table-setting-content>
-                </bk-table-column>
-            </bk-table>
-        </div>
-    </div>
+    </transition>
+
 </template>
 
 <script>
@@ -343,7 +351,9 @@
                 })
             },
             handleLoad() {
-                this.tableLoading = true
+                if (this.pagination.current === 1) {
+                    this.tableLoading = true
+                }
                 this.$api.process.list({
                     ...this.searchFrom,
                     page: this.pagination.current,
@@ -423,6 +433,7 @@
 
         .customTable {
             border: 0 !important;
+
             /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
             }
@@ -459,6 +470,7 @@
         }
     }
 }
+
 .search-box {
     display: flex;
     justify-content: space-between;
@@ -469,9 +481,11 @@
     height: 65px;
     align-items: center;
 }
+
 .btn-color {
     color: rgb(1, 158, 213) !important;
 }
+
 .button {
     --color: rgb(138, 171, 202);
     padding: 0 2.3em;
@@ -526,10 +540,12 @@
 .button:active {
     filter: brightness(.8);
 }
+
 /deep/ .search-input-chip {
     background: #83a7ca !important;
     color: #fff !important;
 }
+
 /deep/ .bk-search-select {
     border-bottom: 1px solid #07386d !important;
     border-top: 0 !important;
@@ -537,10 +553,12 @@
     border-right: 1px solid #07386d !important;
     border-bottom-right-radius: 6px !important;
 }
+
 /deep/ .search-select-wrap .bk-search-select.is-focus {
     border-color: #052150 !important;
     color: #052150 !important;
 }
+
 /deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
     border-color: #052150 !important;
     color: #052150 !important;

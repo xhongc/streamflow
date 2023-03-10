@@ -1,87 +1,99 @@
 <template>
-    <div id="jobList">
-        <div class="header">
-            <div class="search-box">
-                <div class="add-in">
+    <transition name="bk-slide-fade-down">
+        <div id="jobList" v-show="!tableLoading">
+            <div class="header">
+                <div class="search-box">
+                    <div class="add-in">
+                    </div>
+                    <div class="search-in" v-if="auth.search">
+                        <bk-search-select
+                            :show-popover-tag-change="true"
+                            :data="searchData"
+                            :show-condition="false"
+                            :placeholder="'请输入过滤条件'"
+                            @change="handleSearch"
+                            v-model="demo1.value"></bk-search-select>
+                    </div>
                 </div>
-                <div class="search-in" v-if="auth.search">
-                    <bk-search-select
-                        :show-popover-tag-change="true"
-                        :data="searchData"
-                        :show-condition="false"
-                        :placeholder="'请输入过滤条件'"
-                        @change="handleSearch"
-                        v-model="demo1.value"></bk-search-select>
+                <div style="float: left;">
                 </div>
             </div>
-            <div style="float: left;">
-            </div>
-        </div>
-        <div style="clear: both;"></div>
-        <div class="content">
-            <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
-                ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
-                :max-height="maxTableHeight">
-                <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
-                    :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
-                    <template slot-scope="props">
-                        <span v-if="item.id === 'name'" style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
-                            @click="handleOpenDetail(props.row)">{{ props.row[item.id] }}</span>
-                        <div v-else-if="item.id === 'run_type'">
-                            <span v-if="props.row.run_type === 'hand'">
-                                <bk-tag radius="5px">单次</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'cron'">
-                                <bk-tag radius="5px">自定义</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'time'">
-                                <bk-tag radius="5px">定时</bk-tag></span>
-                            <span v-else-if="props.row.run_type === 'cycle'">
-                                <bk-tag radius="5px">周期</bk-tag></span>
-                        </div>
-                        <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id] }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="操作" width="180">
-                    <template slot-scope="props">
-                        <div style="display: flex;align-items: center;">
-                            <div v-if="props.row.run_type === 'hand'">
-                                <bk-button class="mr10 btn-color" theme="primary" text @click="handleImplement(props.row)">执行
+            <div style="clear: both;"></div>
+            <div class="content">
+                <bk-table ref="table" :data="tableList" :pagination="pagination" @page-change="handlePageChange"
+                    @page-limit-change="handlePageLimitChange" v-bkloading="{ isLoading: tableLoading, zIndex: 10 }"
+                    ext-cls="customTable" @select-all="handleSelectAll" @select="handleSelect" :size="setting.size"
+                    :max-height="maxTableHeight">
+                    <bk-table-column :label="item.label" :prop="item.id" v-for="(item, index) in setting.selectedFields"
+                        :key="index" :show-overflow-tooltip="item.overflowTooltip" :sortable="item.sortable">
+                        <template slot-scope="props">
+                            <span v-if="item.id === 'name'"
+                                style="color: #052150;cursor: pointer;font-weight: 400;text-decoration: underline;"
+                                @click="handleOpenDetail(props.row)">
+                                {{ props.row[item.id] }}
+                            </span>
+                            <div v-else-if="item.id === 'run_type'">
+                                <span v-if="props.row.run_type === 'hand'">
+                                    <bk-tag radius="5px">单次</bk-tag>
+                                </span>
+                                <span v-else-if="props.row.run_type === 'cron'">
+                                    <bk-tag radius="5px">自定义</bk-tag></span>
+                                <span v-else-if="props.row.run_type === 'time'">
+                                    <bk-tag radius="5px">定时</bk-tag></span>
+                                <span v-else-if="props.row.run_type === 'cycle'">
+                                    <bk-tag radius="5px">周期</bk-tag></span>
+                            </div>
+                            <span v-else>{{(props.row[item.id] === '' || props.row[item.id] === null) ? '- -' : props.row[item.id] }}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="操作" width="180">
+                        <template slot-scope="props">
+                            <div style="display: flex;align-items: center;">
+                                <div v-if="props.row.run_type === 'hand'">
+                                    <bk-button class="mr10 btn-color" theme="primary" text
+                                        @click="handleImplement(props.row)">执行
+                                    </bk-button>
+                                </div>
+                                <div v-else>
+                                    <bk-button class="mr10 btn-color" theme="primary" text
+                                        @click="handleJumpHistory(props.row)">运行时
+                                    </bk-button>
+                                </div>
+                                <bk-button class="mr10 btn-color" theme="primary" text
+                                    @click="handleOpenDetail(props.row)">修改
                                 </bk-button>
+                                <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)">
+                                    删除
+                                </bk-button>
+                                <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
+                                    trigger="click" :arrow="false" :distance="0" offset="15">
+                                    <span class="dot-menu-trigger"></span>
+                                    <ul class="dot-menu-list" slot="content">
+                                        <li class="dot-menu-item" @click="handleJumpHistory(props.row)">执行历史</li>
+                                    </ul>
+                                </bk-popover>
                             </div>
-                            <div v-else-if="props.row.run_type">
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column type="setting">
+                        <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
+                            @setting-change="handleSettingChange" :size="setting.size">
+                        </bk-table-setting-content>
+                    </bk-table-column>
+                </bk-table>
+            </div>
+            <div>
+                <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500"
+                    ext-cls="custom-sidelider">
+                    <div slot="content" style="height: 100%;">
+                        <job-dialog :job-from="jobFrom" :key="dialogKey">
+                        </job-dialog>
+                    </div>
+                </bk-sideslider>
+            </div>
+        </div>
+    </transition>
 
-                            </div>
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleOpenDetail(props.row)">修改
-                            </bk-button>
-                            <bk-button class="mr10 btn-color" theme="primary" text @click="handleDelete(props.row)">删除
-                            </bk-button>
-                            <bk-popover ext-cls="dot-menu" placement="bottom-start" theme="dot-menu light"
-                                trigger="click" :arrow="false" :distance="0" offset="15">
-                                <span class="dot-menu-trigger"></span>
-                                <ul class="dot-menu-list" slot="content">
-                                    <li class="dot-menu-item" @click="handleJumpHistory(props.row)">执行历史</li>
-                                </ul>
-                            </bk-popover>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column type="setting">
-                    <bk-table-setting-content :fields="setting.fields" :selected="setting.selectedFields"
-                        @setting-change="handleSettingChange" :size="setting.size">
-                    </bk-table-setting-content>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <div>
-            <bk-sideslider :is-show.sync="dialogShow" :quick-close="true" title="作业详情" :width="500"
-                ext-cls="custom-sidelider">
-                <div slot="content" style="height: 100%;">
-                    <job-dialog :job-from="jobFrom" :key="dialogKey">
-                    </job-dialog>
-                </div>
-            </bk-sideslider>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -192,7 +204,7 @@
                 this.$router.push({
                     path: '/jobflowview',
                     query: {
-                        job_flow_id: row.process
+                        task_id: row.id
                     }
                 })
             },
@@ -458,6 +470,7 @@
 
         .customTable {
             border: 0 !important;
+
             /deep/ .bk-table-pagination-wrapper {
                 background-color: #fff;
             }
@@ -500,6 +513,7 @@
         }
     }
 }
+
 .search-box {
     display: flex;
     justify-content: space-between;
@@ -510,13 +524,16 @@
     height: 65px;
     align-items: center;
 }
+
 .btn-color {
     color: rgb(1, 158, 213) !important;
 }
+
 /deep/ .search-input-chip {
     background: #83a7ca !important;
     color: #fff !important;
 }
+
 /deep/ .bk-search-select {
     border-bottom: 1px solid #07386d !important;
     border-top: 0 !important;
@@ -524,10 +541,12 @@
     border-right: 1px solid #07386d !important;
     border-bottom-right-radius: 6px !important;
 }
+
 /deep/ .search-select-wrap .bk-search-select.is-focus {
     border-color: #052150 !important;
     color: #052150 !important;
 }
+
 /deep/ .search-select-wrap .bk-search-select .search-nextfix .search-nextfix-icon.is-focus {
     border-color: #052150 !important;
     color: #052150 !important;

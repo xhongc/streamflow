@@ -24,6 +24,7 @@ class ProcessFilter(filters.FilterSet):
 
 class ProcessRunFilter(filters.FilterSet):
     process_id = filters.CharFilter(lookup_expr="exact")
+    task_id = filters.CharFilter(lookup_expr="exact")
     name = filters.CharFilter(lookup_expr="icontains")
     run_type = filters.CharFilter(lookup_expr="exact")
     state = filters.CharFilter(lookup_expr="exact")

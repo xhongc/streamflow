@@ -101,7 +101,7 @@ class ProcessRun(models.Model):
     # new
     process = models.ForeignKey(Process, on_delete=models.SET_NULL, null=True, db_constraint=False,
                                 related_name="run")
-
+    task_id = models.IntegerField("任务ID", default=0)
     name = models.CharField("作业名称", max_length=255, blank=False, null=False)
     description = models.CharField("作业描述", max_length=255, blank=True, null=True)
     run_type = models.CharField("调度类型", max_length=32)
