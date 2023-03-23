@@ -219,6 +219,7 @@
                     this.$api.task.retrieve(this.$route.query.task_id).then((res) => {
                         if (res.result) {
                             this.formData = res.data
+                            this.periodicCron = res.data.cron_time
                         }
                     })
                 }
