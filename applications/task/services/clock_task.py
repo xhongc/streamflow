@@ -1,11 +1,7 @@
+import json
 from datetime import timedelta
 
-from django.utils import timezone
-
-from applications.task.models import Task
-import json
-
-from django_celery_beat.models import IntervalSchedule, PeriodicTask, CrontabSchedule, ClockedSchedule
+from django_celery_beat.models import PeriodicTask, ClockedSchedule
 
 from applications.task.models import Task
 from applications.utils.timer import string_to_datetime
@@ -69,12 +65,19 @@ class PeriodicTaskUtil:
         self.periodic_task.enabled = True
         self.periodic_task.save()
 
-    def stop_task(self):
+    @staticmethod
+    def stop_task(check_task_id):
         """
         停止任务
         """
-        self.periodic_task.enabled = False
-        self.periodic_task.save()
+        PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").update(enabled=False)
+
+    @staticmethod
+    def resume_task(check_task_id):
+        """
+        停止任务
+        """
+        PeriodicTask.objects.filter(name=f"job_task.{check_task_id}").update(enabled=True)
 
     @staticmethod
     def del_task(check_task_id):

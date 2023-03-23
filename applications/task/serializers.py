@@ -61,6 +61,11 @@ class ReadTaskSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class OperateTaskSerializer(serializers.Serializer):
+    operate = serializers.CharField(required=True)
+    task_id = serializers.IntegerField(required=True)
+
+
 class VarTableSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True)
     processes = serializers.SerializerMethodField()

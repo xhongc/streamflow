@@ -20,6 +20,9 @@ def build_and_create_process(task_id):
     # 运算时节点uid重新生成所以需要映射回节点uid
     process_run_data["dag"] = instance_dag(process_run_data["dag"], process_run_uuid)
     process_run_data["gateways"] = instance_gateways(process_run_data["gateways"], process_run_uuid)
+    # 周期性的任务 记录收敛时
+    if task.log_converge and task.run_type in ["time", "cycle", "cron"]:
+        ProcessRun.objects.filter(task_id=task_id).delete()
     process_run = ProcessRun.objects.create(process_id=process.id,
                                             root_id=pipeline["id"],
                                             task_id=task_id,

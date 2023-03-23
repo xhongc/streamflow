@@ -30,6 +30,11 @@
                     <bk-form-item label="任务名称" :required="true" :property="'name'">
                         <bk-input v-model="formData.name" style="width: 350px;"></bk-input>
                     </bk-form-item>
+                    <bk-form-item label="记录收敛" :required="true" :property="'log_converge'">
+                        <span v-bk-tooltips="'开启记录收敛,周期性的任务记录只会生成最新的一条。'" class="top-start">
+                            <bk-switcher v-model="formData.log_converge"></bk-switcher>
+                        </span>
+                    </bk-form-item>
                 </bk-form>
             </div>
             <div style="padding-top: 26px;padding-left: 30px;">
@@ -169,6 +174,7 @@
                     cycle_time: '1',
                     cycle_type: 'hour',
                     cron_time: '',
+                    log_converge: false,
                     process_id: this.$route.query.job_flow_data
                 },
                 varTableList: [],

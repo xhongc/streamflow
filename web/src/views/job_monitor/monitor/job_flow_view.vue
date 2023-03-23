@@ -410,13 +410,13 @@
                 this.pagination.current = 1
                 this.pagination.limit = val
                 // 首屏刷新
-                this.handleLoad(true)
+                this.handleLoad(false)
             },
             // 处理页面跳转
             handlePageChange(page) {
                 this.pagination.current = page
                 // 首屏刷新
-                this.handleLoad(true)
+                this.handleLoad(false)
             },
             // 处理操作
             handleOperation(str) {

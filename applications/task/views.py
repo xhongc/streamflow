@@ -1,3 +1,4 @@
+from django_celery_beat.models import PeriodicTask
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,11 +6,9 @@ from rest_framework.response import Response
 from applications.task.filters import VarTableFilter, TaskFilter
 from applications.task.models import Task, VarTable
 from applications.task.serializers import TaskSerializer, VarTableSerializer, ExecuteTaskSerializer, \
-    VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer, ReadTaskSerializer
-from applications.task.services.clock_task import delete_clock_task
-from applications.task.services.cycle_task import delete_cycle_task
+    VarTableIDSSerializer, RetrieveVarTableSerializer, PostVarTableSerializer, ReadTaskSerializer, OperateTaskSerializer
+from applications.task.services.base import delete_period_task, create_period_task
 from applications.task.tasks import run_by_task
-from applications.task.utils import delete_cron_task
 from component.drf.viewsets import GenericViewSet
 
 
@@ -27,7 +26,26 @@ class TaskViewSets(mixins.ListModelMixin,
             return ExecuteTaskSerializer
         elif self.action == "retrieve":
             return ReadTaskSerializer
+        elif self.action == "operate":
+            return OperateTaskSerializer
         return TaskSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            serializer_data = serializer.data
+            task_names = [f"job_task.{i['id']}" for i in serializer_data]
+            task_map = dict(PeriodicTask.objects.filter(name__in=task_names).values_list("name", "enabled"))
+            for each in serializer_data:
+                job_name = f"job_task.{each['id']}"
+                each["enabled"] = task_map.get(job_name, False)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(methods=["POST"], detail=False)
     def execute(self, request, *args, **kwargs):
@@ -39,13 +57,23 @@ class TaskViewSets(mixins.ListModelMixin,
         else:
             return self.failure_response(msg=msg)
 
+    @action(methods=["POST"], detail=False)
+    def operate(self, request, *args, **kwargs):
+        validated_data = self.is_validated_data(request.data)
+        operate = validated_data["operate"]
+        task_id = validated_data["task_id"]
+
+        if operate == "pause":
+            delete_period_task(task_id)
+        elif operate == "resume":
+            delete_period_task(task_id)
+            create_period_task(task_id)
+        else:
+            return self.failure_response()
+        return self.success_response()
+
     def perform_destroy(self, instance):
-        if instance.run_type == "time":
-            delete_clock_task(instance.id)
-        elif instance.run_type == "cycle":
-            delete_cycle_task(instance.id)
-        elif instance.run_type == "cron":
-            delete_cron_task(instance.id)
+        delete_period_task(instance.id)
         instance.delete()
 
 

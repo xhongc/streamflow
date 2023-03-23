@@ -351,7 +351,7 @@
             handlePageLimitChange(val) {
                 this.pagination.current = 1
                 this.pagination.limit = val
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理查找
             handleSearch(list) {
@@ -376,7 +376,7 @@
             // 处理页面跳转
             handlePageChange(page) {
                 this.pagination.current = page
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理表格默认选择
             defaultCheck() {
@@ -390,8 +390,10 @@
                     })
                 })
             },
-            handleLoad() {
-                this.tableLoading = true
+            handleLoad(first = true) {
+                if (first) {
+                    this.tableLoading = true
+                }
                 this.$api.content.list({
                     ...this.searchFrom,
                     page: this.pagination.current,

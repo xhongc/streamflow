@@ -36,6 +36,7 @@ class Task(models.Model):
 
     success_count = models.IntegerField("成功执行次数", default=0)
     fail_count = models.IntegerField("失败执行次数", default=0)
+    log_converge = models.BooleanField("记录收敛", default=False)
 
 
 class VarTable(models.Model):

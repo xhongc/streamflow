@@ -16,6 +16,9 @@ export default {
     execute: function(params) {
         return POST(reUrl + '/task/task/execute/', params)
     },
+    operate: function(params) {
+        return POST(reUrl + '/task/task/operate/', params)
+    },
     delete: function(id) {
         return DELETE(reUrl + '/task/task/' + JSON.stringify(id) + '/')
     }

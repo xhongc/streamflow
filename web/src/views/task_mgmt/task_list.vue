@@ -55,9 +55,23 @@
                                     </bk-button>
                                 </div>
                                 <div v-else>
-                                    <bk-button class="mr10 btn-color" theme="primary" text
-                                        @click="handleJumpHistory(props.row)">运行时
-                                    </bk-button>
+                                    <div v-if="props.row.enabled">
+                                        <bk-button class="mr10 btn-color-red" theme="primary" text
+                                            @click="handleOperate(props.row, 'pause')">暂停
+                                        </bk-button>
+                                    </div>
+                                    <div v-else>
+                                        <div v-if="props.row.run_type === 'time'">
+                                            <bk-button class="mr10 btn-color-blue" theme="primary" text>
+                                                完成
+                                            </bk-button>
+                                        </div>
+                                        <div v-else>
+                                            <bk-button class="mr10 btn-color-green" theme="primary" text
+                                                @click="handleOperate(props.row, 'resume')">恢复
+                                            </bk-button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <bk-button class="mr10 btn-color" theme="primary" text
                                     @click="handleOpenDetail(props.row)">修改
@@ -261,6 +275,26 @@
                     }
                 })
             },
+            handleOperate(row, operate) {
+                this.$bkInfo({
+                    title: '确认要执行？',
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        try {
+                            this.$api.task.operate({'task_id': row.id, 'operate': operate}).then(res => {
+                                if (res.result) {
+                                    this.$cwMessage('执行成功！', 'success')
+                                    this.handleLoad(false)
+                                }
+                            })
+                            return true
+                        } catch (e) {
+                            console.warn(e)
+                            return false
+                        }
+                    }
+                })
+            },
             // 处理全选
             handleSelectAll(selection) {
                 if (selection.length > 0) {
@@ -350,7 +384,7 @@
             handlePageLimitChange(val) {
                 this.pagination.current = 1
                 this.pagination.limit = val
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理查找
             handleSearch(list) {
@@ -375,7 +409,7 @@
             // 处理页面跳转
             handlePageChange(page) {
                 this.pagination.current = page
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理表格默认选择
             defaultCheck() {
@@ -389,8 +423,10 @@
                     })
                 })
             },
-            handleLoad() {
-                this.tableLoading = true
+            handleLoad(first = true) {
+                if (first) {
+                    this.tableLoading = true
+                }
                 this.$api.task.list({
                     ...this.searchFrom,
                     page: this.pagination.current,
@@ -528,7 +564,15 @@
 .btn-color {
     color: rgb(1, 158, 213) !important;
 }
-
+.btn-color-red {
+    color: #FF5656 !important;
+}
+.btn-color-green {
+    color: #34ba85 !important;
+}
+.btn-color-blue {
+    color: #0b254f !important;
+}
 /deep/ .search-input-chip {
     background: #83a7ca !important;
     color: #fff !important;

@@ -222,12 +222,12 @@
             handlePageLimitChange(val) {
                 this.pagination.current = 1
                 this.pagination.limit = val
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理页面跳转
             handlePageChange(page) {
                 this.pagination.current = page
-                this.handleLoad()
+                this.handleLoad(false)
             },
             // 处理执行
             handleImplement(row) {
@@ -350,8 +350,8 @@
                     })
                 })
             },
-            handleLoad() {
-                if (this.pagination.current === 1) {
+            handleLoad(first = true) {
+                if (first) {
                     this.tableLoading = true
                 }
                 this.$api.process.list({
