@@ -1,4 +1,5 @@
-from django.contrib import admin
+import xadmin
+
 from django.urls import path, include
 from rest_framework_jwt.views import obtain_jwt_token
 
@@ -10,7 +11,7 @@ from applications.user.urls import user_router
 from dj_flow.views import index
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', xadmin.site.urls),
     path('', index),
     path("process/", include(flow_router.urls)),
     path("node/", include(node_router.urls)),

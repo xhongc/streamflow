@@ -9,6 +9,10 @@ from applications.flow.constants import FAIL_OFFSET_UNIT_CHOICE, NodeTemplateTyp
 class Category(models.Model):
     name = models.CharField("分类名称", max_length=255, blank=False, null=False)
 
+    class Meta:
+        verbose_name = "作业流类别"
+        verbose_name_plural = "作业流类别"
+
 
 class Process(models.Model):
     name = models.CharField("作业名称", max_length=255, blank=False, null=False)
@@ -26,6 +30,10 @@ class Process(models.Model):
     create_time = models.DateTimeField("创建时间", default=datetime.now)
     update_time = models.DateTimeField("修改时间", auto_now=True)
     update_by = models.CharField("修改人", max_length=64, null=True)
+
+    class Meta:
+        verbose_name = "作业流"
+        verbose_name_plural = "作业流"
 
     @property
     def clone_data(self):

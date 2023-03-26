@@ -27,3 +27,9 @@ djangorestframework-jwt==1.11.0
 sqlalchemy==1.4.23
 pymysql==1.0.2
 django-redis==5.2.0
+django-import-export==2.2.0
+django-formtools==2.4
+future==0.18.3
+django-crispy-forms==1.10.0
+django-reversion==3.0.5
+httplib2==0.21.0

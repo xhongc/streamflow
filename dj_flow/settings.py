@@ -24,6 +24,9 @@ CORS_ORIGIN_WHITELIST = [
 # Application definition
 
 INSTALLED_APPS = [
+    'xadmin',
+    'crispy_forms',
+    'reversion',
     "corsheaders",
     "pipeline",
     "pipeline.engine",
