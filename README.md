@@ -35,14 +35,19 @@ python manage.py celery beat -l info
 python manage.py runserver 
 ```
 ### 2. docker安装
-待完成
+1. docker-compose -f local.yml compose
+2. docker-compose -f local.yml up
+3. 访问在 http://127.0.0.1:8001
 ## 👍User Interface Screenshots
 ### 首页
-![img.png](img.png)
+![img_4.png](img_4.png)
 
 ## 自定义节点
 ![img_1.png](img_1.png)
 ![img_2.png](img_2.png)
+![img.png](img.png)
 ## 💬 Contact me
 各位大佬有什么意见需求可以加Q群交流
-![s](WechatIMG176.jpeg)
+<div style="width: 300px;height: 300px;">
+    <img src="./WechatIMG176.jpeg" alt="各位大佬有什么意见需求可以加Q群交流"/>
+</div>

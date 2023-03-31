@@ -6,8 +6,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(1, os.path.join(os.getcwd(), 'lib'))
 
-BROKER_URL = "redis://localhost:6379/4"
-
 SECRET_KEY = 'django-insecure-u5_r=pekio0@zt!y(kgbufuosb9mddu8*qeejkzj@=7uyvb392'
 
 DEBUG = True
@@ -79,16 +77,21 @@ WSGI_APPLICATION = 'dj_flow.wsgi.application'
 TIME_ZONE = "Asia/Shanghai"
 CELERY_TIMEZONE = 'Asia/Shanghai'
 LANGUAGE_CODE = "zh-hans"
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+if os.getenv("dockerrun", "yes") == "yes":
+    REDIS_HOST = "redis"
+    MYSQL_HOST = "db"
+else:
+    REDIS_HOST = "127.0.0.1"
+    MYSQL_HOST = "127.0.0.1"
 
+BROKER_URL = f"redis://{REDIS_HOST}:6379/4"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "bomboo",  # noqa
-        " USER": "root",
+        "USER": "root",
         "PASSWORD": "123456",
-        "HOST": "localhost",
+        "HOST": MYSQL_HOST,
         "PORT": "3306",
         # 单元测试 DB 配置，建议不改动
         "TEST": {"NAME": "test_db", "CHARSET": "utf8", "COLLATION": "utf8_general_ci"},
@@ -98,7 +101,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         # 定义django中redis的位置,指定用redis的dbs
-        "LOCATION": "redis://127.0.0.1:6379/0",
+        "LOCATION": f"redis://{REDIS_HOST}:6379/0",
         "OPTIONS": {
             # django使用redis的默认客户端来进行操作.
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -128,8 +131,8 @@ USE_L10N = True
 USE_TZ = False
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
+# STATIC_ROOT = 'static'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # noqa
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 IS_USE_CELERY = True
@@ -178,4 +181,3 @@ try:
     from local_settings import *  # noqa
 except ImportError:
     pass
-

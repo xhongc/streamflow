@@ -11,7 +11,8 @@ eventlet==0.33.0
 greenlet==1.1.2
 Mako==1.1.6
 MarkupSafe==2.0.1
-mysqlclient==1.4.4
+mysqlclient==2.1.1
+prometheus-client==0.8.0
 python-dateutil==2.8.2
 PyYAML==6.0
 redis==3.5.3
@@ -33,4 +34,3 @@ future==0.18.3
 django-crispy-forms==1.10.0
 django-reversion==3.0.5
 httplib2==0.21.0
-prometheus-client==0.9.0

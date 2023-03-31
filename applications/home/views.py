@@ -1,6 +1,7 @@
 import random
 
 import redis
+from django.conf import settings
 from django.shortcuts import render
 from rest_framework.response import Response
 
@@ -16,7 +17,7 @@ from django.core.cache import cache
 def stream(request):
     def event_stream():
         while True:
-            pool = redis.ConnectionPool(host="127.0.0.1", password="", port=6379, db=0)
+            pool = redis.ConnectionPool(host=settings.REDIS_HOST, password="", port=6379, db=0)
             r = redis.Redis(connection_pool=pool)
             res = r.get("localhost_monitor")
             if res:
