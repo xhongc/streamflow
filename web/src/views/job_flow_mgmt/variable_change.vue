@@ -4,7 +4,7 @@
             <bk-form-item label="变量表名:" :error-display-type="'normal'" :required="true" :property="'name'">
                 <bk-input v-model="form.name" :disabled="disabled"></bk-input>
             </bk-form-item>
-            <bk-form-item label="描述:">
+            <bk-form-item label="描述:" :required="true">
                 <bk-input v-model="form.description" :disabled="disabled"></bk-input>
             </bk-form-item>
             <bk-form-item>
@@ -23,7 +23,7 @@
                     </bk-table-column>
                     <bk-table-column label="变量名" prop="name" :show-overflow-tooltip="true" align="center">
                         <template slot-scope="props">
-                            <bk-input v-model="props.row.name" v-if="props.row.edit"></bk-input>
+                            <bk-input v-model="props.row.name" v-if="props.row.edit" :placeholder="'请输入变量名, ${变量}'"></bk-input>
                             <span v-else>{{props.row.name}}</span>
                         </template>
                     </bk-table-column>

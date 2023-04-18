@@ -56,8 +56,8 @@ class HttpRequestService(Service, ServiceMixin):
         _result_content = ""
         inputs = node_info["inputs"]
         try:
-            headers = self.parse_headers(inputs["header"])
-            inputs["body"] = try_json(inputs["body"])
+            headers = try_json(inputs["header"].replace("\r", "").replace("\n", ""))
+            inputs["body"] = try_json(inputs["body"].replace("\r", "").replace("\n", ""))
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
             res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=int(inputs["timeout"]),
                                    verify=False,
