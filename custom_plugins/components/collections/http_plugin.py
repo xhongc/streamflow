@@ -57,7 +57,18 @@ class HttpRequestService(Service, ServiceMixin):
         inputs = node_info["inputs"]
         try:
             headers = try_json(inputs["header"].replace("\r", "").replace("\n", ""))
+        except Exception as e:
+            _result_sign = False
+            _result_content = "headers解析错误！" + str(e)
+            return _result_sign, _result_content
+
+        try:
             inputs["body"] = try_json(inputs["body"].replace("\r", "").replace("\n", ""))
+        except Exception as e:
+            _result_sign = False
+            _result_content = "body解析错误！" + str(e)
+            return _result_sign, _result_content
+        try:
             req_data = [{"params": inputs["body"]}, {"json": inputs["body"]}][inputs["method"] != "get"]
             res = requests.request(inputs["method"], url=inputs["url"], headers=headers, timeout=int(inputs["timeout"]),
                                    verify=False,
@@ -70,7 +81,7 @@ class HttpRequestService(Service, ServiceMixin):
 
         except Exception as e:
             _result_sign = False
-            _result_content = str(e)
+            _result_content = "request请求失败！"+ str(e)
         finally:
             return _result_sign, _result_content
 

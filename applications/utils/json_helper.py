@@ -7,6 +7,6 @@ def try_json(val):
             val = json.loads(val)
             return val
         except Exception:
-            raise Exception("json序列化失败")
+            raise Exception(f"{val}::json序列化失败")
     else:
         return val
