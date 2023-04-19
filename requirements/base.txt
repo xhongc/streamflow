@@ -8,7 +8,7 @@ django-mysql==3.8.1
 django-timezone-field==4.2.3
 djangorestframework==3.8.1
 eventlet==0.33.0
-greenlet==1.1.2
+greenlet==2.0.2
 Mako==1.1.6
 MarkupSafe==2.0.1
 mysqlclient==2.1.1

@@ -81,7 +81,7 @@ class HttpRequestService(Service, ServiceMixin):
 
         except Exception as e:
             _result_sign = False
-            _result_content = "request请求失败！"+ str(e)
+            _result_content = "request请求失败！" + str(e)
         finally:
             return _result_sign, _result_content
 

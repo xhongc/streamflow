@@ -7,6 +7,8 @@ services:
       dockerfile: ./compose/local/django/Dockerfile
     image: stremflow
     container_name: stremflow
+    environment:
+      dockerrun: yes
     depends_on:
       - redis
       - db
@@ -20,6 +22,8 @@ services:
     <<: *django
     image: stremflow_celeryworker
     container_name: stremflow_celeryworker
+    environment:
+      dockerrun: yes
     ports: []
     depends_on:
       - redis
@@ -30,6 +34,8 @@ services:
     <<: *django
     image: stremflow_celerybeat
     container_name: stremflow_celerybeat
+    environment:
+      dockerrun: yes
     ports: []
     depends_on:
       - redis
@@ -40,6 +46,8 @@ services:
     <<: *django
     image: stremflow_flower
     container_name: stremflow_flower
+    environment:
+      dockerrun: yes
     ports:
       - "5555:5555"
     depends_on:

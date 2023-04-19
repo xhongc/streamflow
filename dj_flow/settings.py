@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'dj_flow.wsgi.application'
 TIME_ZONE = "Asia/Shanghai"
 CELERY_TIMEZONE = 'Asia/Shanghai'
 LANGUAGE_CODE = "zh-hans"
-if os.getenv("dockerrun", "yes") == "yes":
+if os.getenv("dockerrun", "no") == "yes":
     REDIS_HOST = "redis"
     MYSQL_HOST = "db"
 else:
