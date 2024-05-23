@@ -47,7 +47,9 @@ python manage.py runserver
 ![img_2.png](img_2.png)
 ![img.png](img.png)
 ## 💬 Contact me
+商业合作，技术交流，问题反馈，功能需求，欢迎联系我。
+
 各位大佬有什么意见需求可以加Q群交流
-<div style="width: 300px;height: 300px;">
+<div style="width: 200px;height: 200px;">
     <img src="./WechatIMG176.jpeg" alt="各位大佬有什么意见需求可以加Q群交流"/>
 </div>
